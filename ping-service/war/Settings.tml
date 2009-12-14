@@ -1,0 +1,37 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+	<head>
+		<title>Settings - Ping Service</title>
+		<link rel="stylesheet" type="text/css" href="/css/all.css" />
+		<link rel="icon" type="image/png" href="/favicon.png" />
+	</head>
+	<body>
+		<t:topbar />
+
+		<h2>Settings</h2>
+
+		<font color="${messageColor}">
+			<p>${message}</p>
+		</font>
+
+		<div align="center">
+			<t:form>
+				<table>
+					<tr>
+						<td>Time Zone:</td>
+						<td>
+							<t:select t:id="timeZone" model="timeZoneModel"
+								value="userAccount.timeZoneCity" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" colspan="2">
+							<t:submit value="Save" />
+						</td>
+					</tr>
+				</table>
+			</t:form>
+		</div>
+
+		<t:footer />
+	</body>
+</html>

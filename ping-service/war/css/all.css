@@ -1,0 +1,19 @@
+body, table, tr, td, input, textarea {
+	font-family: Arial, Sans-Serif;
+	font-size: 13px;
+}
+
+h2 {
+	margin-top: 0px;
+}
+
+.topbar {
+	display: inline; 
+	float: right;
+	margin-top: -4px;
+}
+
+a.external {
+	background: transparent url(../images/external.png) no-repeat scroll right center;
+	padding-right: 13px; 
+}

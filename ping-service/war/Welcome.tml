@@ -1,0 +1,23 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+    <head>
+        <title>Welcome to Ping Service</title>
+        <link rel="stylesheet" type="text/css" href="/css/all.css" />
+		<link rel="icon" type="image/png" href="/favicon.png" /> 
+    </head>
+    <body>
+
+		<h3>Welcome to Ping Service!</h3>
+
+		<p>You can <a href="${startURL}">start using the service</a> right now.</p> 
+		
+		<p>
+			Use your Google Account to login. 
+			<br/>
+			If you don't have Google Account yet, you can easily create one here.
+		</p>
+
+		<p>You also may find helpful our <t:pagelink page="help">Quick Start Guide</t:pagelink>.</p>
+
+		<t:footer/>
+    </body>
+</html>

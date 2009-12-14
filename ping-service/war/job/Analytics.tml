@@ -1,0 +1,61 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<head>
+    <title>Job Analytics - Ping Service</title>
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+	<link rel="icon" type="image/png" href="/favicon.png" /> 
+    <link rel="stylesheet" type="text/css" href="/assets/css/cube.css" />
+    <link rel="stylesheet" type="text/css" href="/css/analytics.css" />
+    <script type="text/javascript" src="/assets/js/jquery-1.3.2.js"></script>
+    <script type="text/javascript" src="/assets/js/cube.js"></script>
+    <!--[if IE]><script language="javascript" type="text/javascript" src="excanvas.js"></script><![endif]--> 
+    <script type="text/javascript" src="/js/jquery.flot.js"></script>
+    <script type="text/javascript" src="/js/analytics.js"></script>
+</head>
+<body>
+	<t:topbar/>
+	
+   	<h2>Analytics Workspace</h2>
+   	
+   	<p>for ${job.titleFriendly}</p>
+   	
+   	<font color="red"><p>${message}</p></font>
+
+	<p>
+	<t:form>
+		View: <t:select t:id="view" model="viewModel" value="view"/>
+		<t:submit value="Show" />
+		&#160;
+		<a href="javascript:collapseAll();">Collapse All</a>&#160;
+		<a href="javascript:collapseOne();">&#xAB; Less</a>&#160;
+		<a href="javascript:expandOne();">More &#xBB;</a>&#160;
+		<a href="javascript:expandAll();">Expand All</a>
+		<p>
+			<a href="/feedback?subject=Request for custom View">Need more views? Send a request (it's free)</a>
+		</p>
+	</t:form>
+	</p>
+   	
+   	<table>
+	   	<tr valign="top">
+		   	<td>
+		   		<t:outputraw value="cubeHTML" />
+				<p>   	
+			 	    Download raw data in 
+					<t:actionlink t:id="exportCSV">CSV</t:actionlink>
+					for analysis.
+				</p>
+		   	</td>
+		   	<td align="center" style="padding-left: 50px;">
+		   		<div style="width: 500px; height: 300px;" id="chart"/>
+		   	</td>
+	   	</tr>
+   	</table>
+   	
+   	
+   	<script type="text/javascript">
+   		collapseAll();
+   	</script>
+   	
+	<t:footer/>
+</body>
+</html>

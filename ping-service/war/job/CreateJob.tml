@@ -1,0 +1,63 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<head>
+    <title>Create Job - Ping Service</title>
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+    <link rel="stylesheet" type="text/css" href="/css/job.css" />
+	<link rel="icon" type="image/png" href="/favicon.png" /> 
+</head>
+<body>
+	<t:topbar/>
+
+   	<h2>Create Job</h2>
+   	
+   	<font color="red"><p>${message}</p></font>
+   	
+   	<t:form>
+		<t:errors/>
+	
+		<div class="t-beaneditor">
+			<t:beaneditor object="job" 
+				reorder="title, pingURL, cronString, usesValidatingHttpCode, validatingHttpCode, usesValidatingRegexp, validatingRegexp, responseEncoding, reportEmail"
+				exclude="titleFriendly, shortenURL, id, lastPingTimestamp, lastPingResult, lastPingDetails">
+	
+				<t:parameter name="cronString">
+					<t:label for="cronString"/>
+					<t:select t:id="cronString" model="cronStringModel" value="job.cronString"/>
+					&#8194;
+					<a href="/feedback?subject=Request for custom Cron string">Need more? Send a request (it's free)</a>
+				</t:parameter>
+				
+				<t:parameter name="validatingHttpCode">
+					<t:label for="validatingHttpCode"/>
+					<t:select t:id="validatingHttpCode" model="httpCodesModel" value="job.validatingHttpCode"/>
+					&#8194;
+					<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html" target="_blank">HTTP/1.1: Status Code Definitions</a>
+				</t:parameter>
+				
+				<t:parameter name="responseEncoding">
+					<t:label for="responseEncoding"/>
+					<t:textfield t:id="responseEncoding" value="job.responseEncoding"/>
+					&#8194;
+					<a href="http://java.sun.com/j2se/1.5.0/docs/guide/intl/encoding.doc.html" target="_blank">Supported Encodings</a>
+				</t:parameter>
+				
+				<t:parameter name="validatingRegexp">
+					<span>Validating Regexp:</span>
+					<t:textfield t:id="validatingRegexp" value="job.validatingRegexp" />
+					&#8194;
+					<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html" target="_blank">Java Regexp Reference</a>
+					&#160;
+					<a href="/feedback?subject=Need help on regexp">Need help? Ask an expert (it's free)</a>
+				</t:parameter>
+									
+			</t:beaneditor>
+			<div class="t-beaneditor-row">
+					<input type="submit" value="Create"/>&#160;
+					<a t:type="pagelink" t:page="index" href="#">Return</a>
+				</div>
+			</div>
+ 	</t:form>
+ 	
+	<t:footer/>
+</body>
+</html>

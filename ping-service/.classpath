@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jar-dependencies-assembly"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/cubics-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/cubics-renders"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/cubics-core-1.0.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/cubics-renders-1.0.0.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry-core-5.2.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry-ioc-5.2.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry-spring-5.2.0-SNAPSHOT.jar" sourcepath="C:/dev/src/tapestry5/tapestry-spring"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry5-annotations-5.2.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/log4j-1.2.14.jar"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
+	<classpathentry kind="output" path="war/WEB-INF/classes"/>
+</classpath>

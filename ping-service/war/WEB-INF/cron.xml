@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
+  <cron>
+    <url>/cron/?schedule=every%205%20minutes&amp;secretKey=secret</url>
+    <description>Ping every 5 minutes</description>
+    <schedule>every 5 minutes</schedule>
+  </cron>
+  <cron>
+    <url>/cron/?schedule=every%2015%20minutes&amp;secretKey=secret</url>
+    <description>Ping every 15 minutes</description>
+    <schedule>every 15 minutes</schedule>
+  </cron>
+  <cron>
+    <url>/cron/?schedule=every%2030%20minutes&amp;secretKey=secret</url>
+    <description>Ping every 30 minutes</description>
+    <schedule>every 30 minutes</schedule>
+  </cron>
+  <cron>
+    <url>/cron/?schedule=every%201%20hours&amp;secretKey=secret</url>
+    <description>Ping every 1 hours</description>
+    <schedule>every 1 hours</schedule>
+  </cron>
+</cronentries>

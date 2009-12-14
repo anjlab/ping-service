@@ -1,0 +1,160 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<head>
+	<title>Help - Ping Service</title>
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+    <link rel="stylesheet" type="text/css" href="/css/help.css" />
+	<link rel="icon" type="image/png" href="/favicon.png" /> 
+</head>
+<body>
+	<t:topbar />
+
+	<h2>Ping Service Help</h2>
+
+	<h3>Quick Start Guide</h3>
+
+	<p>Ping Service can ping your sites to check whether they healthy or not.</p>
+
+	<p>In Ping Service you create jobs in order to do this.</p>
+	
+	<p>You can create job on <t:pagelink page="index">jobs</t:pagelink> page by 
+		clicking <t:pagelink page="job/create">Create Job...</t:pagelink>.</p>
+		
+	<p><em>Create Job</em> page allows you to specify the details of your job, like what is your site's address and how to validate its healthy state.</p>
+	
+		<p>Job parameters with brief descriptions are listed below.</p>
+
+	<table class="params" cellpadding="0" cellspacing="0">
+		<tr>
+			<th>Parameter</th>
+			<th>Default Value</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td>Title (recommended)</td>
+			<td>&#160;</td>
+			<td>
+				Any descriptive title for the job (will appear in jobs grid and
+				email notifications)
+			</td>
+		</tr>
+		<tr>
+			<td>Ping URL (required)</td>
+			<td>&#160;</td>
+			<td>
+				Ping URL is your site's URL, e.g.:
+				<a href="http://anjlab.com" target="_blank">http://anjlab.com</a>
+				
+				<p>Note that your site will have to respond in less than 10 seconds. 
+				We can't wait longer, sorry.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>Cron String (required)</td>
+			<td>every 1 hours</td>
+			<td>
+				<p>Cron String allows you to specify how frequent Ping Service will
+					check your URL. There are only three options available for now:</p>
+				<ul type="circle">
+					<li>every 1 hours</li>
+					<li>every 30 minutes</li>
+					<li>every 15 minutes</li>
+				</ul>
+				<p>
+					In general, this could be any valid
+					<a href="http://code.google.com/intl/ru/appengine/docs/java/config/cron.html#The_Schedule_Format" target="_blank">Cron expression</a>.
+					If you need some custom option which isn't in this list,
+					feel free to contact us using
+					<a href="/feedback?subject=Request for custom Cron string">the Feedback form</a>.
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td>Use Validating HTTP Code (recommended)</td>
+			<td>On</td>
+			<td>Check this on if you want Ping Service validate your site
+				against HTTP response code.</td>
+		</tr>
+
+		<tr>
+			<td>Validating HTTP Code</td>
+			<td>2xx Successful</td>
+			<td>
+				<p>
+				Validating HTTP Code is the HTTP response code of your site in a
+				healthy state. If you don't know what value should be set, the default
+				value (which is <em>2xx Successful</em>) should be okay for you.
+				</p>
+				<p>
+				Codes 1xx, 2xx, etc. will match any code from corresponding group
+				values. For instance, <em>HTTP 404</em> response will match <em>4xx Client Error</em>
+				validating code. </p>
+				<p>
+				For complete list of HTTP codes see
+				<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+					target="_blank">HTTP/1.1: Status Code Definitions</a>.
+				</p>
+			</td>
+		</tr>
+
+		<tr>
+			<td>Use Validating Regexp</td>
+			<td>&#160;</td>
+			<td>
+				Choose this option if you want to check the response content of your
+				site against a Regular expression.
+			</td>
+		</tr>
+		<tr>
+			<td>Validating Regexp</td>
+			<td>&#160;</td>
+			<td>
+				Validating Regexp is a regexp to validate HTTP response on.
+				<p>
+				I.e., if you want to verify that (HTML) response of your
+				site's URL contains string "I'm okay", you should write "I'm okay"
+				into this field.
+				</p>
+				<p>
+				This is the simplest use case. Regular expressions allow you to specify
+				much more complex conditions.
+				</p>
+				<p>
+				For more information on supported Regexp syntax please refer to
+				<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html"
+					target="_blank">Java documentation</a>.
+				</p>
+			</td>
+		</tr>
+
+		<tr>
+			<td>Response Encoding</td>
+			<td>UTF-8</td>
+			<td>
+				Response Encoding is a response encoding of your site.
+				<p>
+				For complete list of supported encodings see
+				<a
+					href="http://java.sun.com/j2se/1.5.0/docs/guide/intl/encoding.doc.html"
+					target="_blank">Java encodings reference page</a>.
+				</p>
+			</td>
+		</tr>
+
+		<tr>
+			<td>Report Email</td>
+			<td>Your Google Account's email</td>
+			<td>
+				Reporting Email is an email for job's status notifications.
+				<p>
+				Note that you'll only get notified when something went wrong with
+				your site or when the site is returned back to a healthy state.
+				You can check your jobs' last ping status any time from
+				<t:pagelink page="index">the Jobs</t:pagelink>
+				page.</p>
+			</td>
+		</tr>
+	</table>
+	
+	<t:footer/>
+</body>
+</html>

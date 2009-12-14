@@ -1,0 +1,12 @@
+
+/.metadata
+/jar-dependencies-assembly/.classpath
+/jar-dependencies-assembly/.project
+/jar-dependencies-assembly/target
+/google-appengine-plugin-1.2.x-hacks/.settings
+/google-appengine-plugin-1.2.x-hacks/bin
+/ping-service/.settings
+/ping-service/war/WEB-INF/appengine-generated
+/ping-service/war/WEB-INF/classes
+/ping-service/war/WEB-INF/lib/*.jar
+

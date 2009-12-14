@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/shared/appengine-local-runtime-shared.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/shared/geronimo-el_1.0_spec-1.0.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/shared/geronimo-jsp_2.1_spec-1.0.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/shared/geronimo-servlet_2.5_spec-1.2.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/shared/jsp/repackaged-appengine-ant-1.6.5.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/shared/jsp/repackaged-appengine-ant-launcher-1.6.5.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/shared/jsp/repackaged-appengine-commons-el-1.0.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/shared/jsp/repackaged-appengine-commons-logging-1.1.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/shared/jsp/repackaged-appengine-jasper-compiler-5.0.28.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/shared/jsp/repackaged-appengine-jasper-runtime-5.0.28.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/user/appengine-api-1.0-sdk-1.2.6.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/user/appengine-api-labs-1.2.6.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/user/orm/datanucleus-appengine-1.0.3.jar" sourcepath="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/src/orm/datanucleus-appengine-1.0.3-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/user/orm/datanucleus-core-1.1.5.jar" sourcepath="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/src/orm/datanucleus-core-1.1.5-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/user/orm/datanucleus-jpa-1.1.5.jar" sourcepath="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/src/orm/datanucleus-jpa-1.1.5-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/user/orm/geronimo-jpa_3.0_spec-1.1.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/user/orm/geronimo-jta_1.1_spec-1.1.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/user/orm/jdo2-api-2.3-eb.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/appengine-tools-api.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/docs/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/dev/bin/eclipse-reporting-galileo/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.2.6.v200910131704/appengine-java-sdk-1.2.6/lib/agent/appengine-agent.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

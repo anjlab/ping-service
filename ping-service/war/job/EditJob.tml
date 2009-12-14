@@ -1,0 +1,88 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<head>
+    <title>Edit Job - Ping Service</title>
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+    <link rel="stylesheet" type="text/css" href="/css/job.css" />
+	<link rel="icon" type="image/png" href="/favicon.png" /> 
+</head>
+<body>
+	<t:topbar/>
+	
+   	<h2>Edit Job</h2>
+   	
+   	<font color="red"><p>${message}</p></font>
+   	
+   	<t:form>
+		<t:errors/>
+	
+		<div class="t-beaneditor">
+			<t:beaneditor object="job" 
+				reorder="title, pingURL, cronString, usesValidatingHttpCode, validatingHttpCode, usesValidatingRegexp, validatingRegexp, responseEncoding, reportEmail, lastPingSummary, availabilityPercent, statusCounter, lastPingDetails"
+				exclude="shortenURL, titleFriendly, id, lastPingResult, lastPingTimestamp"
+				add="availabilityPercent, statusCounter, lastPingSummary"
+				submitLabel="Apply Edit">
+				
+				<t:parameter name="cronString">
+					<t:label for="cronString"/>
+					<t:select t:id="cronString" model="cronStringModel" value="job.cronString"/>
+					&#8194;
+					<a href="/feedback?subject=Request for custom Cron string">Need more? Send a request (it's free)</a>
+				</t:parameter>
+				
+				<t:parameter name="validatingHttpCode">
+					<t:label for="validatingHttpCode"/>
+					<t:select t:id="validatingHttpCode" model="httpCodesModel" value="job.validatingHttpCode"/>
+					&#8194;
+					<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html" target="_blank">HTTP/1.1: Status Code Definitions</a>
+				</t:parameter>
+				
+				<t:parameter name="lastPingSummary">
+					<span>Last Ping Summary:</span>
+					<t:outputRaw t:id="lastPingSummary" value="lastPingSummary" />
+				</t:parameter>
+				
+				<t:parameter name="availabilityPercent">
+					<span>Availability:</span>
+					<t:outputRaw t:id="availabilityPercent" value="job.availabilityPercent" />
+				</t:parameter>
+
+				<t:parameter name="statusCounter">
+					<span>Status Counter / Prev / Total / OK:</span>
+					<t:outputRaw t:id="statusCounter" value="job.statusCounter" /> /
+					<t:outputRaw t:id="previousStatusCounter" value="job.previousStatusCounter" /> /
+					<t:outputRaw t:id="totalStatusCounter" value="job.totalStatusCounter" /> /
+					<t:outputRaw t:id="totalSuccessStatusCounter" value="job.totalSuccessStatusCounter" />
+				</t:parameter>
+				
+				<t:parameter name="responseEncoding">
+					<t:label for="responseEncoding"/>
+					<t:textfield t:id="responseEncoding" value="job.responseEncoding"/>
+					&#8194;
+					<a href="http://java.sun.com/j2se/1.5.0/docs/guide/intl/encoding.doc.html" target="_blank">Supported Encodings</a>
+				</t:parameter>
+				
+				<t:parameter name="validatingRegexp">
+					<span>Validating Regexp:</span>
+					<t:textfield t:id="validatingRegexp" value="job.validatingRegexp" />
+					&#8194;
+					<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html" target="_blank">Java Regexp Reference</a>
+					&#160;
+					<a href="/feedback?subject=Need help on regexp">Need help? Ask an expert (it's free)</a>
+				</t:parameter>
+				
+				<t:parameter name="lastPingDetails">
+					<t:label for="lastPingDetails"/>
+					<t:textarea t:id="lastPingDetails" value="job.lastPingDetails" readOnly="true" />
+				</t:parameter>
+		
+			</t:beaneditor>
+			<div class="t-beaneditor-row">
+					<input type="submit" value="Apply"/>&#160;
+					<a t:type="pagelink" t:page="index" href="#">Return</a>
+				</div>
+			</div>
+ 	</t:form>
+
+	<t:footer/>
+</body>
+</html>

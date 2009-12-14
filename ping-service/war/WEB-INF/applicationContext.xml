@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/tx 
+       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+       http://www.springframework.org/schema/aop 
+       http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+     
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="*" propagation="REQUIRES_NEW" />
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config>
+		<aop:pointcut id="daoOperations" 
+			expression="execution(* dmitrygusev.ping.services.dao.*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="daoOperations" />
+	</aop:config>
+
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean"
+		lazy-init="true">
+		<property name="persistenceUnitName" value="transactions-optional" />
+	</bean>
+	
+	<bean name="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<context:annotation-config/>
+
+	<bean name="jobsDAO" class="dmitrygusev.ping.services.dao.impl.JobDAOImpl"/>
+	<bean name="refDAO" class="dmitrygusev.ping.services.dao.impl.RefDAOImpl"/>
+	<bean name="accountDAO" class="dmitrygusev.ping.services.dao.impl.AccountDAOImpl"/>
+	<bean name="scheduleDAO" class="dmitrygusev.ping.services.dao.impl.ScheduleDAOImpl"/>
+	<bean name="jobResultDAO" class="dmitrygusev.ping.services.dao.impl.JobResultDAOImpl"/>
+	
+</beans>

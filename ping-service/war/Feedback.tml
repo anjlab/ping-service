@@ -1,0 +1,34 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<head>
+    <title>Feedback - Ping Service</title>
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+    <link rel="stylesheet" type="text/css" href="/css/feedback.css" />
+	<link rel="icon" type="image/png" href="/favicon.png" /> 
+</head>
+<body>
+	<t:topbar />
+
+	<h2>Ping Service Feedback</h2>
+
+	<div align="center">
+	<font color="green" weight="bold"><p>${thanks}</p></font>
+	<t:form>
+		<table>
+		<tr>
+			<td><t:label for="subject">Subject:</t:label></td> 
+			<td><t:textfield t:id="subject" value="subject" validate="required" size="50" /></td>
+		</tr>
+		<tr>
+			<td valign="top"><t:label for="message">Message:</t:label></td> 
+			<td><t:textarea t:id="message" value="message" validate="required"/></td>
+		</tr>
+		<tr>
+			<td colspan="2" align="right"><t:submit value="Send Feedback"/></td>
+		</tr>
+		</table>
+	</t:form>
+	</div> 
+
+	<t:footer/>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<head>
+	<title>Ping Service</title>
+	<link rel="stylesheet" type="text/css" href="/css/all.css" />
+	<link rel="icon" type="image/png" href="/favicon.png" /> 
+</head>
+<body>
+	<t:topbar />
+
+	<table width="100%" cellspacing="0" cellpadding="0" style="padding-bottom: 20px;">
+		<tr>
+			<td width="250">
+		   		<h2>Scheduled Jobs</h2>
+		   		
+		   		<p>
+		   			<t:pagelink page="job/create">Create job...</t:pagelink>
+		   		</p>
+			</td>
+			<td align="center" valign="middle">
+		   		<font color="${messageColor}"><p>${message}</p></font>
+
+				<t:form t:id="sendInvite" autofocus="false">
+					<t:label for="friendEmail">Tell a friend about Ping Service (email):</t:label>&#160;
+					<t:textfield t:id="friendEmail" value="friendEmail" validate="required, email" />&#160;
+					<t:submit value="Send Invite" />
+				</t:form>
+				You may also want to <t:pagelink page="feedback">provide a feedback</t:pagelink>
+			</td>
+		</tr>
+	</table>
+	
+    <t:grid empty="No jobs" source="jobs" row="job"
+       	reorder="scheduledBy, pingURL, cronString, edit, analytics, validationSummary, lastPingSummary, statusCounter"
+       	exclude="availabilityPercent, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, titleFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp"
+       	add="edit, delete, analytics">
+
+		<t:parameter name="lastPingSummaryCell">
+			<div>${lastPingSummary}</div>
+		</t:parameter>
+		
+		<t:parameter name="statusCounterCell">
+			<div align="center">${job.availabilityPercent} / ${job.statusCounter}</div>
+		</t:parameter>
+		
+		<t:parameter name="pingURLCell">
+			<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank">${job.titleFriendly}</a>
+		</t:parameter>
+
+       	<t:parameter name="analyticsCell">
+       		<t:pagelink t:id="analytics" page="job/analytics" context="jobContext">Analyze</t:pagelink>
+       	</t:parameter>
+
+       	<t:parameter name="editCell">
+       		<t:pagelink t:id="edit" page="job/edit" context="jobContext">Edit</t:pagelink>
+       	</t:parameter>
+
+       	<t:parameter name="deleteCell">
+       		<t:actionlink t:id="deleteJob" context="jobContext">Delete</t:actionlink>
+       	</t:parameter>
+
+    </t:grid>
+
+	<h4>Users you're sharing your schedule with</h4>
+
+	<p>
+		<t:form t:id="grantAccessTo" autofocus="false">
+			<t:label for="email">Grant access to your schedule (email):</t:label> 
+			<t:textfield t:id="email" value="grantedEmail" validate="email, required" size="35" />
+			<t:checkbox t:id="readOnly" value="readonly"/><t:label for="readOnly"/>&#160;
+			<t:submit value="Grant"/>
+		</t:form>
+	</p>
+
+    <t:grid empty="ACL is empty" source="accounts" row="account"
+       	reorder="email, refAccessType" 
+       	exclude="id" add="delete">
+	       	<t:parameter name="deleteCell">
+	       		<t:if test="deleteAccountLinkEnabled">
+	       			<t:actionlink t:id="removeAccount" context="account.id">Delete</t:actionlink>
+	       		</t:if>
+	       	</t:parameter>
+    	</t:grid>
+
+	<t:footer/>
+</body>
+</html>
