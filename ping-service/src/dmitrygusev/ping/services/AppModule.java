@@ -208,4 +208,13 @@ public class AppModule
     
       configuration.add(AppSessionCache.class, new ApplicationStateContribution("session", creator));
     }
+    
+    public void contributeRegexAuthorizer(Configuration<String> regex)
+    {
+    	String pathPattern = "([^/.]+/)*[^/.]+\\.((css)|(js)|(jpg)|(jpeg)|(png)|(gif))$";
+    	regex.add("^anjlab/cubics/css/" + pathPattern);
+    	regex.add("^anjlab/cubics/images/" + pathPattern);
+    	regex.add("^anjlab/cubics/js/" + pathPattern);
+    	regex.add("^anjlab/cubics/js/jquery-1.3.2.js");
+    }
 } 

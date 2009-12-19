@@ -11,7 +11,6 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/cubics-renders-1.0.0.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry-core-5.2.0-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry-ioc-5.2.0-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry-spring-5.2.0-SNAPSHOT.jar" sourcepath="C:/dev/src/tapestry5/tapestry-spring"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry5-annotations-5.2.0-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/log4j-1.2.14.jar"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/App Engine (1)"/>
