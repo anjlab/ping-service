@@ -3,54 +3,42 @@
 
  Содержимое папки c:\dev\workspaces\ping-service\ping-service\war\WEB-INF\lib
 
-14.12.2009  23:09    <DIR>          .
-14.12.2009  23:09    <DIR>          ..
+20.12.2009  01:49    <DIR>          .
+20.12.2009  01:49    <DIR>          ..
 28.10.2009  11:09           116 205 antlr-runtime-3.1.1.jar
 26.07.2007  17:08             4 467 aopalliance-1.0.jar
-28.10.2009  23:10         8 852 258 appengine-api-1.0-sdk-1.2.6.jar
-28.10.2009  23:10           542 372 appengine-api-labs-1.2.6.jar
+20.12.2009  00:21         9 262 117 appengine-api-1.0-sdk-1.3.0.jar
+20.12.2009  00:21           583 552 appengine-api-labs-1.3.0.jar
 19.08.2009  10:37         1 545 023 aspectjweaver-1.6.2.jar
-19.08.2009  10:27            89 582 com.springsource.javax.servlet-2.5.0.jar
-19.08.2009  10:27             4 615 com.springsource.org.aopalliance-1.0.0.jar
-19.08.2009  09:45            61 464 com.springsource.org.apache.commons.logging-1.1.1.jar
-19.06.2007  15:12            46 725 commons-codec-1.3.jar
+24.11.2009  11:27            46 725 commons-codec-1.3.jar
 13.11.2008  15:10            60 686 commons-logging-1.1.1.jar
 14.12.2009  23:09                18 create-filelist.cmd
 01.11.2009  23:42            26 003 cubics-core-1.0.0.jar
-01.11.2009  23:42            49 635 cubics-renders-1.0.0.jar
-28.10.2009  23:10           245 333 datanucleus-appengine-1.0.3.jar
-28.10.2009  23:10         1 933 065 datanucleus-core-1.1.5.jar
-28.10.2009  23:10           152 768 datanucleus-jpa-1.1.5.jar
-14.12.2009  23:25                 0 filelist.txt
-28.10.2009  23:10            52 877 geronimo-jpa_3.0_spec-1.1.1.jar
-28.10.2009  23:10            16 030 geronimo-jta_1.1_spec-1.1.1.jar
+20.12.2009  02:17            49 915 cubics-renders-1.0.0.jar
+20.12.2009  00:21           272 431 datanucleus-appengine-1.0.4.1.final.jar
+20.12.2009  00:21         1 933 065 datanucleus-core-1.1.5.jar
+20.12.2009  00:21           152 768 datanucleus-jpa-1.1.5.jar
+20.12.2009  02:36                 0 filelist.txt
+20.12.2009  00:21            52 877 geronimo-jpa_3.0_spec-1.1.1.jar
+20.12.2009  00:21            16 030 geronimo-jta_1.1_spec-1.1.1.jar
 28.10.2009  11:11           597 476 javassist-3.9.0.GA.jar
-28.10.2009  23:10           192 820 jdo2-api-2.3-eb.jar
+20.12.2009  00:21           192 820 jdo2-api-2.3-eb.jar
 18.06.2007  10:33           367 444 log4j-1.2.14.jar
-28.10.2009  11:14           324 204 org.springframework.aop-3.0.0.RC1.jar
-28.10.2009  11:14            53 074 org.springframework.asm-3.0.0.RC1.jar
-28.10.2009  11:14            18 531 org.springframework.aspects-3.0.0.RC1.jar
-28.10.2009  11:13           548 870 org.springframework.beans-3.0.0.RC1.jar
-28.10.2009  11:14           600 678 org.springframework.context-3.0.0.RC1.jar
-28.10.2009  11:13            99 926 org.springframework.context.support-3.0.0.RC1.jar
-28.10.2009  11:13           344 833 org.springframework.core-3.0.0.RC1.jar
-28.10.2009  11:13           148 835 org.springframework.expression-3.0.0.RC1.jar
-28.10.2009  11:13           373 402 org.springframework.jdbc-3.0.0.RC1.jar
-28.10.2009  11:14           184 205 org.springframework.jms-3.0.0.RC1.jar
-28.10.2009  11:13           330 580 org.springframework.orm-3.0.0.RC1.jar
-28.10.2009  11:13            56 194 org.springframework.oxm-3.0.0.RC1.jar
-28.10.2009  11:13           230 311 org.springframework.transaction-3.0.0.RC1.jar
-28.10.2009  11:14           346 946 org.springframework.web-3.0.0.RC1.jar
-28.10.2009  11:13           174 410 org.springframework.web.portlet-3.0.0.RC1.jar
-28.10.2009  11:14           372 010 org.springframework.web.servlet-3.0.0.RC1.jar
 25.09.2008  17:11            17 384 slf4j-api-1.5.2.jar
 25.09.2008  17:11             9 501 slf4j-log4j12-1.5.2.jar
-19.06.2007  15:12            26 514 stax-api-1.0.1.jar
-28.10.2009  11:09           179 977 stax2-api-3.0.1.jar
-28.10.2009  16:08         1 441 182 tapestry-core-5.2.0-SNAPSHOT.jar
-28.10.2009  16:07           399 708 tapestry-ioc-5.2.0-SNAPSHOT.jar
-28.10.2009  16:08            26 059 tapestry-spring-5.2.0-SNAPSHOT.jar
-28.10.2009  16:07            11 949 tapestry5-annotations-5.2.0-SNAPSHOT.jar
-28.10.2009  11:11           481 111 woodstox-core-asl-4.0.3.jar
-              47 файлов     21 757 260 байт
-               2 папок   4 444 737 536 байт свободно
+20.12.2009  00:53           324 242 spring-aop-3.0.0.RELEASE.jar
+20.12.2009  00:53            53 081 spring-asm-3.0.0.RELEASE.jar
+20.12.2009  00:54           551 967 spring-beans-3.0.0.RELEASE.jar
+20.12.2009  01:43           657 492 spring-context-3.0.0.RELEASE.jar
+20.12.2009  00:53           359 338 spring-core-3.0.0.RELEASE.jar
+20.12.2009  01:43           154 200 spring-expression-3.0.0.RELEASE.jar
+20.12.2009  01:48           381 893 spring-jdbc-3.0.0.RELEASE.jar
+20.12.2009  01:47           330 198 spring-orm-3.0.0.RELEASE.jar
+20.12.2009  01:46           231 660 spring-tx-3.0.0.RELEASE.jar
+20.12.2009  01:45           359 154 spring-web-3.0.0.RELEASE.jar
+20.12.2009  01:08         1 469 362 tapestry-core-5.2.0-SNAPSHOT.jar
+20.12.2009  01:08           407 795 tapestry-ioc-5.2.0-SNAPSHOT.jar
+20.12.2009  01:08            31 308 tapestry-spring-5.2.0-20091218.183947-143.jar
+20.12.2009  01:08            16 591 tapestry5-annotations-5.2.0-SNAPSHOT.jar
+              35 файлов     20 634 788 байт
+               2 папок   5 116 260 352 байт свободно
