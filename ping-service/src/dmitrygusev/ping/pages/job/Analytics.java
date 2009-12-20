@@ -19,6 +19,7 @@ import anjlab.cubics.Cube;
 import anjlab.cubics.FactModel;
 import anjlab.cubics.aggregate.histogram.HistogramAggregateFactory;
 import anjlab.cubics.aggregate.histogram.Range;
+import anjlab.cubics.aggregate.histogram.Histogram.HistogramMergeStrategy;
 import anjlab.cubics.aggregate.pie.PieAggregateFactory;
 import anjlab.cubics.coerce.IntegerCoercer;
 import anjlab.cubics.renders.HtmlRender;
@@ -131,7 +132,9 @@ public class Analytics {
 		model.setDimensions(view.split(" > "));
 		model.setMeasures("responseTime", "succeeded");
 		model.declareCustomAggregate(new PieAggregateFactory<JobResult>(new IntegerCoercer()), "succeeded");
-		model.declareCustomAggregate(new HistogramAggregateFactory<JobResult>(0, end / 10, end), "responseTime");
+		model.declareCustomAggregate(
+				new HistogramAggregateFactory<JobResult>(HistogramMergeStrategy.NumericRanges, 0, end / 10, end), 
+				"responseTime");
 		
 		Cube<JobResult> cube = Cube.createCube(model, results);
 		
