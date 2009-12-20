@@ -19,11 +19,6 @@ public class CronIndex {
 	private PageRenderLinkSource linkSource;
 	
 	public void onActivate() {
-		if (request.getParameter("secretKey") == null ||
-			! request.getParameter("secretKey").equals("secret")) {
-			return;
-		}
-		
 		String cronString = request.getParameter("schedule");
 		
 		if (! Utils.isNullOrEmpty(cronString)) {
