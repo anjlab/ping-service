@@ -65,12 +65,12 @@
 		<dependency>
 			<groupId>anjlab</groupId>
 			<artifactId>cubics-core</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>anjlab</groupId>
 			<artifactId>cubics-renders</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</dependency>
 	</dependencies>
 	<repositories>
