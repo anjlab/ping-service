@@ -41,6 +41,7 @@ public class CreateJob {
 	private Job getDefaultJob() {
 		Job result = new Job();
 		
+		result.setPingURL("http://");
 		result.setReportEmail(gaeHelper.getUserPrincipal().getName());
 		result.setUsesValidatingHttpCode(true);
 		result.setValidatingHttpCode(-200);

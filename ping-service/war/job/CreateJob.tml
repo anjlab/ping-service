@@ -52,10 +52,10 @@
 									
 			</t:beaneditor>
 			<div class="t-beaneditor-row">
-					<input type="submit" value="Create"/>&#160;
-					<a t:type="pagelink" t:page="index" href="#">Return</a>
-				</div>
+				<input type="submit" value="Create"/>&#160;
+				<a t:type="pagelink" t:page="index" href="#">Return</a>
 			</div>
+		</div>
  	</t:form>
  	
 	<t:footer/>

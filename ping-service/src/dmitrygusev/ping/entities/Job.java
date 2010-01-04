@@ -24,7 +24,7 @@ public class Job {
 
 	//	URL to ping
 	@Column(nullable=false)
-	@Validate("required")
+	@Validate("required,regexp=(http://|https://).+")
 	private String pingURL;
 	//	Validating regexp
 	private String validatingRegexp;

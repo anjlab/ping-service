@@ -55,7 +55,8 @@
        	</t:parameter>
 
        	<t:parameter name="deleteCell">
-       		<t:actionlink t:id="deleteJob" context="jobContext">Delete</t:actionlink>
+       		<t:actionlink t:id="deleteJob" context="jobContext" 
+       			onclick="return confirm('Are you sure you want to delete the job and all its statistics?');">Delete</t:actionlink>
        	</t:parameter>
 
     </t:grid>
