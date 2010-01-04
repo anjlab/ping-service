@@ -23,9 +23,16 @@ public class JobResultDAOImpl implements JobResultDAO {
 		em.persist(result);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<JobResult> getResults(Job job) {
+		int maxResults = 0;
+		
+		return getResults(job, maxResults);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<JobResult> getResults(Job job, int maxResults) {
 		List<JobResult> result = new ArrayList<JobResult>();
 		
 		Calendar c = Calendar.getInstance();
@@ -41,10 +48,14 @@ public class JobResultDAOImpl implements JobResultDAO {
 			Query q = em.createQuery(
 					"SELECT r FROM JobResult r " 
 					+ "WHERE r.jobKey = :jobKey AND r.timestamp > :timestamp "
-					+ "ORDER BY r.timestamp ASC").
+					+ "ORDER BY r.timestamp DESC").
 					
 				setParameter("jobKey", job.getKey()).
 				setParameter("timestamp", timestamp);
+			
+			if (maxResults > 0) {
+				q.setMaxResults(maxResults);
+			}
 		
 			result.addAll(q.getResultList());
 			

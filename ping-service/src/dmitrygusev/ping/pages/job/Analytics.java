@@ -119,7 +119,7 @@ public class Analytics {
 	private double end;
 	
 	public String getCubeHTML() {
-		List<JobResult> results = jobResultDAO.getResults(job);
+		List<JobResult> results = jobResultDAO.getResults(job, 1000);
 
 		TimeZone timeZone = application.getTimeZone();
 

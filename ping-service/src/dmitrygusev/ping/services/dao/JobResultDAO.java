@@ -11,4 +11,6 @@ public interface JobResultDAO {
 
 	public List<JobResult> getResults(Job job);
 	
+	public List<JobResult> getResults(Job job, int maxResults);
+	
 }

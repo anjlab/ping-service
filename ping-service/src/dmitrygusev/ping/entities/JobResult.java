@@ -77,7 +77,7 @@ public class JobResult {
 		return getCalendar().get(Calendar.YEAR);
 	}
 	public String getMonth() {
-		return String.format("%02d", getCalendar().get(Calendar.MONTH)) 
+		return String.format("%02d", getCalendar().get(Calendar.MONTH) + 1) 
 			 + " - " 
 		     + getCalendar().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH);
 	}
