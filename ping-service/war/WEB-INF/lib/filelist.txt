@@ -3,26 +3,26 @@
 
  Содержимое папки c:\dev\workspaces\ping-service\ping-service\war\WEB-INF\lib
 
-04.01.2010  21:18    <DIR>          .
-04.01.2010  21:18    <DIR>          ..
+07.01.2010  23:29    <DIR>          .
+07.01.2010  23:29    <DIR>          ..
 28.10.2009  11:09           116 205 antlr-runtime-3.1.1.jar
 26.07.2007  17:08             4 467 aopalliance-1.0.jar
-04.01.2010  21:02         9 262 117 appengine-api-1.0-sdk-1.3.0.jar
-04.01.2010  21:02           583 552 appengine-api-labs-1.3.0.jar
+07.01.2010  15:32         9 262 117 appengine-api-1.0-sdk-1.3.0.jar
+07.01.2010  15:32           583 552 appengine-api-labs-1.3.0.jar
 19.08.2009  10:37         1 545 023 aspectjweaver-1.6.2.jar
 24.11.2009  11:27            46 725 commons-codec-1.3.jar
 13.11.2008  15:10            60 686 commons-logging-1.1.1.jar
 14.12.2009  23:09                18 create-filelist.cmd
-04.01.2010  21:09            39 528 cubics-core-1.0.1.jar
-04.01.2010  21:09            49 985 cubics-renders-1.0.1.jar
-04.01.2010  21:02           272 431 datanucleus-appengine-1.0.4.1.final.jar
-04.01.2010  21:02         1 933 065 datanucleus-core-1.1.5.jar
-04.01.2010  21:02           152 768 datanucleus-jpa-1.1.5.jar
-04.01.2010  21:21                 0 filelist.txt
-04.01.2010  21:02            52 877 geronimo-jpa_3.0_spec-1.1.1.jar
-04.01.2010  21:02            16 030 geronimo-jta_1.1_spec-1.1.1.jar
+07.01.2010  21:32            39 530 cubics-core-1.0.1.jar
+07.01.2010  21:32            52 078 cubics-renders-1.0.1.jar
+07.01.2010  15:32           272 431 datanucleus-appengine-1.0.4.1.final.jar
+07.01.2010  15:32         1 933 065 datanucleus-core-1.1.5.jar
+07.01.2010  15:32           152 768 datanucleus-jpa-1.1.5.jar
+07.01.2010  23:29                 0 filelist.txt
+07.01.2010  15:32            52 877 geronimo-jpa_3.0_spec-1.1.1.jar
+07.01.2010  15:32            16 030 geronimo-jta_1.1_spec-1.1.1.jar
 28.10.2009  11:11           597 476 javassist-3.9.0.GA.jar
-04.01.2010  21:02           192 820 jdo2-api-2.3-eb.jar
+07.01.2010  15:32           192 820 jdo2-api-2.3-eb.jar
 18.06.2007  10:33           367 444 log4j-1.2.14.jar
 25.09.2008  17:11            17 384 slf4j-api-1.5.2.jar
 25.09.2008  17:11             9 501 slf4j-log4j12-1.5.2.jar
@@ -36,9 +36,9 @@
 20.12.2009  01:47           330 198 spring-orm-3.0.0.RELEASE.jar
 20.12.2009  01:46           231 660 spring-tx-3.0.0.RELEASE.jar
 20.12.2009  01:45           359 154 spring-web-3.0.0.RELEASE.jar
-04.01.2010  21:08         1 470 056 tapestry-core-5.2.0-SNAPSHOT.jar
-04.01.2010  21:07           409 180 tapestry-ioc-5.2.0-SNAPSHOT.jar
-04.01.2010  21:08            31 305 tapestry-spring-5.2.0-20100104.090436-155.jar
-04.01.2010  21:07            16 589 tapestry5-annotations-5.2.0-SNAPSHOT.jar
-              35 файлов     20 650 457 байт
-               2 папок   1 162 022 912 байт свободно
+07.01.2010  20:57         1 470 513 tapestry-core-5.2.0-SNAPSHOT.jar
+07.01.2010  20:56           409 181 tapestry-ioc-5.2.0-SNAPSHOT.jar
+07.01.2010  20:57            31 305 tapestry-spring-5.2.0-20100106.090434-157.jar
+07.01.2010  20:56            16 589 tapestry5-annotations-5.2.0-SNAPSHOT.jar
+              35 файлов     20 653 010 байт
+               2 папок   1 626 423 296 байт свободно

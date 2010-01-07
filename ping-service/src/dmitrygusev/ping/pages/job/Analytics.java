@@ -147,8 +147,8 @@ public class Analytics {
 		FactModel<JobResult> model = new FactModel<JobResult>(JobResult.class);
 		
 		model.setDimensions(view.split(" > "));
-		model.setMeasures("responseTime", "succeeded");
-		model.declareCustomAggregate(new PieAggregateFactory<JobResult>(new IntegerCoercer()), "succeeded");
+		model.setMeasures("responseTime", "pingResult");
+		model.declareCustomAggregate(new PieAggregateFactory<JobResult>(new IntegerCoercer()), "pingResult");
 		model.declareCustomAggregate(
 				new HistogramAggregateFactory<JobResult>(HistogramMergeStrategy.NumericRanges, 0, end / 10, end), 
 				"responseTime");
@@ -157,12 +157,13 @@ public class Analytics {
 		
 		HtmlRender<JobResult> render = new HtmlRender<JobResult>(cube);
 		
-		render.getAggregatesOptions("succeeded").
-			reorder("pie-1-%", "count").
-			exclude("min", "max", "sum", "avg", "pie").
-			setFormat("pie-1-%", "%.5f").
-			setLabel("pie-1-%", "avail. %").
-			setLabel("count", "# of pings");
+		render.getAggregatesOptions("pingResult").
+			reorder("pie-" + Job.PING_RESULT_OK + "-%", "count", "pie").
+			exclude("min", "max", "sum", "avg").
+			setFormat("pie-" + Job.PING_RESULT_OK + "-%", "%.5f").
+			setLabel("pie-" + Job.PING_RESULT_OK + "-%", "avail. %").
+			setLabel("count", "# of pings").
+			setLabel("pie", "chart");
 
 		render.getAggregatesOptions("responseTime").
 			reorder("avg").
@@ -171,7 +172,7 @@ public class Analytics {
 		
 		render.getMeasuresOptions().
 			setLabel("responseTime", "Response Time, ms").
-			setLabel("succeeded", "Availability");
+			setLabel("pingResult", "Availability");
 		
 		render.getDimensionsOptions().
 			setLabel("all", "All").
