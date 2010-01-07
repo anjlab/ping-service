@@ -48,8 +48,8 @@ public class AppModule
         // invoking the constructor.
     }
 
-    public static ReportSender buildReportSender(RequestGlobals requestGlobals) {
-    	return new ReportSender(requestGlobals);
+    public static ReportSender buildReportSender(RequestGlobals requestGlobals, Mailer mailer) {
+    	return new ReportSender(requestGlobals, mailer);
     }
     
     public static void contributeIgnoredPathsFilter(Configuration<String> configuration) {

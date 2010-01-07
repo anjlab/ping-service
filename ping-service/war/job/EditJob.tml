@@ -48,10 +48,10 @@
 
 				<t:parameter name="statusCounter">
 					<span>Status Counter / Prev / Total / OK:</span>
-					<t:outputRaw t:id="statusCounter" value="job.statusCounter" /> /
-					<t:outputRaw t:id="previousStatusCounter" value="job.previousStatusCounter" /> /
-					<t:outputRaw t:id="totalStatusCounter" value="job.totalStatusCounter" /> /
-					<t:outputRaw t:id="totalSuccessStatusCounter" value="job.totalSuccessStatusCounter" />
+					<t:outputRaw t:id="statusCounter" value="job.statusCounterFriendly" /> /
+					<t:outputRaw t:id="previousStatusCounter" value="job.previousStatusCounterFriendly" /> /
+					<t:outputRaw t:id="totalStatusCounter" value="job.totalStatusCounterFriendly" /> /
+					<t:outputRaw t:id="totalSuccessStatusCounter" value="job.totalSuccessStatusCounterFriendly" />
 				</t:parameter>
 				
 				<t:parameter name="responseEncoding">

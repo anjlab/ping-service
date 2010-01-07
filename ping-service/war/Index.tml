@@ -31,7 +31,7 @@
 	
     <t:grid empty="No jobs" source="jobs" row="job"
        	reorder="scheduledBy, pingURL, cronString, edit, analytics, validationSummary, lastPingSummary, statusCounter"
-       	exclude="availabilityPercent, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, titleFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp"
+       	exclude="availabilityPercent, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, totalStatusCounterFriendly, totalSuccessStatusCounterFriendly, previousStatusCounterFriendly, titleFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp, statusCounterFriendly"
        	add="edit, delete, analytics">
 
 		<t:parameter name="lastPingSummaryCell">
@@ -39,7 +39,7 @@
 		</t:parameter>
 		
 		<t:parameter name="statusCounterCell">
-			<div align="center">${job.availabilityPercent} / ${job.statusCounter}</div>
+			<div align="center">${job.availabilityPercent} / ${job.statusCounterFriendly}</div>
 		</t:parameter>
 		
 		<t:parameter name="pingURLCell">

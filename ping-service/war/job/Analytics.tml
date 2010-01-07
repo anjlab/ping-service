@@ -16,7 +16,7 @@
 	
    	<h2>Analytics Workspace</h2>
    	
-   	<p>for ${job.titleFriendly}</p>
+   	<p>for ${job.titleFriendly} (${dateFrom} - ${dateTo})</p>
    	
    	<font color="red"><p>${message}</p></font>
 

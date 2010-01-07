@@ -16,6 +16,8 @@ import org.apache.tapestry5.beaneditor.Validate;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 
+import dmitrygusev.ping.services.Utils;
+
 @Entity
 public class Job {
 	@Id
@@ -192,11 +194,21 @@ public class Job {
 	public int getStatusCounter() {
 		return statusCounter == null ? 0 : statusCounter;
 	}
+	public String getStatusCounterFriendly() {
+		return formatCounter(getStatusCounter());
+	}
+	private String formatCounter(int counter) {
+		int minutes = counter * Utils.getCronMinutes(cronString);
+		return counter + " (" + Utils.formatTime(minutes) + ")";
+	}
 	private void setStatusCounter(int statusCounter) {
 		this.statusCounter = statusCounter;
 	}
 	public int getPreviousStatusCounter() {
 		return previousStatusCounter == null ? 0 : previousStatusCounter;
+	}
+	public String getPreviousStatusCounterFriendly() {
+		return formatCounter(getPreviousStatusCounter());
 	}
 	private void setPreviousStatusCounter(int previousStatusCounter) {
 		this.previousStatusCounter = previousStatusCounter;
@@ -215,6 +227,9 @@ public class Job {
 		     ? getPreviousStatusCounter() + getStatusCounter() 
 		     : totalStatusCounter;
 	}
+	public String getTotalStatusCounterFriendly() {
+		return formatCounter(getTotalStatusCounter());
+	}
 	private void incrementTotalStatusCounter() {
 		int correction = 0;
 		if (totalStatusCounter == null) {
@@ -231,6 +246,9 @@ public class Job {
 		return totalSuccessStatusCounter == null 
 			 ? (isLastPingFailed() ? getPreviousStatusCounter() : getStatusCounter())
 			 : totalSuccessStatusCounter;
+	}
+	public String getTotalSuccessStatusCounterFriendly() {
+		return formatCounter(getTotalSuccessStatusCounter());
 	}
 	private void incrementTotalSuccessStatusCounter() {
 		int correction = 0;

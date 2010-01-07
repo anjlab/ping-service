@@ -3,6 +3,8 @@ package dmitrygusev.ping.pages.job;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -18,16 +20,15 @@ import org.apache.tapestry5.services.Response;
 import anjlab.cubics.Cube;
 import anjlab.cubics.FactModel;
 import anjlab.cubics.aggregate.histogram.HistogramAggregateFactory;
-import anjlab.cubics.aggregate.histogram.Range;
 import anjlab.cubics.aggregate.histogram.Histogram.HistogramMergeStrategy;
 import anjlab.cubics.aggregate.pie.PieAggregateFactory;
 import anjlab.cubics.coerce.IntegerCoercer;
 import anjlab.cubics.renders.HtmlRender;
+import dmitrygusev.ping.entities.Account;
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
 import dmitrygusev.ping.pages.Index;
 import dmitrygusev.ping.services.Application;
-import dmitrygusev.ping.services.GeneralStats;
 import dmitrygusev.ping.services.JobResultCSVExporter;
 import dmitrygusev.ping.services.Utils;
 import dmitrygusev.ping.services.dao.JobResultDAO;
@@ -39,6 +40,18 @@ public class Analytics {
 
 	@Property
 	private Job job;
+	
+	private Date dateFrom;
+	
+	private Date dateTo;
+
+	public String getDateFrom() {
+		return application.formatDate(dateFrom);
+	}
+	
+	public String getDateTo() {
+		return application.formatDate(dateTo);
+	}
 	
 	@InjectPage
 	private Index index;

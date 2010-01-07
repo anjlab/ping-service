@@ -1,6 +1,8 @@
 package dmitrygusev.ping.services;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -274,8 +276,98 @@ public class Utils {
 		return timeZoneByCity.get(city);
 	}
 
+	private static final Map<String, Integer> cronModel = buildCronModel();
+	private static final String cronStringModel = join(",", cronModel.keySet()); 
+	
 	public static String getCronStringModel() {
-		return "every 1 hours,every 30 minutes,every 15 minutes,every 5 minutes";
+		return cronStringModel;
+	}
+	
+	private static String join(String delimeter, Iterable<String> values) {
+		StringBuilder builder = new StringBuilder();
+		for (String value : values) {
+			if (builder.length() > 0) {
+				builder.append(delimeter);
+			}
+			builder.append(value);
+		}
+		return builder.toString();
+	}
+
+	/**
+	 * model Key is a cron string, Value is number of minutes in cron interval 
+	 * @return
+	 */
+	private static Map<String, Integer> buildCronModel() {
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		result.put("every 1 hours", 60);
+		result.put("every 30 minutes", 30);
+		result.put("every 15 minutes", 15);
+		result.put("every 5 minutes", 5);
+		return result;
+	}
+
+	public static Integer getCronMinutes(String cronString) {
+		return cronModel.containsKey(cronString) ? cronModel.get(cronString) : 0;
+	}
+
+	private static class Pair {
+		public final int number;
+		public final String name;
+		public Pair(int number, String name) {
+			this.number = number;
+			this.name = name;
+		}
+	}
+	
+	public static String formatTime(int numberOfMinutes) {
+		int numberOfMinutesInYear = 365 * 24 * 60;
+		int numberOfMinutesInMonth = 30 * 24 * 60;
+		int numberOfMinutesInDay = 24 * 60;
+		int numberOfMinutesInHour = 60;
+		
+		int years = numberOfMinutes / numberOfMinutesInYear;
+		numberOfMinutes -= years * numberOfMinutesInYear;
+		
+		int months = numberOfMinutes / numberOfMinutesInMonth;
+		numberOfMinutes -= months * numberOfMinutesInMonth;
+		
+		int days = numberOfMinutes / numberOfMinutesInDay;
+		numberOfMinutes -= days * numberOfMinutesInDay;
+		
+		int hours = numberOfMinutes / numberOfMinutesInHour;
+		numberOfMinutes -= hours * numberOfMinutesInHour;
+		
+		int minutes = numberOfMinutes > 0 ? numberOfMinutes : 0;
+
+		List<Pair> pairs = new ArrayList<Pair>();
+		pairs.add(new Pair(years, " year"));
+		pairs.add(new Pair(months, " month"));
+		pairs.add(new Pair(days, " day"));
+		pairs.add(new Pair(hours, " hour"));
+		pairs.add(new Pair(minutes, " minute"));
+		
+		StringBuilder sb = new StringBuilder();
+		
+		for (Pair pair : pairs) {
+			if (pair.number > 0 || (pair.name.endsWith("minute") && sb.length() == 0)) {
+				if (sb.length() > 0) {
+					sb.append(" ");
+				}
+				sb.append(pair.number);
+				sb.append(pair.name);
+				appendIfPlural(sb, "s", pair.number);
+			}
+		}
+		
+		return sb.toString();
+	}
+	
+	private static void appendIfPlural(StringBuilder builder, String appendWhat, int number) {
+		int mod = number % 10;
+		if (mod == 0 || mod > 1) {
+			builder.append(appendWhat);
+		}
 	}
 
 	public static String getHttpCodeDescription(int validatingHttpCode) {
