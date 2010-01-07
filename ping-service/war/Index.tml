@@ -39,7 +39,7 @@
 		</t:parameter>
 		
 		<t:parameter name="statusCounterCell">
-			<div align="center">${job.availabilityPercent} / ${job.statusCounterFriendly}</div>
+			<div align="left">${job.availabilityPercent} / ${job.statusCounterFriendly}</div>
 		</t:parameter>
 		
 		<t:parameter name="pingURLCell">
