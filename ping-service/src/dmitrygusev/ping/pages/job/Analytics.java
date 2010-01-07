@@ -65,6 +65,7 @@ public class Analytics {
 		message = null;
 		job = null;
 		view = null;
+		results = null;
 	}
 	
 	@Inject
@@ -95,6 +96,9 @@ public class Analytics {
 			if (view == null) {
 				view = DEFAULT_VIEW;
 			}
+			
+			initResults();
+
 		} catch (Exception e) {
 			index.setExceptionMessage(e.getMessage());
 			return index;
@@ -130,10 +134,10 @@ public class Analytics {
 	private JobResultDAO jobResultDAO;
 	
 	private double end;
-	
-	public String getCubeHTML() {
-		List<JobResult> results = jobResultDAO.getResults(job, 1000);
 
+	private List<JobResult> results;
+
+	public String getCubeHTML() {
 		TimeZone timeZone = application.getTimeZone();
 
 		for (JobResult result : results) {
@@ -180,6 +184,17 @@ public class Analytics {
 			setLabel("dayOfWeek", "Day Of Week");
 		
 		return render.render().toString();
+	}
+
+	private void initResults() {
+		results = jobResultDAO.getResults(job, 1000);
+
+		if (results.size() > 0) {
+			dateTo = results.get(0).getTimestamp();
+			dateFrom = results.get(results.size() - 1).getTimestamp();
+		} else {
+			dateTo = dateFrom = new Date();
+		}
 	}
 	
 	private StreamResponse getExport(final String format) {
