@@ -212,7 +212,7 @@ public class Analytics {
 
 			@Override
 			public InputStream getStream() throws IOException {
-				InputStream csvExport = csvExporter.export(job);
+				InputStream csvExport = csvExporter.export(results);
 				
 				return csvExport;
 			}

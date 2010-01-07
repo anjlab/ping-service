@@ -84,8 +84,8 @@ public class AppModule
     	return Logger.getLogger(AppModule.class);
     }
     
-    public static JobResultCSVExporter buildJobResultCSVExporter(JobResultDAO jobResultDAO) {
-    	return new JobResultCSVExporter(jobResultDAO);
+    public static JobResultCSVExporter buildJobResultCSVExporter() {
+    	return new JobResultCSVExporter();
     }
     
     public static void contributeApplicationDefaults(

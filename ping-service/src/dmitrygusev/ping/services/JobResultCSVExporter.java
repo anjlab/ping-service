@@ -9,9 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
-import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
-import dmitrygusev.ping.services.dao.JobResultDAO;
 
 public class JobResultCSVExporter {
 
@@ -71,15 +69,7 @@ public class JobResultCSVExporter {
 		return buffer.toString();
 	}
 	
-	private JobResultDAO jobResultDAO;
-
-	public JobResultCSVExporter(JobResultDAO jobResultDAO) {
-		this.jobResultDAO = jobResultDAO;
-	}
-	
-	public InputStream export(Job job) throws IOException {
-		List<JobResult> results = jobResultDAO.getResults(job);
-		
+	public InputStream export(List<JobResult> results) throws IOException {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(TIMESTAMP_PATTERN);
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(
