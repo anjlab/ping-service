@@ -364,8 +364,7 @@ public class Utils {
 	}
 	
 	private static void appendIfPlural(StringBuilder builder, String appendWhat, int number) {
-		int mod = number % 10;
-		if (mod == 0 || mod > 1) {
+		if (number == 0 || number > 1) {
 			builder.append(appendWhat);
 		}
 	}
