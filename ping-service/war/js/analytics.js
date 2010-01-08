@@ -42,31 +42,35 @@ $(document).ready(function() {
 
 			var intIdx;
 			var key;
-			
-			//	See Job.java for response codes
-//			public static final int PING_RESULT_NOT_AVAILABLE = 1;
-//			public static final int PING_RESULT_OK = 2;
-//			public static final int PING_RESULT_CONNECTIVITY_PROBLEM = 4;
-//			public static final int PING_RESULT_HTTP_ERROR = 8;
-//			public static final int PING_RESULT_REGEXP_VALIDATION_FAILED = 16;
 
 			var labels = [];
 			labels[1]  = 'No data';
 			labels[2]  = 'Okay';
-			labels[4]  = 'Connectivity Problems';
+			labels[4]  = 'Timeouts';
 			labels[8]  = 'HTTP Errors';
-			labels[16] = 'Regexp Validation Failures';
+			labels[16] = 'Regexp Failures';
+			
+			var pieColors = [];
+			pieColors[1]  = '#999';
+			pieColors[2]  = '#4da74d';
+			pieColors[4]  = '#edc240';
+			pieColors[8]  = '#cb4b4b';
+			pieColors[16] = '#afd8f8';
+
+			var actualColors = [];
 			
 			var data = [];
 	   		for (var idx in jsonData.keys)
 			{
 	   			intIdx = parseInt(idx);
 	   			key = parseInt(jsonData.keys[intIdx]);
-				data[data.length] = { label: labels[key], data: jsonData.values[intIdx] }
+				data[data.length] = { label: labels[key], data: jsonData.values[intIdx] };
+				actualColors[actualColors.length] = pieColors[key];
 			}
 
 			$.plot($("#chart"), data,
 				{
+					colors: actualColors,
 			        series: {
 			            pie: {
 			                show: true

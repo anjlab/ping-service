@@ -75,7 +75,7 @@ public class Analytics {
 	private Request request;
 	
 	public Index onActivate(Long scheduleId, Long jobId) {
-		int defaultEnd = 2800;
+		int defaultEnd = 10000;
 		try { 
 			this.end = request.getParameterNames().contains("end") 
 				? Long.parseLong(request.getParameter("end")) 
