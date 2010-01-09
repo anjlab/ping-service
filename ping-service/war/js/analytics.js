@@ -136,7 +136,9 @@ $(document).ready(function() {
    		}
 
    		$.plot($("#chart"), [{ 
-   			data: d
+   			data: d,
+   			lines: { show: true },
+   			points: { show: true }
    		}], 
    		{
    			xaxis: {
