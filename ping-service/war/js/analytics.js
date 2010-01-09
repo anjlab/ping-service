@@ -97,7 +97,6 @@ $(document).ready(function() {
 		var thisClass = classes[0];
 
 		var parts = thisClass.split('-');
-		var part = parts[parts.length - 1];
 
 		var columnClass = classes[classes.length - 3];
 
@@ -109,20 +108,17 @@ $(document).ready(function() {
 			}
 		}
 		
-		var $dimension = $($("." + thisClass).parent().parent().children().children().get(parts.length-2+offset));
+		$($("." + thisClass).parent().parent().children().children().get(parts.length-2+offset)).addClass("c-sh");
 		
-		$dimension.addClass("c-sh");
+		var colspan = $($this.parent().children().get(0)).attr("colspan");
 		
 		$("." + columnClass).each(function() {
 			var $this = $(this);
 			var classes = $this.attr("class").split(' ');
-			var thisClass = classes[0];
+			var _colspan = $($this.parent().children().get(0)).attr("colspan");
 			var dimensionClass = classes[classes.length-2];
 			
-			var _parts = thisClass.split('-');
-			var _part = _parts[_parts.length - 1];
-			
-			if (part == _part && parts.length == _parts.length) {
+			if (colspan == _colspan) {
 				$this.addClass("c-sm");
 				$("#" + dimensionClass).addClass("c-sd");
 			}
