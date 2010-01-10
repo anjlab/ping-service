@@ -4,7 +4,8 @@ $(document).ready(function() {
 		$this.attr("href", "javascript:void(0)");
 		$this.click(function(){
 			hideSummaryCharts();
-			plotHistogramChart($(this), "#chart");
+			showPrimaryChart();
+			plotHistogramChart($(this), "#chart", "Response Time for Period, ms");
 		});
 	});
 	$(".c-pb").each(function() {
@@ -12,16 +13,19 @@ $(document).ready(function() {
 		$this.attr("href", "javascript:void(0)");
 		$this.click(function(){
 			hideSummaryCharts();
-			plotPieChart($(this), "#chart");
+			showPrimaryChart();
+			plotPieChart($(this), "#chart", "Availability Chart for Period");
 		});
 	});
 	$(".c-m").click(function() {
 		hideSummaryCharts();
+		showPrimaryChart();
 		plotLineChart($(this), "#chart");
 	});
 });
 
-function plotHistogramChart($this, chartId) {
+function plotHistogramChart($this, chartId, chartTitle) {
+	setChartTitle(chartId, chartTitle);
 	var jsonData = eval('(' + $this.parent().attr("data-json") + ')');
 		var d = [];
 		var ticks = [];
@@ -53,7 +57,9 @@ function plotHistogramChart($this, chartId) {
 		});
 }
 
-function plotPieChart($this, chartId) {
+function plotPieChart($this, chartId, chartTitle) {
+	setChartTitle(chartId, chartTitle);
+	
 	var jsonData = eval('(' + $this.parent().attr("data-json") + ')');
 
 	var intIdx;
@@ -98,7 +104,7 @@ function plotPieChart($this, chartId) {
 		});
 }
 
-function plotLineChart($this, chartId) {
+function plotLineChart($this, chartId, chartTitle) {
 	$(".c-sm").removeClass("c-sm");
 	$(".c-sh").removeClass("c-sh");
 	$(".c-sd").removeClass("c-sd");
@@ -108,6 +114,7 @@ function plotLineChart($this, chartId) {
 	}
 
 	var classes = $this.attr("class").split(' ');
+	
 	var thisClass = classes[0];
 
 	var parts = thisClass.split('-');
@@ -122,8 +129,23 @@ function plotLineChart($this, chartId) {
 		}
 	}
 	
-	$($("." + thisClass).parent().parent().children().children().get(parts.length-2+offset)).addClass("c-sh");
+	var $dimension = $($("." + thisClass).parent().parent().children().children().get(parts.length-2+offset));
+	$dimension.addClass("c-sh");
+
+	var $aggregateLabel = $(".a" + columnClass);
+	var $measureLabel = $("#" + $aggregateLabel.attr("class").split(' ')[1]);
+
+	$aggregateLabel.addClass("c-sh");
+	$measureLabel.addClass("c-sh");
 	
+	if (!chartTitle) {
+		var aggregateLabel = $aggregateLabel.html();
+		aggregateLabel = aggregateLabel[0].toUpperCase() + aggregateLabel.substring(1);
+		
+		chartTitle = aggregateLabel + " of " + $measureLabel.html() + " for Period by " + $dimension.html();
+	}
+	setChartTitle(chartId, chartTitle);
+
 	var colspan = $($this.parent().children().get(0)).attr("colspan");
 	
 	$("." + columnClass).each(function() {
@@ -146,7 +168,7 @@ function plotLineChart($this, chartId) {
 	
 	for (var i = 0; i < $dimensions.length; i++) {
 		ticks.push([i, $($dimensions.get(i)).html()]);
-		d.push([i, parseFloat($($values.get(i)).html())]);
+		d.push([i, parseFloat($($values.get(i)).html().replace(',', '.'))]);
 	}
 
 	$.plot($(chartId), [{ 
@@ -160,4 +182,9 @@ function plotLineChart($this, chartId) {
 			autoscaleMargin: 0.02
 		}
 	});
+}
+
+function setChartTitle(chartId, chartTitle) {
+	var $chartTitle = $(chartId).parent().children().filter(".chartTitle");
+	$chartTitle.text(chartTitle);
 }

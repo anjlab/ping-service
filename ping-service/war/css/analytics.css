@@ -2,3 +2,8 @@
 	text-align: center;
 	padding-bottom: 1px !important;
 }
+
+.chartTitle {
+	text-align: left;
+	border-bottom: 1px #999 solid;
+}

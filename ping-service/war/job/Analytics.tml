@@ -47,12 +47,21 @@
 				</p>
 		   	</td>
 		   	<td align="center" style="padding-left: 50px;">
-		   		<p align="right">
+		   		<p align="right" id="summaryChartsButton">
 		   			<a href="javascript:plotSummaryCharts();">Plot Summary Charts</a>
 		   		</p>
-		   		<div style="width: 400px; height: 200px;" id="chart"/>
-		   		<div style="width: 400px; height: 200px; display: hidden;" id="chart2"/>
-		   		<div style="width: 400px; height: 200px; display: hidden;" id="chart3"/>
+		   		<div>
+		   			<h4 class="chartTitle">Chart</h4>
+		   			<div style="width: 400px; height: 200px;" id="chart"/>
+		   		</div>
+		   		<div>
+		   			<h4 class="chartTitle">Chart</h4>
+		   			<div style="width: 400px; height: 200px; display: hidden;" id="chart2"/>
+		   		</div>
+		   		<div>
+		   			<h4 class="chartTitle">Chart</h4>
+		   			<div style="width: 400px; height: 200px; display: hidden;" id="chart3"/>
+		   		</div>
 		   	</td>
 	   	</tr>
    	</table>
@@ -61,27 +70,41 @@
    	<script type="text/javascript">
    		collapseAll();
    		
+   		function showPrimaryChart() {
+   			$("#chart").parent().show();
+   		}
+   		
+   		function hidePrimaryChart() {
+   			$("#chart").parent().hide();
+   		}
+   		
    		function hideSummaryCharts() {
-   			$("#chart2").hide();
-   			$("#chart3").hide();
+   			$("#chart2").parent().hide();
+   			$("#chart3").parent().hide();
    		}
    		
    		function showSummaryCharts() {
-   			$("#chart2").show();
-   			$("#chart3").show();
+   			$("#chart2").parent().show();
+   			$("#chart3").parent().show();
    		}
    		
    		function plotSummaryCharts() {
    			showSummaryCharts();
-   		
+   			
    			var pies = $(".m-7");
-   			plotPieChart($($(pies.get(pies.length-1)).children().get(0)), "#chart");
+   			plotPieChart($($(pies.get(pies.length-1)).children().get(0)), "#chart", "Total Availability, % for Period");
    			plotLineChart($($(".m-0").get(0)), "#chart2");
    			var histograms = $(".m-4");
-   			plotHistogramChart($($(histograms.get(histograms.length-1)).children().get(0)), "#chart3");
+   			plotHistogramChart($($(histograms.get(histograms.length-1)).children().get(0)), "#chart3", "Total Response Time, ms for Period");
    		}
    		
-   		plotSummaryCharts();
+   		if ($("#view").val().indexOf("day") != 0) {
+   			plotSummaryCharts();
+  		} else {
+  			$("#summaryChartsButton").hide();
+  			hidePrimaryChart();
+  			hideSummaryCharts();
+  		}
    	</script>
    	
 	<t:footer/>
