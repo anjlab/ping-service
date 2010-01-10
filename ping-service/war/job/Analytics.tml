@@ -30,15 +30,15 @@
 		<a href="javascript:collapseOne();">&#xAB; Less</a>&#160;
 		<a href="javascript:expandOne();">More &#xBB;</a>&#160;
 		<a href="javascript:expandAll();">Expand All</a>
-		<p>
-			<a href="/feedback?subject=Request for custom View">Need more views? Send a request (it's free)</a>
-		</p>
 	</t:form>
 	</p>
    	
    	<table>
 	   	<tr valign="top">
 		   	<td>
+				<p>
+					<a href="/feedback?subject=Request for custom View">Need more views? Send a request (it's free)</a>
+				</p>
 		   		<t:outputraw value="cubeHTML" />
 				<p>   	
 			 	    Download raw data in 
@@ -47,7 +47,12 @@
 				</p>
 		   	</td>
 		   	<td align="center" style="padding-left: 50px;">
-		   		<div style="width: 500px; height: 300px;" id="chart"/>
+		   		<p align="right">
+		   			<a href="javascript:plotSummaryCharts();">Plot Summary Charts</a>
+		   		</p>
+		   		<div style="width: 400px; height: 200px;" id="chart"/>
+		   		<div style="width: 400px; height: 200px; display: hidden;" id="chart2"/>
+		   		<div style="width: 400px; height: 200px; display: hidden;" id="chart3"/>
 		   	</td>
 	   	</tr>
    	</table>
@@ -55,6 +60,28 @@
    	
    	<script type="text/javascript">
    		collapseAll();
+   		
+   		function hideSummaryCharts() {
+   			$("#chart2").hide();
+   			$("#chart3").hide();
+   		}
+   		
+   		function showSummaryCharts() {
+   			$("#chart2").show();
+   			$("#chart3").show();
+   		}
+   		
+   		function plotSummaryCharts() {
+   			showSummaryCharts();
+   		
+   			var pies = $(".m-7");
+   			plotPieChart($($(pies.get(pies.length-1)).children().get(0)), "#chart");
+   			plotLineChart($($(".m-0").get(0)), "#chart2");
+   			var histograms = $(".m-4");
+   			plotHistogramChart($($(histograms.get(histograms.length-1)).children().get(0)), "#chart3");
+   		}
+   		
+   		plotSummaryCharts();
    	</script>
    	
 	<t:footer/>
