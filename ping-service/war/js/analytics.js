@@ -5,7 +5,7 @@ $(document).ready(function() {
 		$this.click(function(){
 			hideSummaryCharts();
 			showPrimaryChart();
-			plotHistogramChart($(this), "#chart", "Response Time for Period, ms");
+			plotHistogramChart($(this), "#chart");
 		});
 	});
 	$(".c-pb").each(function() {
@@ -14,7 +14,7 @@ $(document).ready(function() {
 		$this.click(function(){
 			hideSummaryCharts();
 			showPrimaryChart();
-			plotPieChart($(this), "#chart", "Availability Chart for Period");
+			plotPieChart($(this), "#chart");
 		});
 	});
 	$(".c-m").click(function() {
@@ -25,41 +25,48 @@ $(document).ready(function() {
 });
 
 function plotHistogramChart($this, chartId, chartTitle) {
-	setChartTitle(chartId, chartTitle);
+	removeHighlights();
+	
+	highlightHeaders($this.parent(), chartId, chartTitle, buildChartTitle);
+	highlightValuesAndDimensions($this.parent(), false);
+
 	var jsonData = eval('(' + $this.parent().attr("data-json") + ')');
-		var d = [];
-		var ticks = [];
-		
-		var intIdx;
-		
-		ticks.push([0, "0"]);
-		for (var idx in jsonData.keys) {
-			intIdx = parseInt(idx);
-			d.push([intIdx, jsonData.values[intIdx]]);
-			var key = jsonData.keys[intIdx];
-			ticks.push([intIdx + 1, key.substring(key.indexOf(";") + 1, key.lastIndexOf("."))]);
+	var d = [];
+	var ticks = [];
+	
+	var intIdx;
+	
+	ticks.push([0, "0"]);
+	for (var idx in jsonData.keys) {
+		intIdx = parseInt(idx);
+		d.push([intIdx, jsonData.values[intIdx]]);
+		var key = jsonData.keys[intIdx];
+		ticks.push([intIdx + 1, key.substring(key.indexOf(";") + 1, key.lastIndexOf("."))]);
+	}
+	
+	intIdx++;
+	
+	d.push([intIdx, jsonData.others]);
+	ticks.push([intIdx + 1, "others"]);
+	
+	$.plot($(chartId), [{ 
+		data: d, 
+		bars: { show: true }
+	}], 
+	{
+		xaxis: {
+			ticks: ticks,
+			autoscaleMargin: 0.02
 		}
-		
-		intIdx++;
-		
-		d.push([intIdx, jsonData.others]);
-		ticks.push([intIdx + 1, "others"]);
-		
-		$.plot($(chartId), [{ 
-			data: d, 
-			bars: { show: true }
-		}], 
-		{
-			xaxis: {
-				ticks: ticks,
-				autoscaleMargin: 0.02
-			}
-		});
+	});
 }
 
 function plotPieChart($this, chartId, chartTitle) {
-	setChartTitle(chartId, chartTitle);
+	removeHighlights();
 	
+	highlightHeaders($this.parent(), chartId, chartTitle, buildChartTitle);
+	highlightValuesAndDimensions($this.parent(), false);
+
 	var jsonData = eval('(' + $this.parent().attr("data-json") + ')');
 
 	var intIdx;
@@ -105,60 +112,13 @@ function plotPieChart($this, chartId, chartTitle) {
 }
 
 function plotLineChart($this, chartId, chartTitle) {
-	$(".c-sm").removeClass("c-sm");
-	$(".c-sh").removeClass("c-sh");
-	$(".c-sd").removeClass("c-sd");
-	
 	if (!$this.is(".c-n")) {
 		return;	//	not a numeric measure
 	}
-
-	var classes = $this.attr("class").split(' ');
+	removeHighlights();
 	
-	var thisClass = classes[0];
-
-	var parts = thisClass.split('-');
-
-	var columnClass = classes[classes.length - 3];
-
-	var parentClass = classes[1];
-	var offset = 0;
-	if (parentClass[0] == "x") {
-		if (parts.length - parentClass.split('-').length == 1) {
-			offset = 1;
-		}
-	}
-	
-	var $dimension = $($("." + thisClass).parent().parent().children().children().get(parts.length-2+offset));
-	$dimension.addClass("c-sh");
-
-	var $aggregateLabel = $(".a" + columnClass);
-	var $measureLabel = $("#" + $aggregateLabel.attr("class").split(' ')[1]);
-
-	$aggregateLabel.addClass("c-sh");
-	$measureLabel.addClass("c-sh");
-	
-	if (!chartTitle) {
-		var aggregateLabel = $aggregateLabel.html();
-		aggregateLabel = aggregateLabel[0].toUpperCase() + aggregateLabel.substring(1);
-		
-		chartTitle = aggregateLabel + " of " + $measureLabel.html() + " for Period by " + $dimension.html();
-	}
-	setChartTitle(chartId, chartTitle);
-
-	var colspan = $($this.parent().children().get(0)).attr("colspan");
-	
-	$("." + columnClass).each(function() {
-		var $this = $(this);
-		var classes = $this.attr("class").split(' ');
-		var _colspan = $($this.parent().children().get(0)).attr("colspan");
-		var dimensionClass = classes[classes.length-2];
-		
-		if (colspan == _colspan) {
-			$this.addClass("c-sm");
-			$("#" + dimensionClass).addClass("c-sd");
-		}
-	});
+	highlightHeaders($this, chartId, chartTitle, buildLineChartTitle);
+	highlightValuesAndDimensions($this, true);
 	
 	var d = [];
 	var ticks = [];
@@ -182,6 +142,89 @@ function plotLineChart($this, chartId, chartTitle) {
 			autoscaleMargin: 0.02
 		}
 	});
+}
+
+function removeHighlights() {
+	$(".c-sm").removeClass("c-sm");
+	$(".c-sh").removeClass("c-sh");
+	$(".c-sd").removeClass("c-sd");
+}
+
+function highlightHeaders($this, chartId, chartTitle, chartTitleBuilder) {
+	var classes = $this.attr("class").split(' ');
+	var thisClass = classes[0];
+	var parts = thisClass.split('-');
+	var columnClass = classes[classes.length - 3];
+
+	if (columnClass[0] != 'm') {
+		columnClass = classes[classes.length - 2];
+	}
+	
+	var parentClass = classes[1];
+	var offset = 0;
+	if (parentClass[0] == "x" && (parts.length - parentClass.split('-').length == 1)) {
+		offset = 1;
+	}
+	
+	var $dimensionLabel = $($("." + thisClass).parent().parent().children().children().get(parts.length-2+offset));
+	$dimensionLabel.addClass("c-sh");
+
+	var $aggregateLabel = $(".a" + columnClass);
+	var $measureLabel = $("#" + $aggregateLabel.attr("class").split(' ')[1]);
+
+	$aggregateLabel.addClass("c-sh");
+	$measureLabel.addClass("c-sh");
+	
+	if (!chartTitle) {
+		chartTitle = chartTitleBuilder($aggregateLabel, $measureLabel, $dimensionLabel, $this);
+	}
+	setChartTitle(chartId, chartTitle);
+}
+
+function buildChartTitle($aggregateLabel, $measureLabel, $dimensionLabel, $valueCell) {
+	var aggregateLabel = $aggregateLabel.html();
+	
+	aggregateLabel = aggregateLabel[0].toUpperCase() + aggregateLabel.substring(1);
+
+	var classes = $valueCell.attr("class").split(' ');
+	var dimensionClass = classes[classes.length-2];
+	var dimensionValue = $("#" + dimensionClass).html();
+
+	return aggregateLabel + " of " + $measureLabel.html() + " for " + $dimensionLabel.html() + " = " + dimensionValue;
+}
+
+function buildLineChartTitle($aggregateLabel, $measureLabel, $dimensionLabel, $valueCell) {
+	var aggregateLabel = $aggregateLabel.html();
+	
+	aggregateLabel = aggregateLabel[0].toUpperCase() + aggregateLabel.substring(1);
+	
+	return aggregateLabel + " of " + $measureLabel.html() + " by " + $dimensionLabel.html();
+}
+
+function highlightValuesAndDimensions($valueCell, allValues) {
+	var classes = $valueCell.attr("class").split(' ');
+	var columnClass = classes[classes.length - 3];
+	var colspan = $($valueCell.parent().children().get(0)).attr("colspan");
+
+	if (allValues == true) {
+		$("." + columnClass).each(function() {
+			var $this = $(this);
+			var _colspan = $($this.parent().children().get(0)).attr("colspan");
+			
+			if (colspan == _colspan) {
+				highlightValueWithParentDimension($this);
+			}
+		});
+	} else {
+		highlightValueWithParentDimension($valueCell);
+	}
+}
+
+function highlightValueWithParentDimension($this) {
+	var classes = $this.attr("class").split(' ');
+	var dimensionClass = classes[classes.length-2];
+	$("#" + dimensionClass).addClass("c-sd");
+	$this.addClass("c-sm");
 }
 
 function setChartTitle(chartId, chartTitle) {

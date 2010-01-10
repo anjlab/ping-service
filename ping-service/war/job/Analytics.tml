@@ -48,7 +48,7 @@
 		   	</td>
 		   	<td align="center" style="padding-left: 50px;">
 		   		<p align="right" id="summaryChartsButton">
-		   			<a href="javascript:plotSummaryCharts();">Plot Summary Charts</a>
+		   			<a href="javascript:plotOverviewCharts();">Overview</a>
 		   		</p>
 		   		<div>
 		   			<h4 class="chartTitle">Chart</h4>
@@ -88,18 +88,18 @@
    			$("#chart3").parent().show();
    		}
    		
-   		function plotSummaryCharts() {
+   		function plotOverviewCharts() {
    			showSummaryCharts();
    			
    			var pies = $(".m-7");
-   			plotPieChart($($(pies.get(pies.length-1)).children().get(0)), "#chart", "Total Availability, % for Period");
-   			plotLineChart($($(".m-0").get(0)), "#chart2");
+   			plotPieChart($($(pies.get(pies.length-1)).children().get(0)), "#chart", "Total Availability, %");
    			var histograms = $(".m-4");
-   			plotHistogramChart($($(histograms.get(histograms.length-1)).children().get(0)), "#chart3", "Total Response Time, ms for Period");
+   			plotHistogramChart($($(histograms.get(histograms.length-1)).children().get(0)), "#chart3", "Total Response Time, ms");
+   			plotLineChart($($(".m-0").get(0)), "#chart2");
    		}
    		
    		if ($("#view").val().indexOf("day") != 0) {
-   			plotSummaryCharts();
+   			plotOverviewCharts();
   		} else {
   			$("#summaryChartsButton").hide();
   			hidePrimaryChart();
