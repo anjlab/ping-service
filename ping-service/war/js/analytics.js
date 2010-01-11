@@ -125,8 +125,11 @@ function plotLineChart($this, chartId, chartTitle) {
 	var d = [];
 	var ticks = [];
 	
+	var classes = $this.attr("class").split(' ');
+	var columnClass = getColumnClass(classes);
+	
 	$dimensions = $(".c-sd");
-	$values = $(".c-sm");
+	$values = $(".c-sm").filter("." + columnClass);
 	
 	for (var i = 0; i < $dimensions.length; i++) {
 		ticks.push([i, $($dimensions.get(i)).html()]);
