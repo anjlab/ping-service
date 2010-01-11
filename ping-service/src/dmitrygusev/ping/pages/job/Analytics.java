@@ -161,7 +161,7 @@ public class Analytics {
 			reorder("pie-" + Job.PING_RESULT_OK + "-%", "count", "pie").
 			exclude("min", "max", "sum", "avg").
 			setFormat("pie-" + Job.PING_RESULT_OK + "-%", "%.5f").
-			setLabel("pie-" + Job.PING_RESULT_OK + "-%", "avail. %").
+			setLabel("pie-" + Job.PING_RESULT_OK + "-%", "%").
 			setLabel("count", "# of pings").
 			setLabel("pie", "chart");
 
