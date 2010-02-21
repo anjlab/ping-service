@@ -8,18 +8,15 @@ import org.apache.tapestry5.services.Request;
 
 import dmitrygusev.ping.services.Mailer;
 import dmitrygusev.ping.services.security.GAEHelper;
+import dmitrygusev.tapestry5.Utils;
 
 public class Feedback {
 
-	@Property
-	private String subject;
-	
 	@Property
 	private String message;
 	
 	@AfterRender
 	public void cleanup() {
-		subject = null;
 		message = null;
 		thanks = null;
 	}
@@ -33,7 +30,8 @@ public class Feedback {
 	private Request request;
 	
 	public void onActivate() {
-		this.subject = request.getParameter("subject");
+		String subject = request.getParameter("subject");
+		this.message = Utils.isNullOrEmpty(subject) ? null : subject + "\n\n";
 	}
 	
 	@Inject
@@ -43,6 +41,8 @@ public class Feedback {
 	private Mailer mailer;
 	
 	public void onSuccess() {
+		String subject = "Ping Service Feedback";
+		
 		mailer.sendMail(
 				gaeHelper.getUserPrincipal() == null ? "dmitry.gusev@gmail.com"
 						: gaeHelper.getUserPrincipal().getName(),
