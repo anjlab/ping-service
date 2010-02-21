@@ -3,7 +3,8 @@ package dmitrygusev.ping.services.dao.impl;
 import static com.google.appengine.api.datastore.KeyFactory.createKey;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+
+import org.apache.tapestry5.ioc.annotations.Inject;
 
 import com.google.appengine.api.datastore.Key;
 
@@ -12,7 +13,7 @@ import dmitrygusev.ping.services.dao.ScheduleDAO;
 
 public class ScheduleDAOImpl implements ScheduleDAO {
 
-	@PersistenceContext
+	@Inject
 	private EntityManager em;
 	
 	public Schedule createSchedule(String name) {

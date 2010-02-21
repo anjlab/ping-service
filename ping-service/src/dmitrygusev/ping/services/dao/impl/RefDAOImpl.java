@@ -5,8 +5,9 @@ import static com.google.appengine.api.datastore.KeyFactory.createKey;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+
+import org.apache.tapestry5.ioc.annotations.Inject;
 
 import dmitrygusev.ping.entities.Account;
 import dmitrygusev.ping.entities.Ref;
@@ -16,7 +17,7 @@ import dmitrygusev.ping.services.dao.RefDAO;
 @SuppressWarnings("unchecked")
 public class RefDAOImpl implements RefDAO {
 
-	@PersistenceContext
+	@Inject
     private EntityManager em;
 
 	@Override

@@ -5,8 +5,9 @@ import static com.google.appengine.api.datastore.KeyFactory.createKey;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+
+import org.apache.tapestry5.ioc.annotations.Inject;
 
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.Schedule;
@@ -15,7 +16,7 @@ import dmitrygusev.ping.services.dao.JobDAO;
 @SuppressWarnings("unchecked")
 public class JobDAOImpl implements JobDAO {
 
-	@PersistenceContext
+	@Inject
     private EntityManager em;
 	
 	public List<Job> getJobsByCronString(String cronString) {

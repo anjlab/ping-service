@@ -6,8 +6,9 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+
+import org.apache.tapestry5.ioc.annotations.Inject;
 
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
@@ -15,7 +16,7 @@ import dmitrygusev.ping.services.dao.JobResultDAO;
 
 public class JobResultDAOImpl implements JobResultDAO {
 
-	@PersistenceContext
+	@Inject
     private EntityManager em;
 	
 	@Override

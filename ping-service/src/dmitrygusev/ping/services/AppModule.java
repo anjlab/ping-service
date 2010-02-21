@@ -8,9 +8,11 @@ import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.Translator;
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
+import org.apache.tapestry5.ioc.MethodAdviceReceiver;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.InjectService;
+import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.services.ApplicationStateContribution;
 import org.apache.tapestry5.services.ApplicationStateCreator;
 import org.apache.tapestry5.services.ApplicationStateManager;
@@ -21,12 +23,19 @@ import org.apache.tapestry5.services.RequestFilter;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.RequestHandler;
 import org.apache.tapestry5.services.Response;
+import org.tynamo.jpa.JPASymbols;
+import org.tynamo.jpa.JPATransactionAdvisor;
 
 import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.JobDAO;
 import dmitrygusev.ping.services.dao.JobResultDAO;
 import dmitrygusev.ping.services.dao.RefDAO;
 import dmitrygusev.ping.services.dao.ScheduleDAO;
+import dmitrygusev.ping.services.dao.impl.AccountDAOImpl;
+import dmitrygusev.ping.services.dao.impl.JobDAOImpl;
+import dmitrygusev.ping.services.dao.impl.JobResultDAOImpl;
+import dmitrygusev.ping.services.dao.impl.RefDAOImpl;
+import dmitrygusev.ping.services.dao.impl.ScheduleDAOImpl;
 import dmitrygusev.ping.services.security.AccessController;
 import dmitrygusev.ping.services.security.GAEHelper;
 import dmitrygusev.tapestry5.TimeTranslator;
@@ -41,6 +50,12 @@ public class AppModule
     {
         binder.bind(JobExecutor.class);
         binder.bind(Mailer.class);
+        
+        binder.bind(AccountDAO.class, AccountDAOImpl.class);
+        binder.bind(JobDAO.class, JobDAOImpl.class);
+        binder.bind(JobResultDAO.class, JobResultDAOImpl.class);
+        binder.bind(RefDAO.class, RefDAOImpl.class);
+        binder.bind(ScheduleDAO.class, ScheduleDAOImpl.class);
         
         // Make bind() calls on the binder object to define most IoC services.
         // Use service builder methods (example below) when the implementation
@@ -104,6 +119,11 @@ public class AppModule
         // on the command line as -Dtapestry.production-mode=false
         configuration.add(SymbolConstants.PRODUCTION_MODE, "true");
         configuration.add(SymbolConstants.COMPRESS_WHITESPACE, "true");
+
+        configuration.add(JPASymbols.PERSISTENCE_UNIT, "transactions-optional");
+        //	DataNucleus' GAE implementation doesn't provide EMF.getMetamodel() which is required for
+        //	providing entity value encoders
+        configuration.add(JPASymbols.PROVIDE_ENTITY_VALUE_ENCODERS, "false");
     }
 
     /**
@@ -217,4 +237,10 @@ public class AppModule
     	regex.add("^anjlab/cubics/js/" + pathPattern);
     	regex.add("^anjlab/cubics/js/jquery-1.3.2.js");
     }
+
+    @Match("*DAO")
+    public static void adviseTransactions(JPATransactionAdvisor advisor, MethodAdviceReceiver receiver)   {
+        advisor.addTransactionCommitAdvice(receiver);
+    }
+
 } 

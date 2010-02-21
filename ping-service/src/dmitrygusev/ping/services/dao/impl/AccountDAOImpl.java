@@ -3,8 +3,9 @@ package dmitrygusev.ping.services.dao.impl;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+
+import org.apache.tapestry5.ioc.annotations.Inject;
 
 import dmitrygusev.ping.entities.Account;
 import dmitrygusev.ping.services.dao.AccountDAO;
@@ -12,7 +13,7 @@ import dmitrygusev.ping.services.dao.AccountDAO;
 @SuppressWarnings("unchecked")
 public class AccountDAOImpl implements AccountDAO {
 
-	@PersistenceContext
+	@Inject
     private EntityManager em;
 	
 	@Override

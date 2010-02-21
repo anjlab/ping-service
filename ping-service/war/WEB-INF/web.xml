@@ -6,7 +6,7 @@
     </context-param>
    	<filter>
         <filter-name>app</filter-name>
-        <filter-class>org.apache.tapestry5.spring.TapestrySpringFilter</filter-class>
+        <filter-class>org.apache.tapestry5.TapestryFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>app</filter-name>
