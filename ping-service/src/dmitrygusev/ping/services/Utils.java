@@ -299,7 +299,7 @@ public class Utils {
 	 * @return
 	 */
 	private static Map<String, Integer> buildCronModel() {
-		Map<String, Integer> result = new HashMap<String, Integer>();
+		Map<String, Integer> result = new TreeMap<String, Integer>();
 		result.put("every 1 hours", 60);
 		result.put("every 30 minutes", 30);
 		result.put("every 15 minutes", 15);
@@ -407,4 +407,11 @@ public class Utils {
 		return "ping-service-" + String.valueOf(job.getKey().getId());
 	}
 
+	public static boolean isCronStringSupported(String cronString) {
+		if (isNullOrEmpty(cronString)) {
+			return false;
+		}
+		
+		return cronModel.containsKey(cronString);
+	}
 }

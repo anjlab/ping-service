@@ -1,5 +1,8 @@
 package dmitrygusev.ping.services;
 
+import static com.google.appengine.api.datastore.KeyFactory.keyToString;
+import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,6 +15,9 @@ import org.apache.tapestry5.services.ApplicationStateManager;
 import org.apache.tapestry5.services.PageRenderLinkSource;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.labs.taskqueue.Queue;
+import com.google.appengine.api.labs.taskqueue.QueueFactory;
+import com.google.appengine.api.labs.taskqueue.TaskOptions.Method;
 
 import dmitrygusev.ping.entities.Account;
 import dmitrygusev.ping.entities.Job;
@@ -341,22 +347,24 @@ public class Application {
 	}
 
 	public static final int GOOGLE_IO_FAIL_LIMIT = 3;
-
-	public void runJobs(String cronString, PageRenderLinkSource linkSource) {
-		logger.debug("Running jobs for cron string: " + cronString);
+	
+	public void enqueueJobs(String cronString) {
+		logger.debug("Enqueueing jobs for cron string: " + cronString);
 		
 		List<Job> jobs = jobDAO.getJobsByCronString(cronString);
 		
-		logger.debug("Found " + jobs.size() + " job(s)");
-		
+		logger.debug("Found " + jobs.size() + " job(s) to enqueue");
+
+		Queue queue = QueueFactory.getQueue(cronString.replace(" ", ""));
+
 		for (Job job : jobs) {
-			runJob(linkSource, job);
+			queue.add(null, url("/job/run/").param("key", keyToString(job.getKey())).method(Method.GET));
 		}
 		
-		logger.debug("Finished running jobs");
+		logger.debug("Finished enqueueing jobs");
 	}
 
-	private void runJob(PageRenderLinkSource linkSource, Job job) {
+	public void runJob(PageRenderLinkSource linkSource, Job job) {
 		try {
 			boolean prevPingFailed = job.isLastPingFailed();
 			boolean prevIsGoogleIOException = job.isGoogleIOException();

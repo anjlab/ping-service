@@ -1,0 +1,18 @@
+<queue-entries>
+  <queue>
+    <name>every5minutes</name>
+    <rate>6/m</rate>
+  </queue>
+  <queue>
+    <name>every15minutes</name>
+    <rate>6/m</rate>
+  </queue>
+  <queue>
+    <name>every30minutes</name>
+    <rate>6/m</rate>
+  </queue>
+  <queue>
+    <name>every1hours</name>
+    <rate>6/m</rate>
+  </queue>
+</queue-entries>

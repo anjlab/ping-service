@@ -9,6 +9,8 @@ import javax.persistence.Query;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 
+import com.google.appengine.api.datastore.Key;
+
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.Schedule;
 import dmitrygusev.ping.services.dao.JobDAO;
@@ -17,7 +19,7 @@ import dmitrygusev.ping.services.dao.JobDAO;
 public class JobDAOImpl implements JobDAO {
 
 	@Inject
-    private EntityManager em;
+    public EntityManager em;
 	
 	public List<Job> getJobsByCronString(String cronString) {
 		Query q = em.createQuery("SELECT j FROM Job j WHERE j.cronString = :cronString");
@@ -46,5 +48,10 @@ public class JobDAOImpl implements JobDAO {
 		List<Job> result = q.getResultList();
 		
 		return result.isEmpty() ? null : result.get(0);
+	}
+
+	@Override
+	public Job find(Key jobKey) {
+		return em.find(Job.class, jobKey);
 	}
 }

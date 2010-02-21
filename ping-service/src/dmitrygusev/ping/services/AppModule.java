@@ -117,7 +117,7 @@ public class AppModule
         // The factory default is true but during the early stages of an application
         // overriding to false is a good idea. In addition, this is often overridden
         // on the command line as -Dtapestry.production-mode=false
-        configuration.add(SymbolConstants.PRODUCTION_MODE, "true");
+        configuration.add(SymbolConstants.PRODUCTION_MODE, "false");
         configuration.add(SymbolConstants.COMPRESS_WHITESPACE, "true");
 
         configuration.add(JPASymbols.PERSISTENCE_UNIT, "transactions-optional");

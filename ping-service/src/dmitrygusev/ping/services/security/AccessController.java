@@ -24,6 +24,7 @@ public class AccessController implements Dispatcher {
 				|| thisURL.startsWith("/_ah/login") 
 				|| thisURL.startsWith("/assets")
 				|| thisURL.startsWith("/cron/")
+				|| thisURL.startsWith("/job/run/")
 				|| thisURL.startsWith("/welcome")
 				|| thisURL.startsWith("/help")
 				|| thisURL.startsWith("/feedback")) {
