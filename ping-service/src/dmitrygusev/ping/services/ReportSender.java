@@ -28,10 +28,7 @@ public class ReportSender {
         body.append("Job results for URL: ");
         body.append(job.getPingURL());
         body.append("\n\nYou can view/edit job settings at: ");
-        body.append(
-        		getBaseAddress() +
-        		linkSource.createPageRenderLinkWithContext(
-        				EditJob.class, job.getKey().getParent().getId(), job.getKey().getId()));
+        body.append(buildJobURL(job, linkSource));
 
         body.append("\n\nYour ");
         body.append(job.isLastPingFailed() ? "up" : "down");
@@ -50,6 +47,18 @@ public class ReportSender {
 		String message = body.toString();
 		
 		mailer.sendMail(from, to, subject, message);
+	}
+
+	private String buildJobURL(Job job, PageRenderLinkSource linkSource) {
+		String url = getBaseAddress() +
+						linkSource.createPageRenderLinkWithContext(
+								EditJob.class, job.getKey().getParent().getId(), job.getKey().getId());
+		
+		if (url.contains(";jsessionid=")) {
+			url = url.substring(0, url.indexOf(";jsessionid="));
+		}
+		
+		return url;
 	}
 
 	private String getBaseAddress() {

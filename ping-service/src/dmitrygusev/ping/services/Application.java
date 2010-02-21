@@ -350,40 +350,45 @@ public class Application {
 		logger.debug("Found " + jobs.size() + " job(s)");
 		
 		for (Job job : jobs) {
-			try {
-				boolean prevPingFailed = job.isLastPingFailed();
-				boolean prevIsGoogleIOException = job.isGoogleIOException();
-				
-				JobResult jobResult = jobExecutor.execute(job);
+			runJob(linkSource, job);
+		}
+		
+		logger.debug("Finished running jobs");
+	}
 
-				if (prevPingFailed ^ job.isLastPingFailed()) {
-					job.resetStatusCounter();
-					
-					if (!job.isLastPingFailed() 
-							&& (!prevIsGoogleIOException 
-									/* No need to notify earlier since user didn't received fail report yet */
-									|| job.getPreviousStatusCounter() >= GOOGLE_IO_FAIL_LIMIT)) {
-						//	The job is up again 
-						reportSender.sendReport(job, linkSource);
-					} else if (job.isLastPingFailed() && !job.isGoogleIOException()) {
-						//	Non-Google IO failure
-						reportSender.sendReport(job, linkSource);
-					}
-				} else {
-					job.incrementStatusCounter();
-				}
+	private void runJob(PageRenderLinkSource linkSource, Job job) {
+		try {
+			boolean prevPingFailed = job.isLastPingFailed();
+			boolean prevIsGoogleIOException = job.isGoogleIOException();
+			
+			JobResult jobResult = jobExecutor.execute(job);
+
+			if (prevPingFailed ^ job.isLastPingFailed()) {
+				job.resetStatusCounter();
 				
-				if (job.getStatusCounter() == GOOGLE_IO_FAIL_LIMIT && job.isGoogleIOException()) {
-					//	Register job failure on third fail (see GOOGLE_IO_FAIL_LIMIT)
+				if (!job.isLastPingFailed() 
+						&& (!prevIsGoogleIOException 
+								/* No need to notify earlier since user didn't received fail report yet */
+								|| job.getPreviousStatusCounter() >= GOOGLE_IO_FAIL_LIMIT)) {
+					//	The job is up again 
+					reportSender.sendReport(job, linkSource);
+				} else if (job.isLastPingFailed() && !job.isGoogleIOException()) {
+					//	Non-Google IO failure
 					reportSender.sendReport(job, linkSource);
 				}
-				
-				jobDAO.update(job);
-				jobResultDAO.persistResult(jobResult);
-			} catch (Exception e) {
-				logger.error("Error executing job " + job.getKey() + ": " + e);
+			} else {
+				job.incrementStatusCounter();
 			}
-			logger.debug("Finished running jobs");
+			
+			if (job.getStatusCounter() == GOOGLE_IO_FAIL_LIMIT && job.isGoogleIOException()) {
+				//	Register job failure on third fail (see GOOGLE_IO_FAIL_LIMIT)
+				reportSender.sendReport(job, linkSource);
+			}
+			
+			jobDAO.update(job);
+			jobResultDAO.persistResult(jobResult);
+		} catch (Exception e) {
+			logger.error("Error executing job " + job.getKey() + ": " + e);
 		}
 	}
 
