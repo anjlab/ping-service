@@ -21,6 +21,10 @@
    	
    	<font color="red"><p>${message}</p></font>
 
+	<t:if test="admin">
+		Admin tasks: <t:actionlink t:id="runCounterTask">Run Counter Task</t:actionlink>
+	</t:if>
+
 	<p>
 	<t:form>
 		View: <t:select t:id="view" model="viewModel" value="view"/>

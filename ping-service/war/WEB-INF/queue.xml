@@ -1,5 +1,9 @@
 <queue-entries>
   <queue>
+    <name>default</name>
+    <rate>5/s</rate>
+  </queue>
+  <queue>
     <name>every5minutes</name>
     <rate>6/m</rate>
   </queue>

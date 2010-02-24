@@ -21,10 +21,10 @@ public class AccessController implements Dispatcher {
 		String thisURL = request.getPath();
 
 		if (principal != null 
-				|| thisURL.startsWith("/_ah/login") 
 				|| thisURL.startsWith("/assets")
 				|| thisURL.startsWith("/cron/")
 				|| thisURL.startsWith("/job/run/")
+				|| thisURL.startsWith("/task/counter/")
 				|| thisURL.startsWith("/welcome")
 				|| thisURL.startsWith("/help")
 				|| thisURL.startsWith("/feedback")) {

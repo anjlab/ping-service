@@ -414,4 +414,12 @@ public class Utils {
 		
 		return cronModel.containsKey(cronString);
 	}
+
+	public static String removeJSessionId(String url) {
+		if (url.contains(";jsessionid=")) {
+			url = url.substring(0, url.indexOf(";jsessionid="));
+		}
+		
+		return url;
+	}
 }

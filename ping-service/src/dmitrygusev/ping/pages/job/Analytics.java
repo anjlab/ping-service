@@ -1,6 +1,8 @@
 package dmitrygusev.ping.pages.job;
 
 
+import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
@@ -16,6 +18,14 @@ import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.Response;
+import org.datanucleus.store.appengine.query.JPACursorHelper;
+
+import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.labs.taskqueue.Queue;
+import com.google.appengine.api.labs.taskqueue.QueueFactory;
+import com.google.appengine.api.labs.taskqueue.TaskOptions.Method;
+import com.google.appengine.api.users.UserServiceFactory;
 
 import anjlab.cubics.Cube;
 import anjlab.cubics.FactModel;
@@ -32,6 +42,7 @@ import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.JobResultCSVExporter;
 import dmitrygusev.ping.services.Utils;
 import dmitrygusev.ping.services.dao.JobResultDAO;
+import dmitrygusev.ping.services.security.GAEHelper;
 
 @SuppressWarnings("unused")
 public class Analytics {
@@ -73,6 +84,10 @@ public class Analytics {
 	
 	@Inject
 	private Request request;
+	
+	public boolean isAdmin() {
+		return UserServiceFactory.getUserService().isUserAdmin();
+	}
 	
 	public Index onActivate(Long scheduleId, Long jobId) {
 		int defaultEnd = 10000;
@@ -223,5 +238,12 @@ public class Analytics {
 				return "text/csv";					
 			}
 		};
+	}
+	
+	public void onActionFromRunCounterTask() {
+		Queue queue = QueueFactory.getDefaultQueue();
+		queue.add(null, url("/task/counter/")
+					.param("key", KeyFactory.keyToString(job.getKey()))
+					.method(Method.GET));
 	}
 }
