@@ -10,3 +10,5 @@
 /ping-service/war/WEB-INF/classes
 /ping-service/war/WEB-INF/lib/*.jar
 
+
+/soapui.log

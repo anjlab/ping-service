@@ -33,6 +33,9 @@ import org.slf4j.LoggerFactory;
 import org.tynamo.jpa.JPASymbols;
 import org.tynamo.jpa.JPATransactionAdvisor;
 
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
+
 import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.JobDAO;
 import dmitrygusev.ping.services.dao.JobResultDAO;
@@ -98,6 +101,16 @@ public class AppModule
 			logger.error("Error instantiating cache", e);
 			return null;
 		}
+    }
+
+    public static MemcacheService buildMemcacheService(Logger logger) {
+    	MemcacheService memcacheService = MemcacheServiceFactory.getMemcacheService();
+    	
+    	if (memcacheService == null) {
+    		logger.error("MemcacheService is null.");
+    	}
+    	
+    	return memcacheService;
     }
     
     public static BeanModelHelper buildBeanModelHelper(

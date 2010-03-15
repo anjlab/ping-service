@@ -57,7 +57,7 @@ public class MailJobResultsTask {
 	
 	@Inject
 	private JobDAO jobDAO;
-
+	
 	private boolean initTask() {
 		String encodedJobKey = request.getParameter(LongRunningQueryTask.JOB_PARAMETER_NAME);
 		

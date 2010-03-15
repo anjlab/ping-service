@@ -23,6 +23,7 @@ import org.apache.tapestry5.services.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableMultimap;
 import com.google.appengine.repackaged.com.google.common.collect.Multimap;
 
@@ -152,14 +153,17 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 	@InjectPage
 	private MailJobResultsTask mailJobResultsTask;
 	
+	@Inject
+	private MemcacheService memcacheService;
+	
 	private void backupResults(List<JobResult> results) throws MessagingException, IOException {
-		if (cache == null) {
-			//	If the cache is null, the user wont be able to receive emails w/ backup
+		if (cache == null || memcacheService == null) {
+			//	If the cache/memcacheService is null, the user wont be able to receive emails w/ backup
 			//	unless we send him up to several hundreds of emails.
-			//	In this situation lets send these emails to PING_SERVICE_NOTIFY_GMAIL_COM 
+			//	In this situation lets send these emails to PING_SERVICE_NOTIFY_GMAIL_COM instead. 
 			mailJobResultsTask.sendResultsByMail(results, Mailer.PING_SERVICE_NOTIFY_GMAIL_COM);
 		} else {
-			long id = getMemcacheService().increment(taskId, 1, CACHED_RESULTS_FIRST_CHUNK_ID - 1);
+			long id = memcacheService.increment(taskId, 1, CACHED_RESULTS_FIRST_CHUNK_ID - 1);
 			
 			String chunkKey = getChunkKeyInCache(taskId, id);
 			ArrayList<JobResult> values = new ArrayList<JobResult>(results);
