@@ -1,10 +1,8 @@
 package dmitrygusev.ping.pages.task;
 
-import static com.google.appengine.api.datastore.KeyFactory.keyToString;
 import static com.google.appengine.api.datastore.KeyFactory.stringToKey;
-import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
 import static dmitrygusev.ping.pages.task.BackupAndDeleteOldJobResultsTask.getChunkKeyInCache;
-import static dmitrygusev.tapestry5.GAEUtils.buildTaskUrl;
+import static dmitrygusev.ping.services.Utils.formatTimeMillis;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,9 +42,9 @@ public class MailJobResultsTask {
 	@Inject private Mailer mailer;
 	@Inject private Request request;
 
-	private static final String TOTAL_RECORDS_PARAMETER_NAME = "totalRecords";
-	private static final String FILE_NUMBER_PARAMETER_NAME = "fileNumber";
-	private static final String CHUNK_ID_PARAMETER_NAME = "chunkId";
+	public static final String TOTAL_RECORDS_PARAMETER_NAME = "totalRecords";
+	public static final String FILE_NUMBER_PARAMETER_NAME = "fileNumber";
+	public static final String CHUNK_ID_PARAMETER_NAME = "chunkId";
 
 	private Job job;
 	private String taskId;
@@ -132,20 +130,26 @@ public class MailJobResultsTask {
 				resultsBuffer.clear();
 			}
 		}
+		
+		if (taskCompleted) {
+			mailer.sendSystemMessageToDeveloper(
+					"Debug: Backup Completed for Job", 
+					"Job: " + job.getTitleFriendly() + " / " + job.getKey() +
+					"\nTotal files: " + fileNumber +
+					"\nTotal records: " + totalRecords +
+					"\nTotal time: " + formatTimeMillis(System.currentTimeMillis() - startTime));
+		}
 	}
 
+	@Inject
+	private Application application;
+	
 	private void continueTask() {
 		try {
 			logger.debug("Continue taskId {}", taskId);
 			
-			getQueue("mail")
-				.add(null, buildTaskUrl(linkSource, MailJobResultsTask.class)
-					.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, keyToString(job.getKey()))
-					.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, taskId)
-					.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(startTime))
-					.param(CHUNK_ID_PARAMETER_NAME, String.valueOf(chunkId))
-					.param(TOTAL_RECORDS_PARAMETER_NAME, String.valueOf(totalRecords))
-					.param(FILE_NUMBER_PARAMETER_NAME, String.valueOf(fileNumber)));
+			application.continueMailJobResultsTask(job.getKey(), taskId, startTime, chunkId, totalRecords, fileNumber);
+			
 		} catch (Exception e) {
 			logger.error("Error enqueueing task", e);
 		}
@@ -186,14 +190,7 @@ public class MailJobResultsTask {
 		builder.append(")");
 		
 		if (taskCompleted) {
-			long totalTime = System.currentTimeMillis() - startTime;
-			
-			String totalTimeFormatted;
-			if (totalTime < 1000 * 60) {
-				totalTimeFormatted = "Less than a minute";
-			} else {
-				totalTimeFormatted = Utils.formatTime((int)(totalTime / 1000 / 60));
-			}
+			String totalTimeFormatted = dmitrygusev.ping.services.Utils.formatTimeMillis(System.currentTimeMillis() - startTime);
 			
 			builder.append("\n\nThis is the last email in current backup.");
 			builder.append("\n\tTotal # of files: ");

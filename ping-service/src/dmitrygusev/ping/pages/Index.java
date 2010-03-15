@@ -1,11 +1,14 @@
 package dmitrygusev.ping.pages;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.ioc.annotations.Inject;
+
+import com.google.appengine.api.users.UserServiceFactory;
 
 import dmitrygusev.ping.entities.Account;
 import dmitrygusev.ping.entities.Job;
@@ -142,5 +145,12 @@ public class Index {
 		message = "Your invite has been sent!";
 		messageColor = "green";
 	}
-	
+
+	public boolean isAdmin() {
+		return UserServiceFactory.getUserService().isUserAdmin();
+	}
+
+	public void onActionFromRunCyclicBackupTask() throws URISyntaxException {
+		application.runCyclicBackupTask();
+	}
 }

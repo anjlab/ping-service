@@ -1,5 +1,7 @@
 package dmitrygusev.ping.pages.task;
 
+import static com.google.appengine.api.labs.taskqueue.QueueFactory.getDefaultQueue;
+import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
 import static dmitrygusev.tapestry5.GAEUtils.buildTaskUrl;
 
 import java.util.List;
@@ -15,8 +17,8 @@ import org.slf4j.LoggerFactory;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.labs.taskqueue.Queue;
-import com.google.appengine.api.labs.taskqueue.QueueFactory;
 import com.google.appengine.api.labs.taskqueue.TaskOptions;
+import com.google.appengine.repackaged.com.google.common.collect.ImmutableMultimap;
 import com.google.appengine.repackaged.com.google.common.collect.Multimap;
 
 import dmitrygusev.ping.services.Utils;
@@ -34,6 +36,10 @@ public abstract class LongRunningQueryTask {
 	protected abstract int getMaxResultsToFetchAtATime();
 
 	private long startTime;
+
+	public String getQueueName() {
+		return getDefaultQueue().getQueueName();
+	}
 	
 	public long getStartTime() {
 		return startTime;
@@ -58,7 +64,9 @@ public abstract class LongRunningQueryTask {
 
 	protected void completeTask() throws Exception { ; }
 
-	protected abstract Multimap<String, String> getTaskParameters();
+	protected Multimap<String, String> getTaskParameters() { 
+		return ImmutableMultimap.<String, String>builder().build(); 
+	}
 
 	@Inject 
 	private Request request; 
@@ -124,7 +132,8 @@ public abstract class LongRunningQueryTask {
 	private void continueTask(List<?> results) {
 		Cursor cursor = JPACursorHelper.getCursor(results);
 		
-		Queue queue = QueueFactory.getDefaultQueue();
+		Queue queue = getQueue(getQueueName());
+		
 		TaskOptions taskOptions = buildTaskUrl(request.getPath())
 					.param(CURSOR_PARAMETER_NAME, cursor.toWebSafeString())
 					.param(STARTTIME_PARAMETER_NAME, String.valueOf(startTime));

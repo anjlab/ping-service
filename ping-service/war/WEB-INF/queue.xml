@@ -24,4 +24,9 @@
     <rate>1/m</rate>
     <bucket-size>1</bucket-size>
   </queue>
+  <queue>
+  	<name>backup</name>
+    <rate>2/d</rate>
+    <bucket-size>1</bucket-size>
+  </queue>
 </queue-entries>

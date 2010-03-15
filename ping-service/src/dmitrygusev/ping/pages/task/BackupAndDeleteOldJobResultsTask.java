@@ -2,9 +2,7 @@ package dmitrygusev.ping.pages.task;
 
 import static com.google.appengine.api.datastore.KeyFactory.keyToString;
 import static com.google.appengine.api.datastore.KeyFactory.stringToKey;
-import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
-import static com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService;
-import static dmitrygusev.tapestry5.GAEUtils.buildTaskUrl;
+import static java.lang.Long.parseLong;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,7 +16,6 @@ import net.sf.jsr107cache.Cache;
 
 import org.apache.tapestry5.annotations.InjectPage;
 import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +26,7 @@ import com.google.appengine.repackaged.com.google.common.collect.Multimap;
 
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
+import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.Mailer;
 import dmitrygusev.ping.services.Utils;
 import dmitrygusev.ping.services.dao.JobDAO;
@@ -36,14 +34,15 @@ import dmitrygusev.ping.services.dao.JobResultDAO;
 
 public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 
-
 	private static final Logger logger = LoggerFactory.getLogger(BackupAndDeleteOldJobResultsTask.class);
 	
 	private static final int CHUNK_SIZE = 50;
 	private static final String COUNT_PARAMETER_NAME = "count";
 	public static final String TASK_ID_PARAMETER_NAME = "taskId";
 	public static final long CACHED_RESULTS_FIRST_CHUNK_ID = 1;
-	
+
+	private static final int ALLOWED_NUMBER_OF_RESULTS = 1000;
+
 	@Inject private Request request;
 	@Inject private EntityManager em;
 
@@ -93,7 +92,7 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 	protected boolean processResults(List<?> results) throws Exception {
 		totalCount += results.size();
 		
-		if (isNotFirstChunk()) {
+		if (isOldResults()) {
 			backupAndDelete((List<JobResult>)results);
 		} else {
 			logger.debug("Nothing to process here");
@@ -102,23 +101,22 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 		return true;
 	}
 
+	@Inject
+	private Application application;
+	
 	@Override
 	protected void completeTask() throws Exception {
 		if (cacheHasResults()) {
 			
 			logger.info("Enqueueing MailJobResultsTask for taskId {}", taskId);
 			
-			getQueue("mail")
-				.add(null, buildTaskUrl(linkSource, MailJobResultsTask.class)
-					.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, keyToString(job.getKey()))
-					.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, taskId)
-					.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(getStartTime())));
+			application.runMailJobResultsTask(job.getKey(), taskId, getStartTime());
 		}
 	}
-
+	
 	private boolean cacheHasResults() {
-		return getMemcacheService().contains(taskId) 
-			&& Long.parseLong(getMemcacheService().get(taskId).toString()) >= CACHED_RESULTS_FIRST_CHUNK_ID;
+		return memcacheService.contains(taskId) 
+			&& parseLong(memcacheService.get(taskId).toString()) >= CACHED_RESULTS_FIRST_CHUNK_ID;
 	}
 	
 	@Inject
@@ -140,13 +138,10 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 		}
 	}
 
-	private boolean isNotFirstChunk() {
-		return totalCount > CHUNK_SIZE;
+	private boolean isOldResults() {
+		return totalCount > ALLOWED_NUMBER_OF_RESULTS;
 	}
 
-	@Inject
-	private PageRenderLinkSource linkSource;
-	
 	@Inject
 	private Cache cache;
 	

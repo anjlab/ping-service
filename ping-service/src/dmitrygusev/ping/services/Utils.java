@@ -415,12 +415,13 @@ public class Utils {
 		return cronModel.containsKey(cronString);
 	}
 
-	public static String removeJSessionId(String url) {
-		//	XXX This works wrong at GAE		
-//		if (url.contains(";jsessionid=")) {
-//			url = url.substring(0, url.indexOf(";jsessionid="));
-//		}
-		
-		return url;
+	public static String formatTimeMillis(long totalTimeMillis) {
+		String totalTimeFormatted;
+		if (totalTimeMillis < 1000 * 60) {
+			totalTimeFormatted = "Less than a minute";
+		} else {
+			totalTimeFormatted = formatTime((int)(totalTimeMillis / 1000 / 60));
+		}
+		return totalTimeFormatted;
 	}
 }

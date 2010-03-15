@@ -44,9 +44,9 @@ public class Feedback {
 		String subject = "Ping Service Feedback";
 		
 		mailer.sendMail(
-				gaeHelper.getUserPrincipal() == null ? "dmitry.gusev@gmail.com"
+				gaeHelper.getUserPrincipal() == null ? Mailer.PING_SERVICE_NOTIFY_GMAIL_COM
 						: gaeHelper.getUserPrincipal().getName(),
-				"dmitry.gusev@gmail.com", subject, message);
+				Mailer.DMITRY_GUSEV_GMAIL_COM, subject, message);
 		
 		thanks = "Thanks for sharing your feedback!";
 	}

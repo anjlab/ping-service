@@ -19,7 +19,7 @@ public class ReportSender {
 	}
 
 	public void sendReport(Job job, PageRenderLinkSource linkSource) {
-		String from = "ping.service.notify@gmail.com";
+		String from = Mailer.PING_SERVICE_NOTIFY_GMAIL_COM;
 		String to = job.getReportEmail();
         String subject = job.isLastPingFailed() ? job.getTitleFriendly() + " is down" : job.getTitleFriendly() + " is up again";
 
@@ -55,7 +55,6 @@ public class ReportSender {
         				linkSource.createPageRenderLinkWithContext(
         						pageClass, job.getKey().getParent().getId(), job.getKey().getId());
         
-        url = Utils.removeJSessionId(url);
 		return url;
 	}
 

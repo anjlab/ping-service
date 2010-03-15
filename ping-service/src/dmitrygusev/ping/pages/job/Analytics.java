@@ -1,8 +1,6 @@
 package dmitrygusev.ping.pages.job;
 
 
-import static com.google.appengine.api.labs.taskqueue.QueueFactory.getDefaultQueue;
-import static dmitrygusev.tapestry5.GAEUtils.buildTaskUrl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -10,11 +8,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.TimeZone;
-
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 import org.apache.tapestry5.StreamResponse;
 import org.apache.tapestry5.annotations.AfterRender;
@@ -34,14 +28,11 @@ import anjlab.cubics.aggregate.pie.PieAggregateFactory;
 import anjlab.cubics.coerce.IntegerCoercer;
 import anjlab.cubics.renders.HtmlRender;
 
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.UserServiceFactory;
 
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
 import dmitrygusev.ping.pages.Index;
-import dmitrygusev.ping.pages.task.CountJobResultsTask;
-import dmitrygusev.ping.pages.task.BackupAndDeleteOldJobResultsTask;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.JobResultCSVExporter;
 import dmitrygusev.ping.services.Utils;
@@ -248,17 +239,10 @@ public class Analytics {
 	private PageRenderLinkSource linkSource;
 	
 	public void onActionFromRunCountJobResultsTask() throws URISyntaxException {
-		getDefaultQueue()
-			.add(null, buildTaskUrl(linkSource, CountJobResultsTask.class)
-				.param(CountJobResultsTask.JOB_PARAMETER_NAME, KeyFactory.keyToString(job.getKey())));
+		application.runCountJobResultsTask(job.getKey());
 	}
 
 	public void onActionFromRunBackupAndDeleteOldJobResultsTask() throws URISyntaxException {
-		long id = new Random().nextLong();
-		
-		getDefaultQueue()
-			.add(null, buildTaskUrl(linkSource, BackupAndDeleteOldJobResultsTask.class)
-				.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, KeyFactory.keyToString(job.getKey()))
-				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, String.valueOf(id)));
+		application.runBackupAndDeleteTask(job.getKey());
 	}
 }

@@ -67,8 +67,7 @@ public class CountJobResultsTask extends LongRunningQueryTask {
 	protected void completeTask() {
 		String keyString = request.getParameter(JOB_PARAMETER_NAME);
 		
-		mailer.sendMail(
-				"dmitry.gusev@gmail.com", "dmitry.gusev@gmail.com", 
+		mailer.sendSystemMessageToDeveloper(
 				"Task completed", 
 				KeyFactory.stringToKey(keyString).toString() + "\n\n JobResult count: " + counter);
 	}

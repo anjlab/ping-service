@@ -23,6 +23,7 @@ import org.apache.tapestry5.services.ApplicationStateCreator;
 import org.apache.tapestry5.services.ApplicationStateManager;
 import org.apache.tapestry5.services.BeanModelSource;
 import org.apache.tapestry5.services.Dispatcher;
+import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestFilter;
 import org.apache.tapestry5.services.RequestGlobals;
@@ -86,10 +87,11 @@ public class AppModule
     		JobDAO jobDAO, RefDAO refDAO, JobResultDAO jobResultDAO,
     		GAEHelper gaeHelper, JobExecutor jobExecutor, 
     		ReportSender reportSender, Mailer mailer,
-    		ApplicationStateManager stateManager) {
+    		ApplicationStateManager stateManager,
+    		PageRenderLinkSource linkSource) {
     	return new Application(accountDAO, jobDAO, scheduleDAO, 
     			refDAO, jobResultDAO, gaeHelper, jobExecutor, reportSender,
-    			mailer, stateManager);
+    			mailer, stateManager, linkSource);
     }
 
     public static Cache buildCache(Logger logger) {

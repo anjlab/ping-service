@@ -1,14 +1,17 @@
 package dmitrygusev.ping.services;
 
 import static com.google.appengine.api.datastore.KeyFactory.keyToString;
+import static com.google.appengine.api.labs.taskqueue.QueueFactory.getDefaultQueue;
 import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
 import static dmitrygusev.tapestry5.GAEUtils.buildTaskUrl;
 
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.TimeZone;
 
 import org.apache.tapestry5.services.ApplicationStateManager;
@@ -24,6 +27,11 @@ import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
 import dmitrygusev.ping.entities.Ref;
 import dmitrygusev.ping.entities.Schedule;
+import dmitrygusev.ping.pages.task.BackupAndDeleteOldJobResultsTask;
+import dmitrygusev.ping.pages.task.CountJobResultsTask;
+import dmitrygusev.ping.pages.task.CyclicBackupTask;
+import dmitrygusev.ping.pages.task.LongRunningQueryTask;
+import dmitrygusev.ping.pages.task.MailJobResultsTask;
 import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.JobDAO;
 import dmitrygusev.ping.services.dao.JobResultDAO;
@@ -32,6 +40,9 @@ import dmitrygusev.ping.services.dao.ScheduleDAO;
 import dmitrygusev.ping.services.security.GAEHelper;
 
 public class Application {
+
+	public static final String BACKUP_QUEUE = "backup";
+	public static final String MAIL_QUEUE = "mail";
 
 	private static final Logger logger = LoggerFactory.getLogger(Application.class);
 	
@@ -45,6 +56,7 @@ public class Application {
 	private ReportSender reportSender;
 	private Mailer mailer;
 	private AppSessionCache sessionCache;
+	private PageRenderLinkSource linkSource;
 	
 	public Application(
 			AccountDAO accountDAO, 
@@ -56,7 +68,8 @@ public class Application {
 			JobExecutor jobExecutor,
 			ReportSender reportSender,
 			Mailer mailer,
-			ApplicationStateManager stateManager) {
+			ApplicationStateManager stateManager,
+			PageRenderLinkSource linkSource) {
 		super();
 		this.accountDAO = accountDAO;
 		this.jobDAO = jobDAO;
@@ -68,6 +81,7 @@ public class Application {
 		this.reportSender = reportSender;
 		this.mailer = mailer;
 		this.sessionCache = stateManager.get(AppSessionCache.class);
+		this.linkSource = linkSource;
 	}
 
 	public List<Account> getAccounts(Schedule schedule) {
@@ -376,7 +390,7 @@ public class Application {
 		logger.debug("Finished enqueueing jobs");
 	}
 
-	public void runJob(PageRenderLinkSource linkSource, Job job) {
+	public void runJob(Job job) {
 		try {
 			boolean prevPingFailed = job.isLastPingFailed();
 			boolean prevIsGoogleIOException = job.isGoogleIOException();
@@ -425,5 +439,44 @@ public class Application {
 				"This message was sent to you by " + myEmail + " via Ping Service friend invite.\n" +
 				"If you think this message was sent to you by mistake, just ignore it.");
 	}
-
+	
+	public void runCyclicBackupTask() throws URISyntaxException {
+		getQueue(BACKUP_QUEUE)
+			.add(null, buildTaskUrl(linkSource, CyclicBackupTask.class));
+	}
+	
+	public void runBackupAndDeleteTask(Key jobKey) throws URISyntaxException {
+		long id = new Random().nextLong();
+		
+		getDefaultQueue()
+			.add(null, buildTaskUrl(linkSource, BackupAndDeleteOldJobResultsTask.class)
+				.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, keyToString(jobKey))
+				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, String.valueOf(id)));
+	}
+	
+	public void runMailJobResultsTask(Key jobKey, String taskId, long backupStartTime) throws URISyntaxException {
+		getQueue(MAIL_QUEUE)
+			.add(null, buildTaskUrl(linkSource, MailJobResultsTask.class)
+				.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, keyToString(jobKey))
+				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, taskId)
+				.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(backupStartTime)));
+	}
+	
+	public void continueMailJobResultsTask(Key jobKey, String taskId, long backupStartTime, long chunkId, long totalRecords, long fileNumber) throws URISyntaxException {
+		getQueue(MAIL_QUEUE)
+			.add(null, buildTaskUrl(linkSource, MailJobResultsTask.class)
+				.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, keyToString(jobKey))
+				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, taskId)
+				.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(backupStartTime))
+				.param(MailJobResultsTask.CHUNK_ID_PARAMETER_NAME, String.valueOf(chunkId))
+				.param(MailJobResultsTask.TOTAL_RECORDS_PARAMETER_NAME, String.valueOf(totalRecords))
+				.param(MailJobResultsTask.FILE_NUMBER_PARAMETER_NAME, String.valueOf(fileNumber)));
+	}
+	
+	public void runCountJobResultsTask(Key jobKey) throws URISyntaxException {
+		getDefaultQueue()
+			.add(null, buildTaskUrl(linkSource, CountJobResultsTask.class)
+				.param(CountJobResultsTask.JOB_PARAMETER_NAME, keyToString(jobKey)));
+	}
+	
 }

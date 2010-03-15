@@ -3,7 +3,6 @@ package dmitrygusev.ping.pages.job;
 import static com.google.appengine.api.datastore.KeyFactory.stringToKey;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +24,6 @@ public class RunJob {
 	@Inject
 	private JobDAO jobDAO;
 	
-	@Inject
-	private PageRenderLinkSource linkSource;
-	
 	public void onActivate() {
 		String jobKey = request.getParameter("key");
 		
@@ -37,7 +33,7 @@ public class RunJob {
 			Job job = jobDAO.find(stringToKey(jobKey));
 		
 			if (job != null) {
-				application.runJob(linkSource, job);
+				application.runJob(job);
 			}
 		} catch (Exception e) {
 			//	Prevent to run job once again on failure
