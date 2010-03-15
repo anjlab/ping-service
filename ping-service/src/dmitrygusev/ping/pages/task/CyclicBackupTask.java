@@ -30,7 +30,7 @@ public class CyclicBackupTask extends LongRunningQueryTask {
 	
 	@Override
 	protected Query getQuery() {
-		return em.createQuery("SELECT * FROM Job");
+		return em.createQuery("SELECT j FROM Job j");
 	}
 	
 	@Inject
