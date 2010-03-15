@@ -10,7 +10,8 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.urlfetch.HTTPHeader;
 import com.google.appengine.api.urlfetch.HTTPMethod;
@@ -33,7 +34,7 @@ public class JobExecutor {
 				"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"));
 	}
 
-	private static final Logger logger = Logger.getLogger(Job.class);
+	private static final Logger logger = LoggerFactory.getLogger(Job.class);
 	
 	public JobResult execute(Job job) {
 		JobResult jobResult = new JobResult();

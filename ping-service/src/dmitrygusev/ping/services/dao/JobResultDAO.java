@@ -14,5 +14,6 @@ public interface JobResultDAO {
 	public List<JobResult> getResults(Job job);
 	@CommitAfter
 	public List<JobResult> getResults(Job job, int maxResults);
-	
+	@CommitAfter
+	public void delete(Long id);	
 }

@@ -56,6 +56,8 @@ public class Job {
 	@Transient
 	private Schedule schedule;
 	
+	private Boolean receiveBackups;
+	
 	public static final int PING_RESULT_NOT_AVAILABLE = 1;
 	public static final int PING_RESULT_OK = 2;
 	public static final int PING_RESULT_CONNECTIVITY_PROBLEM = 4;
@@ -186,7 +188,7 @@ public class Job {
 		this.title = title;
 	}
 	public String getTitleFriendly() {
-		if (title == null || title.isEmpty()) {
+		if (Utils.isNullOrEmpty(title)) {
 			return getShortenURL();
 		}
 		return title;
@@ -280,5 +282,12 @@ public class Job {
 	}
 	public String getLastPingSummary() {
 		return lastPingTimestamp == null ? "" : lastPingTimestamp.toString(); 
+	}
+	public void setReceiveBackups(boolean receiveBackups) {
+		this.receiveBackups = receiveBackups;
+	}
+	public boolean isReceiveBackups() {
+		return receiveBackups == null ||	//	Receive backups by default 
+			   receiveBackups.booleanValue();
 	}
 }

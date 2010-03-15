@@ -1,14 +1,20 @@
 package dmitrygusev.ping.pages.job;
 
 
-import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
+import static com.google.appengine.api.labs.taskqueue.QueueFactory.getDefaultQueue;
+import static dmitrygusev.tapestry5.GAEUtils.buildTaskUrl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Calendar;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.TimeZone;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.apache.tapestry5.StreamResponse;
 import org.apache.tapestry5.annotations.AfterRender;
@@ -16,16 +22,9 @@ import org.apache.tapestry5.annotations.InjectPage;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.Response;
-import org.datanucleus.store.appengine.query.JPACursorHelper;
-
-import com.google.appengine.api.datastore.Cursor;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.labs.taskqueue.Queue;
-import com.google.appengine.api.labs.taskqueue.QueueFactory;
-import com.google.appengine.api.labs.taskqueue.TaskOptions.Method;
-import com.google.appengine.api.users.UserServiceFactory;
 
 import anjlab.cubics.Cube;
 import anjlab.cubics.FactModel;
@@ -34,15 +33,19 @@ import anjlab.cubics.aggregate.histogram.Histogram.HistogramMergeStrategy;
 import anjlab.cubics.aggregate.pie.PieAggregateFactory;
 import anjlab.cubics.coerce.IntegerCoercer;
 import anjlab.cubics.renders.HtmlRender;
-import dmitrygusev.ping.entities.Account;
+
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.users.UserServiceFactory;
+
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
 import dmitrygusev.ping.pages.Index;
+import dmitrygusev.ping.pages.task.CountJobResultsTask;
+import dmitrygusev.ping.pages.task.BackupAndDeleteOldJobResultsTask;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.JobResultCSVExporter;
 import dmitrygusev.ping.services.Utils;
 import dmitrygusev.ping.services.dao.JobResultDAO;
-import dmitrygusev.ping.services.security.GAEHelper;
 
 @SuppressWarnings("unused")
 public class Analytics {
@@ -228,7 +231,8 @@ public class Analytics {
 
 			@Override
 			public InputStream getStream() throws IOException {
-				InputStream csvExport = csvExporter.export(results);
+				InputStream csvExport = new ByteArrayInputStream(
+						csvExporter.export(application.getTimeZone(), results));
 				
 				return csvExport;
 			}
@@ -240,10 +244,21 @@ public class Analytics {
 		};
 	}
 	
-	public void onActionFromRunCounterTask() {
-		Queue queue = QueueFactory.getDefaultQueue();
-		queue.add(null, url("/task/counter/")
-					.param("key", KeyFactory.keyToString(job.getKey()))
-					.method(Method.GET));
+	@Inject
+	private PageRenderLinkSource linkSource;
+	
+	public void onActionFromRunCountJobResultsTask() throws URISyntaxException {
+		getDefaultQueue()
+			.add(null, buildTaskUrl(linkSource, CountJobResultsTask.class)
+				.param(CountJobResultsTask.JOB_PARAMETER_NAME, KeyFactory.keyToString(job.getKey())));
+	}
+
+	public void onActionFromRunBackupAndDeleteOldJobResultsTask() throws URISyntaxException {
+		long id = new Random().nextLong();
+		
+		getDefaultQueue()
+			.add(null, buildTaskUrl(linkSource, BackupAndDeleteOldJobResultsTask.class)
+				.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, KeyFactory.keyToString(job.getKey()))
+				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, String.valueOf(id)));
 	}
 }

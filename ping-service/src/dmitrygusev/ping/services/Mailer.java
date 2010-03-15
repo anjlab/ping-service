@@ -3,28 +3,48 @@ package dmitrygusev.ping.services;
 import java.util.Properties;
 
 import javax.mail.Message;
+import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Mailer {
 
-	private static final Logger logger = Logger.getLogger(Mailer.class);
+	public static final String PING_SERVICE_NOTIFY_GMAIL_COM = "ping.service.notify@gmail.com";
 	
-	public void sendMail(String from, String to, String subject, String message) {
+	private static final Logger logger = LoggerFactory.getLogger(Mailer.class);
+	
+	public void sendMail(String from, String to, String subject, String message, MimeBodyPart... attachments) {
 		Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
 
         Message msg = new MimeMessage(session);
         
         try {
-	        msg.setFrom(new InternetAddress(from, from.equals("ping.service.notify@gmail.com") ? "Ping Service Notifier" : null));
+	        msg.setFrom(new InternetAddress(from, from.equals(PING_SERVICE_NOTIFY_GMAIL_COM) ? "Ping Service Notifier" : null));
 	        msg.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
 	        msg.setSubject(subject);
-	        msg.setText(message);
+
+	        Multipart multipart = new MimeMultipart();
+
+	        MimeBodyPart main = new MimeBodyPart();
+	        main.setContent(message, "text/plain");
+	        multipart.addBodyPart(main);
+	        
+	        if (attachments != null && attachments.length > 0) {
+		        for (MimeBodyPart part : attachments) {
+			        multipart.addBodyPart(part);
+				}
+	        }
+	        
+			msg.setContent(multipart);
+	        
 	        Transport.send(msg);
         } catch (Exception e) {
         	logger.error(

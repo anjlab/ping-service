@@ -22,7 +22,10 @@
    	<font color="red"><p>${message}</p></font>
 
 	<t:if test="admin">
-		Admin tasks: <t:actionlink t:id="runCounterTask">Run Counter Task</t:actionlink>
+		Admin tasks: 
+			<t:actionlink t:id="runCountJobResultsTask">Count Job Results</t:actionlink>
+			&#160;
+			<t:actionlink t:id="runBackupAndDeleteOldJobResultsTask">Backup and Delete Old Job Results</t:actionlink>
 	</t:if>
 
 	<p>

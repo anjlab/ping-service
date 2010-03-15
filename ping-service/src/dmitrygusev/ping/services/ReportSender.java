@@ -29,11 +29,7 @@ public class ReportSender {
         body.append(job.getPingURL());
         body.append("\n\nYou can analyze URL performance at: ");
         
-        String url = getBaseAddress() + 
-        				linkSource.createPageRenderLinkWithContext(
-        						Analytics.class, job.getKey().getParent().getId(), job.getKey().getId());
-        
-        body.append(Utils.removeJSessionId(url));
+		body.append(getJobLink(job, linkSource, requestGlobals, Analytics.class));
 
         body.append("\n\nYour ");
         body.append(job.isLastPingFailed() ? "up" : "down");
@@ -54,8 +50,17 @@ public class ReportSender {
 		mailer.sendMail(from, to, subject, message);
 	}
 
-	private String getBaseAddress() {
-		HttpServletRequest request = requestGlobals.getHTTPServletRequest();
+	public static String getJobLink(Job job, PageRenderLinkSource linkSource, RequestGlobals globals, Class<?> pageClass) {
+		String url = getBaseAddress(globals) + 
+        				linkSource.createPageRenderLinkWithContext(
+        						pageClass, job.getKey().getParent().getId(), job.getKey().getId());
+        
+        url = Utils.removeJSessionId(url);
+		return url;
+	}
+
+	public static String getBaseAddress(RequestGlobals globals) {
+		HttpServletRequest request = globals.getHTTPServletRequest();
 		
 		String baseAddr = request.getScheme() + "://" + request.getServerName() 
 			 + (request.getLocalPort() == 0 ? "" : ":" + request.getLocalPort());

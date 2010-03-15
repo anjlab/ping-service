@@ -1,13 +1,12 @@
 package dmitrygusev.ping.services;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import dmitrygusev.ping.entities.JobResult;
 
@@ -17,28 +16,14 @@ public class JobResultCSVExporter {
 
 	private static final String[] COLUMN_HEADERS = {
 		"timestamp",
-		"year",
-		"month",
-		"day",
-		"hour",
-		"minute",
-		"day of week",
 		"duration",
-		"succeeded"
+		"resultCode"
 	};
 
-	private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd hh:mm:ss";
-
 	private static final String[] COLUMN_HEADER_PATTERNS = {
-		TIMESTAMP_PATTERN,
-		"2009",
-		"12",
-		"31",
-		"24",
-		"59",
-		"7",
+		Application.DATETIME_PATTERN,
 		"99999",
-		"0"
+		"00"
 	};
 
 	private static final String HEADER_TEXT = getHeaderText();
@@ -69,8 +54,8 @@ public class JobResultCSVExporter {
 		return buffer.toString();
 	}
 	
-	public InputStream export(List<JobResult> results) throws IOException {
-		SimpleDateFormat dateFormat = new SimpleDateFormat(TIMESTAMP_PATTERN);
+	public byte[] export(TimeZone timeZone, List<JobResult> results) throws IOException {
+		DateFormat dateFormat = Application.DATETIME_FORMAT;
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(
 				HEADER_TEXT.length() + results.size() * HEADER_PATTERN.length());
@@ -79,30 +64,22 @@ public class JobResultCSVExporter {
 		
 		Calendar c = Calendar.getInstance();
 		
+		if (timeZone != null) {
+			dateFormat.setTimeZone(timeZone);
+		}
+		
 		for (JobResult result : results) {
 			c.setTime(result.getTimestamp());
 			
 			write(baos, dateFormat.format(c.getTime()));
 			write(baos, SEPARATOR_CHAR);
-			write(baos, c.get(Calendar.YEAR));
-			write(baos, SEPARATOR_CHAR);
-			write(baos, c.get(Calendar.MONTH) + 1);
-			write(baos, SEPARATOR_CHAR);
-			write(baos, c.get(Calendar.DAY_OF_MONTH));
-			write(baos, SEPARATOR_CHAR);
-			write(baos, c.get(Calendar.HOUR_OF_DAY));
-			write(baos, SEPARATOR_CHAR);
-			write(baos, c.get(Calendar.MINUTE));
-			write(baos, SEPARATOR_CHAR);
-			write(baos, c.get(Calendar.DAY_OF_WEEK));
-			write(baos, SEPARATOR_CHAR);
 			write(baos, result.getResponseTime());
 			write(baos, SEPARATOR_CHAR);
-			write(baos, result.isFailed() ? 0 : 1);
+			write(baos, result.getPingResult());
 			write(baos, '\n');
 		}
 		
-        return new ByteArrayInputStream(baos.toByteArray());
+        return baos.toByteArray();
 	}
 
 	private static void write(OutputStream output, String s) throws IOException {

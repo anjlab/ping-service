@@ -8,11 +8,12 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/cubics-renders"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry-ioc-5.2.0-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry5-annotations-5.2.0-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/log4j-1.2.14.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry-jpa-2.0.1-SNAPSHOT.jar" sourcepath="C:/dev/src/tynamo/tapestry-jpa-module"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry-jpa-core-2.0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tapestry-core-5.2.0-20100220.091813-236.jar" sourcepath="C:/dev/src/tapestry5"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/slf4j-api-1.5.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/slf4j-jdk14-1.5.2.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

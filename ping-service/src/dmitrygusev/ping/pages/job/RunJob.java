@@ -2,10 +2,11 @@ package dmitrygusev.ping.pages.job;
 
 import static com.google.appengine.api.datastore.KeyFactory.stringToKey;
 
-import org.apache.log4j.Logger;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.services.Application;
@@ -13,7 +14,7 @@ import dmitrygusev.ping.services.dao.JobDAO;
 
 public class RunJob {
 
-	private static final Logger logger = Logger.getLogger(RunJob.class);
+	private static final Logger logger = LoggerFactory.getLogger(RunJob.class);
 	
 	@Inject
 	private Request request;
@@ -30,7 +31,7 @@ public class RunJob {
 	public void onActivate() {
 		String jobKey = request.getParameter("key");
 		
-		logger.debug("Running job: " + jobKey);
+		logger.debug("Running job: " + stringToKey(jobKey).toString());
 		
 		try {
 			Job job = jobDAO.find(stringToKey(jobKey));

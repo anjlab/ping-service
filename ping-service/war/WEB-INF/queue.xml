@@ -19,4 +19,9 @@
     <name>every1hours</name>
     <rate>6/m</rate>
   </queue>
+  <queue>
+    <name>mail</name>
+    <rate>1/m</rate>
+    <bucket-size>1</bucket-size>
+  </queue>
 </queue-entries>

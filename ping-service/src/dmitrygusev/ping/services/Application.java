@@ -1,7 +1,8 @@
 package dmitrygusev.ping.services;
 
 import static com.google.appengine.api.datastore.KeyFactory.keyToString;
-import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
+import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
+import static dmitrygusev.tapestry5.GAEUtils.buildTaskUrl;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -10,14 +11,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
 import org.apache.tapestry5.services.ApplicationStateManager;
 import org.apache.tapestry5.services.PageRenderLinkSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.labs.taskqueue.Queue;
-import com.google.appengine.api.labs.taskqueue.QueueFactory;
-import com.google.appengine.api.labs.taskqueue.TaskOptions.Method;
 
 import dmitrygusev.ping.entities.Account;
 import dmitrygusev.ping.entities.Job;
@@ -33,7 +33,7 @@ import dmitrygusev.ping.services.security.GAEHelper;
 
 public class Application {
 
-	private static final Logger logger = Logger.getLogger(Application.class);
+	private static final Logger logger = LoggerFactory.getLogger(Application.class);
 	
 	private AccountDAO accountDAO;
 	private JobDAO jobDAO;
@@ -261,27 +261,39 @@ public class Application {
 		assertCanModifyJob(job);
 	}
 
-	private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+	public static final DateFormat DATETIME_FORMAT = new SimpleDateFormat(DATETIME_PATTERN);
+	public static final DateFormat DATETIME_FORMAT_FOR_FILE_NAME = new SimpleDateFormat("yyyyMMddHHmmss");
 
+	public String formatDateForFileName(Date date) {
+		String timeZoneCity = getUserAccount().getTimeZoneCity();
+
+		return formatDate(date, timeZoneCity, DATETIME_FORMAT_FOR_FILE_NAME);
+	}
+	
+	public static String formatDateForFileName(Date date, String timeZoneCity) {
+		return formatDate(date, timeZoneCity, DATETIME_FORMAT_FOR_FILE_NAME);
+	}
+	
 	public String formatDate(Date date) {
 		String timeZoneCity = getUserAccount().getTimeZoneCity();
 
-		return formatDate(date, timeZoneCity);
+		return formatDate(date, timeZoneCity, DATETIME_FORMAT);
 	}
 
-	public static String formatDate(Date date, String timeZoneCity) {
+	public static String formatDate(Date date, String timeZoneCity, DateFormat format) {
 		TimeZone timezone = getTimeZone(timeZoneCity);
 
-		dateFormat.setTimeZone(timezone);
+		format.setTimeZone(timezone);
 		
-		return dateFormat.format(date);
+		return format.format(date);
 	}
 
 	public TimeZone getTimeZone() {
 		return getTimeZone(getUserAccount().getTimeZoneCity());
 	}
 	
-	private static TimeZone getTimeZone(String timeZoneCity) {
+	public static TimeZone getTimeZone(String timeZoneCity) {
 		return Utils.isNullOrEmpty(timeZoneCity) 
 								? TimeZone.getDefault() 
 								: TimeZone.getTimeZone(Utils.getTimeZoneId(timeZoneCity));
@@ -355,10 +367,10 @@ public class Application {
 		
 		logger.debug("Found " + jobs.size() + " job(s) to enqueue");
 
-		Queue queue = QueueFactory.getQueue(cronString.replace(" ", ""));
+		Queue queue = getQueue(cronString.replace(" ", ""));
 
 		for (Job job : jobs) {
-			queue.add(null, url("/job/run/").param("key", keyToString(job.getKey())).method(Method.GET));
+			queue.add(null, buildTaskUrl("/job/run/").param("key", keyToString(job.getKey())));
 		}
 		
 		logger.debug("Finished enqueueing jobs");

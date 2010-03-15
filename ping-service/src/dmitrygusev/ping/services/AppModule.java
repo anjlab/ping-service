@@ -1,9 +1,14 @@
 package dmitrygusev.ping.services;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
+
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.Translator;
 import org.apache.tapestry5.ioc.Configuration;
@@ -23,6 +28,8 @@ import org.apache.tapestry5.services.RequestFilter;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.RequestHandler;
 import org.apache.tapestry5.services.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tynamo.jpa.JPASymbols;
 import org.tynamo.jpa.JPATransactionAdvisor;
 
@@ -81,6 +88,17 @@ public class AppModule
     			refDAO, jobResultDAO, gaeHelper, jobExecutor, reportSender,
     			mailer, stateManager);
     }
+
+    public static Cache buildCache(Logger logger) {
+        try {
+        	CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
+			Cache cache = cacheFactory.createCache(Collections.emptyMap());
+			return cache;
+		} catch (CacheException e) {
+			logger.error("Error instantiating cache", e);
+			return null;
+		}
+    }
     
     public static BeanModelHelper buildBeanModelHelper(
     		BeanModelSource beanModelSource) {
@@ -96,7 +114,7 @@ public class AppModule
     }
     
     public static Logger buildLogger() {
-    	return Logger.getLogger(AppModule.class);
+    	return LoggerFactory.getLogger(AppModule.class);
     }
     
     public static JobResultCSVExporter buildJobResultCSVExporter() {

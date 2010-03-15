@@ -1,5 +1,6 @@
 package dmitrygusev.ping.entities;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -13,9 +14,15 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.memcache.MemcacheServicePb.MemcacheService;
 
 @Entity
-public class JobResult {
+public class JobResult implements Serializable {
+	/**
+	 * Since using {@link MemcacheService} for results backup. 
+	 */
+	private static final long serialVersionUID = -1017360991575189016L;
+	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
