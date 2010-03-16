@@ -67,7 +67,7 @@ public class JobExecutor {
 	        		checkHttpCodeValidation(job, response, hcvb);
 	        		sb.append(hcvb);
 	        	} catch (Exception e) {
-	        		logger.error("Error checking http code validation for url " + url + ": " + e);
+	        		logger.warn("Error checking http code validation for url " + url, e);
 	        		sb.append("Error checking http code validation for url " + url + ": " + e.getMessage());
 	    			job.setLastPingResult(job.getLastPingResult() | Job.PING_RESULT_HTTP_ERROR);
 	        	}
@@ -85,7 +85,7 @@ public class JobExecutor {
 		        	checkRegexpValidation(job, response, rvb);
 	        		sb.append(rvb);
 	        	} catch (Exception e) {
-	        		logger.error("Error checking regexp validation for url " + url + ": " + e);
+	        		logger.warn("Error checking regexp validation for url " + url, e);
 	        		sb.append("Error checking regexp validation for url " + url + ": " + e.getMessage());
 	    			job.setLastPingResult(job.getLastPingResult() | Job.PING_RESULT_REGEXP_VALIDATION_FAILED);
 	        	}
@@ -100,7 +100,7 @@ public class JobExecutor {
 	        job.setLastPingDetails(sb.toString());
 		}
 		catch (Exception e) {
-			logger.error("Error fetching url " + url + ": " + e);
+			logger.warn("Error fetching url " + url, e);
 		
 			job.setLastPingResult(Job.PING_RESULT_CONNECTIVITY_PROBLEM);
 

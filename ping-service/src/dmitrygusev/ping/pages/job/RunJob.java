@@ -37,7 +37,7 @@ public class RunJob {
 			}
 		} catch (Exception e) {
 			//	Prevent to run job once again on failure
-			logger.error("Error running job: " + e);
+			logger.warn("Error running job", e);
 		}
 	}
 	
