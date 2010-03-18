@@ -56,7 +56,7 @@ public class GeneralStats {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T> GeneralStats calculate(Class<T> clazz, List<T> data, final String property) {
+	public static <T> GeneralStats calculate(Class<T> clazz, final String property, List<T> data) {
 		final BeanClass<T> beanClass = new BeanClass<T>(clazz);
 		
 		Collections.sort((List)data, new Comparator<T>() {

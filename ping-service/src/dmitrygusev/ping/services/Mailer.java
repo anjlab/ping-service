@@ -26,6 +26,11 @@ public class Mailer {
 	}
 	
 	public void sendMail(String from, String to, String subject, String message, MimeBodyPart... attachments) {
+		if (Utils.isNullOrEmpty(to)) {
+			logger.warn("mail can't be delivered to (recipient == null):\n{}", message);
+			return;
+		}
+		
 		Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
 
@@ -53,11 +58,11 @@ public class Mailer {
 	        Transport.send(msg);
         } catch (Exception e) {
         	logger.error(
-        			"Error sending mail:\n"+
-        			"From: " + from + 
-        			"; To: " + to + 
-        			"; Subject: " + subject + 
-        			"; Message: " + message + "\n\n" + 
+        			"Error sending mail:"+
+        			"\n\tFrom: " + from + 
+        			"\n\tTo: " + to + 
+        			"\n\tSubject: " + subject + 
+        			"\n\tMessage:\n\n" + message, 
         			e);
         }
 	}

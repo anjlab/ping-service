@@ -43,6 +43,5 @@ public class GAEHelper {
 	public static TaskOptions buildTaskUrl(String path) {
 		return url(path.endsWith("/") ? path : path + "/").method(Method.GET);
 	}
-
 	
 }

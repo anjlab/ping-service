@@ -32,6 +32,7 @@ import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
 import dmitrygusev.ping.entities.Ref;
 import dmitrygusev.ping.entities.Schedule;
+import dmitrygusev.ping.pages.job.Analytics;
 import dmitrygusev.ping.pages.task.BackupAndDeleteOldJobResultsTask;
 import dmitrygusev.ping.pages.task.CountJobResultsTask;
 import dmitrygusev.ping.pages.task.CyclicBackupTask;
@@ -57,7 +58,6 @@ public class Application {
 	private JobResultDAO jobResultDAO;
 	private GAEHelper gaeHelper;
 	private JobExecutor jobExecutor;
-	private ReportSender reportSender;
 	private Mailer mailer;
 	private AppSessionCache sessionCache;
 	private PageRenderLinkSource linkSource;
@@ -71,7 +71,6 @@ public class Application {
 			JobResultDAO jobResultDAO,
 			GAEHelper gaeHelper,
 			JobExecutor jobExecutor,
-			ReportSender reportSender,
 			Mailer mailer,
 			ApplicationStateManager stateManager,
 			PageRenderLinkSource linkSource,
@@ -84,7 +83,6 @@ public class Application {
 		this.jobResultDAO = jobResultDAO;
 		this.gaeHelper = gaeHelper;
 		this.jobExecutor = jobExecutor;
-		this.reportSender = reportSender;
 		this.mailer = mailer;
 		this.sessionCache = stateManager.get(AppSessionCache.class);
 		this.linkSource = linkSource;
@@ -412,10 +410,10 @@ public class Application {
 								/* No need to notify earlier since user didn't received fail report yet */
 								|| job.getPreviousStatusCounter() >= GOOGLE_IO_FAIL_LIMIT)) {
 					//	The job is up again 
-					reportSender.sendReport(job, this);
+					sendReport(job);
 				} else if (job.isLastPingFailed() && !job.isGoogleIOException()) {
 					//	Non-Google IO failure
-					reportSender.sendReport(job, this);
+					sendReport(job);
 				}
 			} else {
 				job.incrementStatusCounter();
@@ -423,13 +421,13 @@ public class Application {
 			
 			if (job.getStatusCounter() == GOOGLE_IO_FAIL_LIMIT && job.isGoogleIOException()) {
 				//	Register job failure on third fail (see GOOGLE_IO_FAIL_LIMIT)
-				reportSender.sendReport(job, this);
+				sendReport(job);
 			}
 			
 			jobDAO.update(job);
 			jobResultDAO.persistResult(jobResult);
 		} catch (Exception e) {
-			logger.error("Error executing job " + job.getKey() + ": " + e);
+			logger.error("Error executing job " + job.getKey(), e);
 		}
 	}
 
@@ -519,6 +517,39 @@ public class Application {
 			 + (request.getLocalPort() == 0 ? "" : ":" + request.getLocalPort());
 		
 		return baseAddr;
+	}
+
+	public void sendReport(Job job) throws URISyntaxException {
+		String from = Mailer.PING_SERVICE_NOTIFY_GMAIL_COM;
+		String to = job.getReportEmail();
+		
+	    String subject = job.isLastPingFailed() ? job.getTitleFriendly() + " is down" : job.getTitleFriendly() + " is up again";
+	
+		StringBuffer body = new StringBuffer();
+	    
+	    body.append("Job results for URL: ");
+	    body.append(job.getPingURL());
+	    body.append("\n\nYou can analyze URL performance at: ");
+	    
+		body.append(getJobUrl(job, Analytics.class));
+	
+	    body.append("\n\nYour ");
+	    body.append(job.isLastPingFailed() ? "up" : "down");
+	    body.append("time status counter was: ");
+	    body.append(job.getPreviousStatusCounterFriendly());
+	    
+	    body.append("\n\nDetailed report:\n\n");
+	
+	    if (job.isGoogleIOException()) {
+	    	body.append("Your server didn't respond in 10 seconds." +
+	    			   "\nWe can't wait longer: http://code.google.com/intl/en/appengine/docs/java/urlfetch/overview.html#Requests\n\n");
+	    }
+	    
+	    body.append(job.getLastPingDetails());
+	    
+		String message = body.toString();
+	
+		mailer.sendMail(from, to, subject, message);
 	}
 	
 }

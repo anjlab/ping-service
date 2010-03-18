@@ -153,13 +153,13 @@ public class MailJobResultsTask {
 
 	private void sendResults(List<JobResult> resultsBuffer) {
 		try {
-			sendResultsByMail(resultsBuffer, getReportRecepient());
+			sendResultsByMail(resultsBuffer, getReportRecipient());
 		} catch (Exception e) {
 			logger.error("Error sending backup by email", e);
 		}
 	}
 	
-	public void sendResultsByMail(List<JobResult> results, String reportRecepient) throws MessagingException, IOException, URISyntaxException {
+	public void sendResultsByMail(List<JobResult> results, String reportRecipient) throws MessagingException, IOException, URISyntaxException {
 		totalRecords += results.size();
 		
 		JobResult firstResult = (JobResult) results.get(results.size() - 1);
@@ -224,14 +224,14 @@ public class MailJobResultsTask {
         byte[] export = new JobResultCSVExporter().export(timeZone, (List<JobResult>)results);
 		attachment.setContent(new String(export), "text/plain");
 		
-		mailer.sendMail(Mailer.PING_SERVICE_NOTIFY_GMAIL_COM, reportRecepient, subject, message, attachment);
+		mailer.sendMail(Mailer.PING_SERVICE_NOTIFY_GMAIL_COM, reportRecipient, subject, message, attachment);
 	}
 
 	private String getReportSubject() {
 		return "Statistics Backup for " + job.getTitleFriendly();
 	}
 
-	private String getReportRecepient() {
+	private String getReportRecipient() {
 		return job.getReportEmail();
 	}
 

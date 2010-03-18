@@ -66,39 +66,35 @@ public class AppModule
         binder.bind(JobResultDAO.class, JobResultDAOImpl.class);
         binder.bind(RefDAO.class, RefDAOImpl.class);
         binder.bind(ScheduleDAO.class, ScheduleDAOImpl.class);
-        
-        // Make bind() calls on the binder object to define most IoC services.
-        // Use service builder methods (example below) when the implementation
-        // is provided inline, or requires more initialization than simply
-        // invoking the constructor.
     }
 
-    public static ReportSender buildReportSender(Mailer mailer) {
-    	return new ReportSender(mailer);
-    }
-    
     public static void contributeIgnoredPathsFilter(Configuration<String> configuration) {
+    	//	GAE filters
     	configuration.add("/_ah/.*");
     }
     
     public static Application buildApplication(
-    		ScheduleDAO scheduleDAO, AccountDAO accountDAO, 
-    		JobDAO jobDAO, RefDAO refDAO, JobResultDAO jobResultDAO,
-    		GAEHelper gaeHelper, JobExecutor jobExecutor, 
-    		ReportSender reportSender, Mailer mailer,
+    		ScheduleDAO scheduleDAO, 
+    		AccountDAO accountDAO, 
+    		JobDAO jobDAO, 
+    		RefDAO refDAO, 
+    		JobResultDAO jobResultDAO,
+    		GAEHelper gaeHelper, 
+    		JobExecutor jobExecutor, 
+    		Mailer mailer,
     		ApplicationStateManager stateManager,
     		PageRenderLinkSource linkSource,
-    		RequestGlobals globals) {
+    		RequestGlobals globals)
+    {
     	return new Application(accountDAO, jobDAO, scheduleDAO, 
-    			refDAO, jobResultDAO, gaeHelper, jobExecutor, reportSender,
-    			mailer, stateManager, linkSource, globals);
+    			refDAO, jobResultDAO, gaeHelper, jobExecutor, mailer,
+    			stateManager, linkSource, globals);
     }
 
     public static Cache buildCache(Logger logger) {
         try {
         	CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
-			Cache cache = cacheFactory.createCache(Collections.emptyMap());
-			return cache;
+			return cacheFactory.createCache(Collections.emptyMap());
 		} catch (CacheException e) {
 			logger.error("Error instantiating cache", e);
 			return null;
@@ -150,7 +146,7 @@ public class AppModule
         // The factory default is true but during the early stages of an application
         // overriding to false is a good idea. In addition, this is often overridden
         // on the command line as -Dtapestry.production-mode=false
-        configuration.add(SymbolConstants.PRODUCTION_MODE, "false");
+        configuration.add(SymbolConstants.PRODUCTION_MODE, "true");
         configuration.add(SymbolConstants.COMPRESS_WHITESPACE, "true");
 
         configuration.add(JPASymbols.PERSISTENCE_UNIT, "transactions-optional");
@@ -248,7 +244,7 @@ public class AppModule
 			}
 		};
 	}
-
+    
     public void contributeApplicationStateManager(
     		MappedConfiguration<Class<?>, ApplicationStateContribution> configuration,
     		final GAEHelper helper, final AccountDAO accountDAO)
@@ -276,4 +272,4 @@ public class AppModule
         advisor.addTransactionCommitAdvice(receiver);
     }
 
-} 
+}
