@@ -2,7 +2,6 @@ package dmitrygusev.ping.pages.task;
 
 import static com.google.appengine.api.labs.taskqueue.QueueFactory.getDefaultQueue;
 import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
-import static dmitrygusev.tapestry5.GAEUtils.buildTaskUrl;
 
 import java.util.List;
 
@@ -21,6 +20,7 @@ import com.google.appengine.api.labs.taskqueue.TaskOptions;
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableMultimap;
 import com.google.appengine.repackaged.com.google.common.collect.Multimap;
 
+import dmitrygusev.ping.services.GAEHelper;
 import dmitrygusev.ping.services.Utils;
 
 public abstract class LongRunningQueryTask {
@@ -36,7 +36,12 @@ public abstract class LongRunningQueryTask {
 	protected abstract int getMaxResultsToFetchAtATime();
 
 	private long startTime;
-
+	private long requestStartTime;
+	
+	public long getRequestDuration() {
+		return System.currentTimeMillis() - requestStartTime;
+	}
+	
 	public String getQueueName() {
 		return getDefaultQueue().getQueueName();
 	}
@@ -73,6 +78,8 @@ public abstract class LongRunningQueryTask {
 	
 	public void onActivate() {
 		try {
+			requestStartTime = System.currentTimeMillis();
+			
 			logTaskParameters();
 
 			if (!initTask()) {
@@ -134,7 +141,7 @@ public abstract class LongRunningQueryTask {
 		
 		Queue queue = getQueue(getQueueName());
 		
-		TaskOptions taskOptions = buildTaskUrl(request.getPath())
+		TaskOptions taskOptions = GAEHelper.buildTaskUrl(request.getPath())
 					.param(CURSOR_PARAMETER_NAME, cursor.toWebSafeString())
 					.param(STARTTIME_PARAMETER_NAME, String.valueOf(startTime));
 		

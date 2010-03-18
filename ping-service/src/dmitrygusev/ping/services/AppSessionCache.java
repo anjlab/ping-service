@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import dmitrygusev.ping.entities.Account;
 import dmitrygusev.ping.services.dao.AccountDAO;
-import dmitrygusev.ping.services.security.GAEHelper;
 
 public class AppSessionCache implements Serializable {
 

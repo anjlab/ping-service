@@ -4,7 +4,7 @@ import java.security.Principal;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 
-import dmitrygusev.ping.services.security.GAEHelper;
+import dmitrygusev.ping.services.GAEHelper;
 
 public class TopBar {
 

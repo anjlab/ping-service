@@ -5,6 +5,7 @@ import static dmitrygusev.ping.pages.task.BackupAndDeleteOldJobResultsTask.getCh
 import static dmitrygusev.ping.services.Utils.formatTimeMillis;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
@@ -15,9 +16,7 @@ import javax.mail.internet.MimeBodyPart;
 import net.sf.jsr107cache.Cache;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
-import org.apache.tapestry5.services.RequestGlobals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +26,6 @@ import dmitrygusev.ping.pages.job.EditJob;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.JobResultCSVExporter;
 import dmitrygusev.ping.services.Mailer;
-import dmitrygusev.ping.services.ReportSender;
 import dmitrygusev.ping.services.Utils;
 import dmitrygusev.ping.services.dao.JobDAO;
 
@@ -37,8 +35,6 @@ public class MailJobResultsTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(MailJobResultsTask.class);
 	
-	@Inject	private PageRenderLinkSource linkSource;
-	@Inject	private RequestGlobals globals;
 	@Inject private Mailer mailer;
 	@Inject private Request request;
 
@@ -163,7 +159,7 @@ public class MailJobResultsTask {
 		}
 	}
 	
-	public void sendResultsByMail(List<JobResult> results, String reportRecepient) throws MessagingException, IOException {
+	public void sendResultsByMail(List<JobResult> results, String reportRecepient) throws MessagingException, IOException, URISyntaxException {
 		totalRecords += results.size();
 		
 		JobResult firstResult = (JobResult) results.get(results.size() - 1);
@@ -203,7 +199,7 @@ public class MailJobResultsTask {
 		
 		builder.append("\n\n----"); 
 		builder.append("\nYou can disable receiving statistics backups for the job here: ");
-		String editJobLink = ReportSender.getJobLink(job, linkSource, globals, EditJob.class);
+		String editJobLink = application.getJobUrl(job, EditJob.class);
 		builder.append(editJobLink);
 		builder.append("\n\nNote:");
 		builder.append("\nAutomatic Backups is a beta function, please use our feedback form (http://ping-service.appspot.com/feedback) to provide a feedback on it.");

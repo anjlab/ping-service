@@ -6,8 +6,8 @@ import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.Request;
 
+import dmitrygusev.ping.services.GAEHelper;
 import dmitrygusev.ping.services.Mailer;
-import dmitrygusev.ping.services.security.GAEHelper;
 import dmitrygusev.tapestry5.Utils;
 
 public class Feedback {

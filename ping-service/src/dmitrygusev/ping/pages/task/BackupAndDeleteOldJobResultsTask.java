@@ -5,6 +5,7 @@ import static com.google.appengine.api.datastore.KeyFactory.stringToKey;
 import static java.lang.Long.parseLong;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 	public static final String TASK_ID_PARAMETER_NAME = "taskId";
 	public static final long CACHED_RESULTS_FIRST_CHUNK_ID = 1;
 
-	private static final int ALLOWED_NUMBER_OF_RESULTS = 1000;
+	private static final int NUMBER_OF_RESULTS_LO_SKIP = 1000;
 
 	@Inject private Request request;
 	@Inject private EntityManager em;
@@ -90,12 +91,11 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected boolean processResults(List<?> results) throws Exception {
-		totalCount += results.size();
-		
-		if (isOldResults()) {
-			backupAndDelete((List<JobResult>)results);
+		if (isOldResults(results)) {
+			totalCount += backupAndDelete((List<JobResult>)results);
 		} else {
 			logger.debug("Nothing to process here");
+			totalCount += results.size();
 		}
 
 		return true;
@@ -122,24 +122,50 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 	@Inject
 	private JobResultDAO jobResultDAO;
 	
-	private void backupAndDelete(List<JobResult> results) throws MessagingException, IOException {
+	/**
+	 * 
+	 * @param results
+	 * @return Returns number of results deleted.
+	 * @throws MessagingException
+	 * @throws IOException
+	 * @throws URISyntaxException 
+	 */
+	private int backupAndDelete(List<JobResult> results) throws MessagingException, IOException, URISyntaxException {
+		int deletedCount = 0;
+		
 		if (results.size() > 0) {
-			if (job.isReceiveBackups()) {
-				backupResults(results);
-			}
+			deletedCount = deleteResults(results);
 
-			deleteResults(results);
+			if (job.isReceiveBackups()) {
+				ArrayList<JobResult> serializableList = 
+					new ArrayList<JobResult>(results.subList(0, deletedCount));
+				backupResults(serializableList);
+			}
 		}
+		
+		return deletedCount;
 	}
 
-	private void deleteResults(List<JobResult> results) {
+	/**
+	 * 
+	 * @param results
+	 * @return Returns number of results deleted.
+	 */
+	private int deleteResults(List<JobResult> results) {
+		int count = 0;
 		for (JobResult result : (List<JobResult>) results) {
 			jobResultDAO.delete(result.getId());
+			count++;
+			if (getRequestDuration() > 10000) {
+				//	Spent only around 1/3 of request duration limit to delete job results
+				break;
+			}
 		}
+		return count;
 	}
 
-	private boolean isOldResults() {
-		return totalCount > ALLOWED_NUMBER_OF_RESULTS;
+	private boolean isOldResults(List<?> results) {
+		return (totalCount + results.size()) > NUMBER_OF_RESULTS_LO_SKIP;
 	}
 
 	@Inject
@@ -151,7 +177,7 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 	@Inject
 	private MemcacheService memcacheService;
 	
-	private void backupResults(List<JobResult> results) throws MessagingException, IOException {
+	private void backupResults(ArrayList<JobResult> results) throws MessagingException, IOException, URISyntaxException {
 		if (cache == null || memcacheService == null) {
 			//	If the cache/memcacheService is null, the user wont be able to receive emails w/ backup
 			//	unless we send him up to several hundreds of emails.
@@ -161,10 +187,9 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 			long id = memcacheService.increment(taskId, 1, CACHED_RESULTS_FIRST_CHUNK_ID - 1);
 			
 			String chunkKey = getChunkKeyInCache(taskId, id);
-			ArrayList<JobResult> values = new ArrayList<JobResult>(results);
 			
-			logger.debug("Put {} values in cache[{}]", values.size(), chunkKey);
-			cache.put(chunkKey, values);
+			logger.debug("Put {} values in cache[{}]", results.size(), chunkKey);
+			cache.put(chunkKey, results);
 		}
 	}
 

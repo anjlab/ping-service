@@ -12,12 +12,12 @@ import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.Schedule;
 import dmitrygusev.ping.pages.Index;
 import dmitrygusev.ping.services.Application;
+import dmitrygusev.ping.services.GAEHelper;
 import dmitrygusev.ping.services.Utils;
 import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.JobDAO;
 import dmitrygusev.ping.services.dao.RefDAO;
 import dmitrygusev.ping.services.dao.ScheduleDAO;
-import dmitrygusev.ping.services.security.GAEHelper;
 
 @SuppressWarnings("unused")
 public class CreateJob {

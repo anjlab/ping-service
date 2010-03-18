@@ -48,7 +48,6 @@ import dmitrygusev.ping.services.dao.impl.JobResultDAOImpl;
 import dmitrygusev.ping.services.dao.impl.RefDAOImpl;
 import dmitrygusev.ping.services.dao.impl.ScheduleDAOImpl;
 import dmitrygusev.ping.services.security.AccessController;
-import dmitrygusev.ping.services.security.GAEHelper;
 import dmitrygusev.tapestry5.TimeTranslator;
 
 /**
@@ -74,8 +73,8 @@ public class AppModule
         // invoking the constructor.
     }
 
-    public static ReportSender buildReportSender(RequestGlobals requestGlobals, Mailer mailer) {
-    	return new ReportSender(requestGlobals, mailer);
+    public static ReportSender buildReportSender(Mailer mailer) {
+    	return new ReportSender(mailer);
     }
     
     public static void contributeIgnoredPathsFilter(Configuration<String> configuration) {
@@ -88,10 +87,11 @@ public class AppModule
     		GAEHelper gaeHelper, JobExecutor jobExecutor, 
     		ReportSender reportSender, Mailer mailer,
     		ApplicationStateManager stateManager,
-    		PageRenderLinkSource linkSource) {
+    		PageRenderLinkSource linkSource,
+    		RequestGlobals globals) {
     	return new Application(accountDAO, jobDAO, scheduleDAO, 
     			refDAO, jobResultDAO, gaeHelper, jobExecutor, reportSender,
-    			mailer, stateManager, linkSource);
+    			mailer, stateManager, linkSource, globals);
     }
 
     public static Cache buildCache(Logger logger) {
@@ -270,7 +270,7 @@ public class AppModule
     	regex.add("^anjlab/cubics/js/" + pathPattern);
     	regex.add("^anjlab/cubics/js/jquery-1.3.2.js");
     }
-
+    
     @Match("*DAO")
     public static void adviseTransactions(JPATransactionAdvisor advisor, MethodAdviceReceiver receiver)   {
         advisor.addTransactionCommitAdvice(receiver);

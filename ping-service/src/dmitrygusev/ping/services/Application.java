@@ -3,8 +3,8 @@ package dmitrygusev.ping.services;
 import static com.google.appengine.api.datastore.KeyFactory.keyToString;
 import static com.google.appengine.api.labs.taskqueue.QueueFactory.getDefaultQueue;
 import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
-import static dmitrygusev.tapestry5.GAEUtils.buildTaskUrl;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -14,13 +14,18 @@ import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.tapestry5.Link;
 import org.apache.tapestry5.services.ApplicationStateManager;
 import org.apache.tapestry5.services.PageRenderLinkSource;
+import org.apache.tapestry5.services.RequestGlobals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.labs.taskqueue.Queue;
+import com.google.appengine.api.labs.taskqueue.TaskOptions;
 
 import dmitrygusev.ping.entities.Account;
 import dmitrygusev.ping.entities.Job;
@@ -37,7 +42,6 @@ import dmitrygusev.ping.services.dao.JobDAO;
 import dmitrygusev.ping.services.dao.JobResultDAO;
 import dmitrygusev.ping.services.dao.RefDAO;
 import dmitrygusev.ping.services.dao.ScheduleDAO;
-import dmitrygusev.ping.services.security.GAEHelper;
 
 public class Application {
 
@@ -57,6 +61,7 @@ public class Application {
 	private Mailer mailer;
 	private AppSessionCache sessionCache;
 	private PageRenderLinkSource linkSource;
+	private RequestGlobals globals;
 	
 	public Application(
 			AccountDAO accountDAO, 
@@ -69,7 +74,8 @@ public class Application {
 			ReportSender reportSender,
 			Mailer mailer,
 			ApplicationStateManager stateManager,
-			PageRenderLinkSource linkSource) {
+			PageRenderLinkSource linkSource,
+			RequestGlobals globals) {
 		super();
 		this.accountDAO = accountDAO;
 		this.jobDAO = jobDAO;
@@ -82,6 +88,7 @@ public class Application {
 		this.mailer = mailer;
 		this.sessionCache = stateManager.get(AppSessionCache.class);
 		this.linkSource = linkSource;
+		this.globals = globals;
 	}
 
 	public List<Account> getAccounts(Schedule schedule) {
@@ -384,7 +391,7 @@ public class Application {
 		Queue queue = getQueue(cronString.replace(" ", ""));
 
 		for (Job job : jobs) {
-			queue.add(null, buildTaskUrl("/job/run/").param("key", keyToString(job.getKey())));
+			queue.add(null, GAEHelper.buildTaskUrl("/job/run/").param("key", keyToString(job.getKey())));
 		}
 		
 		logger.debug("Finished enqueueing jobs");
@@ -405,10 +412,10 @@ public class Application {
 								/* No need to notify earlier since user didn't received fail report yet */
 								|| job.getPreviousStatusCounter() >= GOOGLE_IO_FAIL_LIMIT)) {
 					//	The job is up again 
-					reportSender.sendReport(job, linkSource);
+					reportSender.sendReport(job, this);
 				} else if (job.isLastPingFailed() && !job.isGoogleIOException()) {
 					//	Non-Google IO failure
-					reportSender.sendReport(job, linkSource);
+					reportSender.sendReport(job, this);
 				}
 			} else {
 				job.incrementStatusCounter();
@@ -416,7 +423,7 @@ public class Application {
 			
 			if (job.getStatusCounter() == GOOGLE_IO_FAIL_LIMIT && job.isGoogleIOException()) {
 				//	Register job failure on third fail (see GOOGLE_IO_FAIL_LIMIT)
-				reportSender.sendReport(job, linkSource);
+				reportSender.sendReport(job, this);
 			}
 			
 			jobDAO.update(job);
@@ -442,21 +449,21 @@ public class Application {
 	
 	public void runCyclicBackupTask() throws URISyntaxException {
 		getQueue(BACKUP_QUEUE)
-			.add(null, buildTaskUrl(linkSource, CyclicBackupTask.class));
+			.add(null, buildTaskUrl(CyclicBackupTask.class));
 	}
 	
 	public void runBackupAndDeleteTask(Key jobKey) throws URISyntaxException {
 		long id = new Random().nextLong();
 		
 		getDefaultQueue()
-			.add(null, buildTaskUrl(linkSource, BackupAndDeleteOldJobResultsTask.class)
+			.add(null, buildTaskUrl(BackupAndDeleteOldJobResultsTask.class)
 				.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, keyToString(jobKey))
 				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, String.valueOf(id)));
 	}
 	
 	public void runMailJobResultsTask(Key jobKey, String taskId, long backupStartTime) throws URISyntaxException {
 		getQueue(MAIL_QUEUE)
-			.add(null, buildTaskUrl(linkSource, MailJobResultsTask.class)
+			.add(null, buildTaskUrl(MailJobResultsTask.class)
 				.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, keyToString(jobKey))
 				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, taskId)
 				.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(backupStartTime)));
@@ -464,7 +471,7 @@ public class Application {
 	
 	public void continueMailJobResultsTask(Key jobKey, String taskId, long backupStartTime, long chunkId, long totalRecords, long fileNumber) throws URISyntaxException {
 		getQueue(MAIL_QUEUE)
-			.add(null, buildTaskUrl(linkSource, MailJobResultsTask.class)
+			.add(null, buildTaskUrl(MailJobResultsTask.class)
 				.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, keyToString(jobKey))
 				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, taskId)
 				.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(backupStartTime))
@@ -475,8 +482,43 @@ public class Application {
 	
 	public void runCountJobResultsTask(Key jobKey) throws URISyntaxException {
 		getDefaultQueue()
-			.add(null, buildTaskUrl(linkSource, CountJobResultsTask.class)
+			.add(null, buildTaskUrl(CountJobResultsTask.class)
 				.param(CountJobResultsTask.JOB_PARAMETER_NAME, keyToString(jobKey)));
+	}
+
+	public String getPath(Class<?> pageClass, Object... context) throws URISyntaxException {
+		Link link;
+		
+		if (context != null & context.length > 0) {
+			link = linkSource.createPageRenderLinkWithContext(pageClass, context);
+		} else {
+			link = linkSource.createPageRenderLink(pageClass);
+		}
+			 
+		URI uri = new URI(link.toAbsoluteURI());
+	
+		return uri.getPath();
+	}
+
+	public TaskOptions buildTaskUrl(Class<?> pageClass) throws URISyntaxException {
+		String path = getPath(pageClass);
+		
+		return GAEHelper.buildTaskUrl(path);
+	}
+
+	public String getJobUrl(Job job, Class<?> pageClass) throws URISyntaxException {
+		String url = getBaseAddress() + getPath(pageClass, job.getKey().getParent().getId(), job.getKey().getId());
+	    
+		return url;
+	}
+
+	public String getBaseAddress() {
+		HttpServletRequest request = globals.getHTTPServletRequest();
+		
+		String baseAddr = request.getScheme() + "://" + request.getServerName() 
+			 + (request.getLocalPort() == 0 ? "" : ":" + request.getLocalPort());
+		
+		return baseAddr;
 	}
 	
 }

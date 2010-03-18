@@ -7,6 +7,8 @@ import org.apache.tapestry5.services.Dispatcher;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.Response;
 
+import dmitrygusev.ping.services.GAEHelper;
+
 public class AccessController implements Dispatcher {
 
 	private GAEHelper helper;
