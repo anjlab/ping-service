@@ -21,7 +21,6 @@ import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.services.ApplicationStateContribution;
 import org.apache.tapestry5.services.ApplicationStateCreator;
 import org.apache.tapestry5.services.ApplicationStateManager;
-import org.apache.tapestry5.services.BeanModelSource;
 import org.apache.tapestry5.services.Dispatcher;
 import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
@@ -109,11 +108,6 @@ public class AppModule
     	}
     	
     	return memcacheService;
-    }
-    
-    public static BeanModelHelper buildBeanModelHelper(
-    		BeanModelSource beanModelSource) {
-    	return new BeanModelHelper(beanModelSource);
     }
     
     public static GAEHelper buildGAEHelper(RequestGlobals requestGlobals) {
@@ -267,7 +261,7 @@ public class AppModule
     	regex.add("^anjlab/cubics/js/jquery-1.3.2.js");
     }
     
-    @Match("*DAO")
+    @Match("*DAO*")
     public static void adviseTransactions(JPATransactionAdvisor advisor, MethodAdviceReceiver receiver)   {
         advisor.addTransactionCommitAdvice(receiver);
     }
