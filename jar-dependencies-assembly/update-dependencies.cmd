@@ -10,7 +10,7 @@ ECHO *
 ECHO * Getting recent (snapshot) dependencies...
 ECHO *
 
-CALL mvn clean package
+CALL mvn clean package -Dmaven.test.skip=true
 
 ECHO ************************************************************************
 ECHO *
