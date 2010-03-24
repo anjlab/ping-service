@@ -41,7 +41,7 @@ public class CountJobResultsTask extends LongRunningQueryTask {
 	@Override
 	protected boolean initTask() {
 		counter = readIntegerParameter(RESULT_PARAMETER_NAME, 0);
-		encodedJobKey = request.getParameter(JOB_PARAMETER_NAME);
+		encodedJobKey = request.getParameter(JOB_KEY_PARAMETER_NAME);
 		
 		return !Utils.isNullOrEmpty(encodedJobKey);
 	}
@@ -50,7 +50,7 @@ public class CountJobResultsTask extends LongRunningQueryTask {
 	protected Multimap<String, String> getTaskParameters() {
 		Multimap<String, String> parameters = ArrayListMultimap.create();
 
-		parameters.put(JOB_PARAMETER_NAME, encodedJobKey);
+		parameters.put(JOB_KEY_PARAMETER_NAME, encodedJobKey);
 		parameters.put(RESULT_PARAMETER_NAME, String.valueOf(counter));
 		
 		return parameters;
@@ -65,7 +65,7 @@ public class CountJobResultsTask extends LongRunningQueryTask {
 
 	@Override
 	protected void completeTask() {
-		String keyString = request.getParameter(JOB_PARAMETER_NAME);
+		String keyString = request.getParameter(JOB_KEY_PARAMETER_NAME);
 		
 		mailer.sendSystemMessageToDeveloper(
 				"Task completed", 

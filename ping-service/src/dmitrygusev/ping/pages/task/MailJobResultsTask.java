@@ -53,7 +53,7 @@ public class MailJobResultsTask {
 	private JobDAO jobDAO;
 	
 	private boolean initTask() {
-		String encodedJobKey = request.getParameter(LongRunningQueryTask.JOB_PARAMETER_NAME);
+		String encodedJobKey = request.getParameter(LongRunningQueryTask.JOB_KEY_PARAMETER_NAME);
 		
 		taskId = request.getParameter(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME);
 

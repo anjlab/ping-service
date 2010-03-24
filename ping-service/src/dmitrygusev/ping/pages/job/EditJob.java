@@ -30,7 +30,7 @@ public class EditJob {
 	@Property
 	@Persist
 	private String message;
-
+	
 	@AfterRender
 	public void cleanup() {
 		message = null;

@@ -1,4 +1,4 @@
-package dmitrygusev.ping.pages.job;
+package dmitrygusev.ping.pages.task;
 
 import static com.google.appengine.api.datastore.KeyFactory.stringToKey;
 
@@ -11,10 +11,12 @@ import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.dao.JobDAO;
 
-public class RunJob {
+public class RunJobTask {
 
-	private static final Logger logger = LoggerFactory.getLogger(RunJob.class);
-	
+	private static final Logger logger = LoggerFactory.getLogger(RunJobTask.class);
+
+	public static final String JOB_KEY_PARAMETER_NAME = "job";
+
 	@Inject
 	private Request request;
 	
@@ -25,12 +27,12 @@ public class RunJob {
 	private JobDAO jobDAO;
 	
 	public void onActivate() {
-		String jobKey = request.getParameter("key");
-		
-		logger.debug("Running job: " + stringToKey(jobKey).toString());
+		String encodedJobKey = request.getParameter(JOB_KEY_PARAMETER_NAME);
 		
 		try {
-			Job job = jobDAO.find(stringToKey(jobKey));
+			logger.debug("Running job: {}", stringToKey(encodedJobKey).toString());
+
+			Job job = jobDAO.find(stringToKey(encodedJobKey));
 		
 			if (job != null) {
 				application.runJob(job);

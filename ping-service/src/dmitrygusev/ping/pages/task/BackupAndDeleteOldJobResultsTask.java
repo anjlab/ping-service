@@ -56,7 +56,7 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 
 	@Override
 	protected boolean initTask() throws Exception {
-		String encodedJobKey = request.getParameter(JOB_PARAMETER_NAME);
+		String encodedJobKey = request.getParameter(JOB_KEY_PARAMETER_NAME);
 		totalCount = readIntegerParameter(COUNT_PARAMETER_NAME, 0);
 		taskId = request.getParameter(TASK_ID_PARAMETER_NAME);
 
@@ -77,7 +77,7 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 	@Override
 	protected Multimap<String, String> getTaskParameters() {
 		return ImmutableMultimap.<String, String>of(
-				JOB_PARAMETER_NAME, keyToString(job.getKey()), 
+				JOB_KEY_PARAMETER_NAME, keyToString(job.getKey()), 
 				COUNT_PARAMETER_NAME, String.valueOf(totalCount),
 				TASK_ID_PARAMETER_NAME, taskId);
 	}
@@ -184,7 +184,12 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 			//	In this situation lets send these emails to PING_SERVICE_NOTIFY_GMAIL_COM instead. 
 			mailJobResultsTask.sendResultsByMail(results, Mailer.PING_SERVICE_NOTIFY_GMAIL_COM);
 		} else {
-			long id = memcacheService.increment(taskId, 1, CACHED_RESULTS_FIRST_CHUNK_ID - 1);
+			Long id = memcacheService.increment(taskId, 1, CACHED_RESULTS_FIRST_CHUNK_ID - 1);
+
+			//	This may be true (and it does happened once already)
+			if (id == null) {
+				id = 0L;
+			}
 			
 			String chunkKey = getChunkKeyInCache(taskId, id);
 			

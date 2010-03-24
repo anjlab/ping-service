@@ -261,7 +261,7 @@ public class AppModule
     	regex.add("^anjlab/cubics/js/jquery-1.3.2.js");
     }
     
-    @Match("*DAO*")
+    @Match("*DAO")
     public static void adviseTransactions(JPATransactionAdvisor advisor, MethodAdviceReceiver receiver)   {
         advisor.addTransactionCommitAdvice(receiver);
     }

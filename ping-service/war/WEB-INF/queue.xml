@@ -26,7 +26,7 @@
   </queue>
   <queue>
   	<name>backup</name>
-    <rate>3/d</rate>
+    <rate>4/d</rate>
     <bucket-size>1</bucket-size>
   </queue>
 </queue-entries>

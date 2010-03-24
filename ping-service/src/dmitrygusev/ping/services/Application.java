@@ -38,6 +38,7 @@ import dmitrygusev.ping.pages.task.CountJobResultsTask;
 import dmitrygusev.ping.pages.task.CyclicBackupTask;
 import dmitrygusev.ping.pages.task.LongRunningQueryTask;
 import dmitrygusev.ping.pages.task.MailJobResultsTask;
+import dmitrygusev.ping.pages.task.RunJobTask;
 import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.JobDAO;
 import dmitrygusev.ping.services.dao.JobResultDAO;
@@ -45,9 +46,6 @@ import dmitrygusev.ping.services.dao.RefDAO;
 import dmitrygusev.ping.services.dao.ScheduleDAO;
 
 public class Application {
-
-	public static final String BACKUP_QUEUE = "backup";
-	public static final String MAIL_QUEUE = "mail";
 
 	private static final Logger logger = LoggerFactory.getLogger(Application.class);
 	
@@ -379,22 +377,6 @@ public class Application {
 
 	public static final int GOOGLE_IO_FAIL_LIMIT = 3;
 	
-	public void enqueueJobs(String cronString) {
-		logger.debug("Enqueueing jobs for cron string: " + cronString);
-		
-		List<Job> jobs = jobDAO.getJobsByCronString(cronString);
-		
-		logger.debug("Found " + jobs.size() + " job(s) to enqueue");
-
-		Queue queue = getQueue(cronString.replace(" ", ""));
-
-		for (Job job : jobs) {
-			queue.add(null, GAEHelper.buildTaskUrl("/job/run/").param("key", keyToString(job.getKey())));
-		}
-		
-		logger.debug("Finished enqueueing jobs");
-	}
-
 	public void runJob(Job job) {
 		try {
 			boolean prevPingFailed = job.isLastPingFailed();
@@ -431,6 +413,39 @@ public class Application {
 		}
 	}
 
+	public void sendReport(Job job) throws URISyntaxException {
+		String from = Mailer.PING_SERVICE_NOTIFY_GMAIL_COM;
+		String to = job.getReportEmail();
+		
+	    String subject = job.isLastPingFailed() ? job.getTitleFriendly() + " is down" : job.getTitleFriendly() + " is up again";
+	
+		StringBuffer body = new StringBuffer();
+	    
+	    body.append("Job results for URL: ");
+	    body.append(job.getPingURL());
+	    body.append("\n\nYou can analyze URL performance at: ");
+	    
+		body.append(getJobUrl(job, Analytics.class));
+	
+	    body.append("\n\nYour ");
+	    body.append(job.isLastPingFailed() ? "up" : "down");
+	    body.append("time status counter was: ");
+	    body.append(job.getPreviousStatusCounterFriendly());
+	    
+	    body.append("\n\nDetailed report:\n\n");
+	
+	    if (job.isGoogleIOException()) {
+	    	body.append("Your server didn't respond in 10 seconds." +
+	    			   "\nWe can't wait longer: http://code.google.com/intl/en/appengine/docs/java/urlfetch/overview.html#Requests\n\n");
+	    }
+	    
+	    body.append(job.getLastPingDetails());
+	    
+		String message = body.toString();
+	
+		mailer.sendMail(from, to, subject, message);
+	}
+
 	public void sendInvite(String friendEmail) {
 		String myEmail = gaeHelper.getUserPrincipal().getName();
 		mailer.sendMail(
@@ -444,7 +459,10 @@ public class Application {
 				"This message was sent to you by " + myEmail + " via Ping Service friend invite.\n" +
 				"If you think this message was sent to you by mistake, just ignore it.");
 	}
-	
+
+	public static final String BACKUP_QUEUE = "backup";
+	public static final String MAIL_QUEUE = "mail";
+
 	public void runCyclicBackupTask() throws URISyntaxException {
 		getQueue(BACKUP_QUEUE)
 			.add(null, buildTaskUrl(CyclicBackupTask.class));
@@ -455,14 +473,14 @@ public class Application {
 		
 		getDefaultQueue()
 			.add(null, buildTaskUrl(BackupAndDeleteOldJobResultsTask.class)
-				.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, keyToString(jobKey))
+				.param(BackupAndDeleteOldJobResultsTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey))
 				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, String.valueOf(id)));
 	}
 	
 	public void runMailJobResultsTask(Key jobKey, String taskId, long backupStartTime) throws URISyntaxException {
 		getQueue(MAIL_QUEUE)
 			.add(null, buildTaskUrl(MailJobResultsTask.class)
-				.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, keyToString(jobKey))
+				.param(LongRunningQueryTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey))
 				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, taskId)
 				.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(backupStartTime)));
 	}
@@ -470,7 +488,7 @@ public class Application {
 	public void continueMailJobResultsTask(Key jobKey, String taskId, long backupStartTime, long chunkId, long totalRecords, long fileNumber) throws URISyntaxException {
 		getQueue(MAIL_QUEUE)
 			.add(null, buildTaskUrl(MailJobResultsTask.class)
-				.param(BackupAndDeleteOldJobResultsTask.JOB_PARAMETER_NAME, keyToString(jobKey))
+				.param(LongRunningQueryTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey))
 				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, taskId)
 				.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(backupStartTime))
 				.param(MailJobResultsTask.CHUNK_ID_PARAMETER_NAME, String.valueOf(chunkId))
@@ -481,7 +499,24 @@ public class Application {
 	public void runCountJobResultsTask(Key jobKey) throws URISyntaxException {
 		getDefaultQueue()
 			.add(null, buildTaskUrl(CountJobResultsTask.class)
-				.param(CountJobResultsTask.JOB_PARAMETER_NAME, keyToString(jobKey)));
+				.param(CountJobResultsTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey)));
+	}
+
+	public void enqueueJobs(String cronString) throws URISyntaxException {
+		logger.debug("Enqueueing jobs for cron string '{}'", cronString);
+		
+		List<Job> jobs = jobDAO.getJobsByCronString(cronString);
+		
+		logger.debug("Found {} job(s) to enqueue", jobs.size());
+
+		Queue queue = getQueue(cronString.replace(" ", ""));
+
+		for (Job job : jobs) {
+			queue.add(null, buildTaskUrl(RunJobTask.class)
+					.param(RunJobTask.JOB_KEY_PARAMETER_NAME, keyToString(job.getKey())));
+		}
+		
+		logger.debug("Finished enqueueing jobs");
 	}
 
 	public String getPath(Class<?> pageClass, Object... context) throws URISyntaxException {
@@ -519,37 +554,4 @@ public class Application {
 		return baseAddr;
 	}
 
-	public void sendReport(Job job) throws URISyntaxException {
-		String from = Mailer.PING_SERVICE_NOTIFY_GMAIL_COM;
-		String to = job.getReportEmail();
-		
-	    String subject = job.isLastPingFailed() ? job.getTitleFriendly() + " is down" : job.getTitleFriendly() + " is up again";
-	
-		StringBuffer body = new StringBuffer();
-	    
-	    body.append("Job results for URL: ");
-	    body.append(job.getPingURL());
-	    body.append("\n\nYou can analyze URL performance at: ");
-	    
-		body.append(getJobUrl(job, Analytics.class));
-	
-	    body.append("\n\nYour ");
-	    body.append(job.isLastPingFailed() ? "up" : "down");
-	    body.append("time status counter was: ");
-	    body.append(job.getPreviousStatusCounterFriendly());
-	    
-	    body.append("\n\nDetailed report:\n\n");
-	
-	    if (job.isGoogleIOException()) {
-	    	body.append("Your server didn't respond in 10 seconds." +
-	    			   "\nWe can't wait longer: http://code.google.com/intl/en/appengine/docs/java/urlfetch/overview.html#Requests\n\n");
-	    }
-	    
-	    body.append(job.getLastPingDetails());
-	    
-		String message = body.toString();
-	
-		mailer.sendMail(from, to, subject, message);
-	}
-	
 }

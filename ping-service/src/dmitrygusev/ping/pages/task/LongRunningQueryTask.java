@@ -27,7 +27,7 @@ public abstract class LongRunningQueryTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(LongRunningQueryTask.class);
 
-	public static final String JOB_PARAMETER_NAME = "job";
+	public static final String JOB_KEY_PARAMETER_NAME = "job";
 	public static final String STARTTIME_PARAMETER_NAME = "startTime";
 	public static final String CURSOR_PARAMETER_NAME = "cursor";
 	
@@ -169,7 +169,7 @@ public abstract class LongRunningQueryTask {
 				if (!firstValue) {
 					builder.append("; ");
 				}
-				if (JOB_PARAMETER_NAME.equals(name)) {
+				if (JOB_KEY_PARAMETER_NAME.equals(name)) {
 					value = KeyFactory.stringToKey(value).toString();
 				}
 				builder.append(value);
