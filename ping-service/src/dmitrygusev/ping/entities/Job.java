@@ -199,9 +199,17 @@ public class Job {
 	public String getStatusCounterFriendly() {
 		return formatCounter(getStatusCounter());
 	}
+	public String getStatusCounterFriendlyShort() {
+		return formatCounterShort(getStatusCounter());
+	}
+	public int getUpDownTimeInMinutes() {
+		return Utils.getTimeInMinutes(getStatusCounter(), cronString);
+	}
 	private String formatCounter(int counter) {
-		int minutes = counter * Utils.getCronMinutes(cronString);
-		return counter + " (" + Utils.formatTime(minutes) + ")";
+		return formatCounterShort(counter) + " (" + counter + ")";
+	}
+	private String formatCounterShort(int counter) {
+		return Utils.formatTime(Utils.getTimeInMinutes(counter, cronString));
 	}
 	private void setStatusCounter(int statusCounter) {
 		this.statusCounter = statusCounter;
@@ -216,7 +224,7 @@ public class Job {
 		this.previousStatusCounter = previousStatusCounter;
 	}
 	public boolean isGoogleIOException() {
-		return isLastPingFailed() 
+		return isLastPingFailed()
 			&& getLastPingResult() == PING_RESULT_CONNECTIVITY_PROBLEM
 		    && getLastPingDetails() != null 
 		    && getLastPingDetails().contains("google")
@@ -260,16 +268,21 @@ public class Job {
 
 		this.totalSuccessStatusCounter = getTotalSuccessStatusCounter() + 1 + correction;
 	}
-	public String getAvailabilityPercent() {
+	public double getAvailabilityPercent() {
 		int total = getTotalStatusCounter();
 		
 		if (total == 0) {
-			return "0.00000 %";
+			return 0;
 		}
 		
 		int totalSuccess = getTotalSuccessStatusCounter();
 		
-		return String.format(Locale.ENGLISH, "%.5f", 100d * totalSuccess / total) + " %";
+		double percent = 100d * totalSuccess / total;
+		
+		return percent;
+	}
+	public String getAvailabilityPercentFriendly() {
+		return String.format(Locale.ENGLISH, "%.5f", getAvailabilityPercent()) + " %";
 	}
 	public void resetStatusCounter() {
 		setPreviousStatusCounter(getStatusCounter());

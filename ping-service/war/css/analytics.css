@@ -7,3 +7,19 @@
 	text-align: left;
 	border-bottom: 1px #999 solid;
 }
+
+.adminTasks {
+	float: right;
+	margin-right: 10px;
+	padding: 5px;
+    border: 1px solid gray;
+}
+
+.overviewChartsButton {
+    float: right;
+    align: right;
+}
+
+.cubeToolbar {
+	padding-bottom: 2px;
+}

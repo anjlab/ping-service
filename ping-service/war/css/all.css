@@ -17,3 +17,28 @@ a.external {
 	background: transparent url(../images/external.png) no-repeat scroll right center;
 	padding-right: 13px; 
 }
+
+.status-okay, .status-warning, .status-error, .status-na {
+	padding-left: 22px;
+}
+
+.status-okay {
+	background: transparent url(../images/tick.png) no-repeat left center;
+	background-position: 2px;
+	color: green;
+}
+
+.status-warning {
+	background: transparent url(../images/bullet_error.png) no-repeat left center;
+	background-position: 2px;
+	color: orange;
+}
+
+.status-error {
+	background: transparent url(../images/exclamation.png) no-repeat left center;
+	background-position: 2px;
+	color: red;
+}
+
+.status-na {
+}

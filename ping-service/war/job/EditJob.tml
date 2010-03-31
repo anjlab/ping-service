@@ -43,7 +43,7 @@
 				
 				<t:parameter name="availabilityPercent">
 					<span>Availability:</span>
-					<t:outputRaw t:id="availabilityPercent" value="job.availabilityPercent" />
+					<t:outputRaw t:id="availabilityPercent" value="job.availabilityPercentFriendly" />
 				</t:parameter>
 
 				<t:parameter name="statusCounter">

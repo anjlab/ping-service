@@ -326,8 +326,7 @@ public class Application {
 		} else {
 			sb.append("N/A");
 		}
-		
-		
+				
 		return sb.toString();
 	}
 

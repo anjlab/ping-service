@@ -424,4 +424,8 @@ public class Utils {
 		}
 		return totalTimeFormatted;
 	}
+
+	public static int getTimeInMinutes(int counter, String cronString) {
+		return counter * getCronMinutes(cronString);
+	}
 }

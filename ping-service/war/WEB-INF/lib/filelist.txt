@@ -1,59 +1,59 @@
  Том в устройстве C имеет метку OS
  Серийный номер тома: 32FD-AD7B
 
- Содержимое папки C:\dev\workspaces\ping-service\ping-service\war\WEB-INF\lib
+ Содержимое папки c:\dev\workspaces\ping-service\ping-service\war\WEB-INF\lib
 
-23.03.2010  17:38    <DIR>          .
-23.03.2010  17:38    <DIR>          ..
-28.10.2009  11:09         1 323 005 ant-1.7.1.jar
-28.10.2009  11:11            12 143 ant-launcher-1.7.1.jar
-28.10.2009  11:09           116 205 antlr-runtime-3.1.1.jar
-23.03.2010  15:58         9 729 129 appengine-api-1.0-sdk-1.3.1.jar
-23.03.2010  15:58           665 338 appengine-api-labs-1.3.1.jar
-23.03.2010  15:58            15 351 appengine-jsr107cache-1.3.1.jar
-28.10.2009  11:09         1 269 446 bcprov-jdk15-135.jar
-24.11.2009  11:27            46 725 commons-codec-1.3.jar
-24.11.2009  11:28            38 015 commons-logging-1.0.4.jar
-13.11.2008  15:10            60 686 commons-logging-1.1.1.jar
-14.12.2009  23:09                18 create-filelist.cmd
-11.01.2010  11:54            39 527 cubics-core-1.0.1.jar
-11.01.2010  11:54            52 296 cubics-renders-1.0.1.jar
-23.03.2010  15:58           290 583 datanucleus-appengine-1.0.5.final.jar
-23.03.2010  15:58         1 933 065 datanucleus-core-1.1.5.jar
-23.03.2010  15:58           152 768 datanucleus-jpa-1.1.5.jar
-23.03.2010  17:38                 0 filelist.txt
-23.03.2010  15:58            52 877 geronimo-jpa_3.0_spec-1.1.1.jar
-23.03.2010  15:58            16 030 geronimo-jta_1.1_spec-1.1.1.jar
-28.10.2009  11:05            15 172 gmaven-common-1.0-rc-3.jar
-28.10.2009  11:05            17 457 gmaven-feature-api-1.0-rc-3.jar
-28.10.2009  11:10            16 103 gmaven-feature-support-1.0-rc-3.jar
-28.10.2009  11:07            46 285 gmaven-runtime-1.5-1.0-rc-3.jar
-28.10.2009  11:11            22 707 gmaven-runtime-api-1.0-rc-3.jar
-28.10.2009  11:10            11 453 gmaven-runtime-default-1.0-rc-3.jar
-28.10.2009  11:09            76 671 gmaven-runtime-support-1.0-rc-3.jar
-28.10.2009  11:08         2 810 333 groovy-all-minimal-1.5.6.jar
-28.10.2009  11:11           597 476 javassist-3.9.0.GA.jar
-21.02.2010  10:49           121 807 javax.persistence-2.0.0.jar
-23.03.2010  15:58           192 820 jdo2-api-2.3-eb.jar
-28.10.2009  11:11            87 325 jline-0.9.94.jar
-23.03.2010  15:58             8 082 jsr107cache-1.1.jar
-24.11.2009  11:27           121 070 junit-3.8.1.jar
-19.06.2007  15:12           676 858 org.mortbay.jetty-5.1.10.jar
-28.10.2009  11:09           251 275 plexus-utils-1.5.5.jar
-28.10.2009  11:11           104 078 qdox-1.6.3.jar
-28.10.2009  11:10         1 659 772 selenium-core-1.0-beta-2.jar
-28.10.2009  11:10            51 761 selenium-java-client-driver-1.0-beta-2.jar
-28.10.2009  11:07         5 269 668 selenium-server-1.0-beta-2-standalone.jar
-28.10.2009  11:10             3 611 selenium-server-1.0-beta-2.jar
-28.10.2009  11:10           542 112 selenium-server-coreless-1.0-beta-2.jar
-19.06.2007  15:12            97 693 servlet-api-2.4.jar
-25.09.2008  17:11            17 384 slf4j-api-1.5.2.jar
-23.03.2010  16:09             8 643 slf4j-jdk14-1.5.2.jar
-23.03.2010  16:20         1 589 922 tapestry-core-5.2.0-20100323.011050-39.jar
-23.03.2010  16:20           427 682 tapestry-ioc-5.2.0-SNAPSHOT.jar
-23.03.2010  17:24            15 534 tapestry-jpa-2.0.1-20100311.214934-5.jar
-23.03.2010  17:34            14 810 tapestry-jpa-core-2.0.1-SNAPSHOT.jar
-23.03.2010  16:20            16 589 tapestry5-annotations-5.2.0-SNAPSHOT.jar
-28.10.2009  11:08           843 464 testng-5.8-jdk15.jar
-              50 файлов     31 548 824 байт
-               2 папок   1 402 953 728 байт свободно
+29.03.2010  23:43    <DIR>          .
+29.03.2010  23:43    <DIR>          ..
+28.10.2009  12:09         1 323 005 ant-1.7.1.jar
+28.10.2009  12:11            12 143 ant-launcher-1.7.1.jar
+28.10.2009  12:09           116 205 antlr-runtime-3.1.1.jar
+23.03.2010  16:58         9 729 129 appengine-api-1.0-sdk-1.3.1.jar
+23.03.2010  16:58           665 338 appengine-api-labs-1.3.1.jar
+23.03.2010  16:58            15 351 appengine-jsr107cache-1.3.1.jar
+28.10.2009  12:09         1 269 446 bcprov-jdk15-135.jar
+24.11.2009  12:27            46 725 commons-codec-1.3.jar
+24.11.2009  12:28            38 015 commons-logging-1.0.4.jar
+13.11.2008  16:10            60 686 commons-logging-1.1.1.jar
+15.12.2009  00:09                18 create-filelist.cmd
+11.01.2010  12:54            39 527 cubics-core-1.0.1.jar
+11.01.2010  12:54            52 296 cubics-renders-1.0.1.jar
+23.03.2010  16:58           290 583 datanucleus-appengine-1.0.5.final.jar
+23.03.2010  16:58         1 933 065 datanucleus-core-1.1.5.jar
+23.03.2010  16:58           152 768 datanucleus-jpa-1.1.5.jar
+30.03.2010  11:21                 0 filelist.txt
+23.03.2010  16:58            52 877 geronimo-jpa_3.0_spec-1.1.1.jar
+23.03.2010  16:58            16 030 geronimo-jta_1.1_spec-1.1.1.jar
+28.10.2009  12:05            15 172 gmaven-common-1.0-rc-3.jar
+28.10.2009  12:05            17 457 gmaven-feature-api-1.0-rc-3.jar
+28.10.2009  12:10            16 103 gmaven-feature-support-1.0-rc-3.jar
+28.10.2009  12:07            46 285 gmaven-runtime-1.5-1.0-rc-3.jar
+28.10.2009  12:11            22 707 gmaven-runtime-api-1.0-rc-3.jar
+28.10.2009  12:10            11 453 gmaven-runtime-default-1.0-rc-3.jar
+28.10.2009  12:09            76 671 gmaven-runtime-support-1.0-rc-3.jar
+28.10.2009  12:08         2 810 333 groovy-all-minimal-1.5.6.jar
+28.10.2009  12:11           597 476 javassist-3.9.0.GA.jar
+21.02.2010  11:49           121 807 javax.persistence-2.0.0.jar
+23.03.2010  16:58           192 820 jdo2-api-2.3-eb.jar
+28.10.2009  12:11            87 325 jline-0.9.94.jar
+23.03.2010  16:58             8 082 jsr107cache-1.1.jar
+24.11.2009  12:27           121 070 junit-3.8.1.jar
+19.06.2007  16:12           676 858 org.mortbay.jetty-5.1.10.jar
+28.10.2009  12:09           251 275 plexus-utils-1.5.5.jar
+28.10.2009  12:11           104 078 qdox-1.6.3.jar
+28.10.2009  12:10         1 659 772 selenium-core-1.0-beta-2.jar
+28.10.2009  12:10            51 761 selenium-java-client-driver-1.0-beta-2.jar
+28.10.2009  12:07         5 269 668 selenium-server-1.0-beta-2-standalone.jar
+28.10.2009  12:10             3 611 selenium-server-1.0-beta-2.jar
+28.10.2009  12:10           542 112 selenium-server-coreless-1.0-beta-2.jar
+19.06.2007  16:12            97 693 servlet-api-2.4.jar
+25.09.2008  18:11            17 384 slf4j-api-1.5.2.jar
+23.03.2010  17:09             8 643 slf4j-jdk14-1.5.2.jar
+30.03.2010  11:21         1 594 790 tapestry-core-5.2.0-SNAPSHOT.jar
+29.03.2010  23:42           430 946 tapestry-ioc-5.2.0-SNAPSHOT.jar
+23.03.2010  18:24            15 534 tapestry-jpa-2.0.1-20100311.214934-5.jar
+23.03.2010  18:34            14 810 tapestry-jpa-core-2.0.1-SNAPSHOT.jar
+29.03.2010  23:42            16 607 tapestry5-annotations-5.2.0-SNAPSHOT.jar
+28.10.2009  12:08           843 464 testng-5.8-jdk15.jar
+              50 файлов     31 556 974 байт
+               2 папок   1 021 558 784 байт свободно

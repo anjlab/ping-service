@@ -2,15 +2,18 @@ package dmitrygusev.ping.pages.task;
 
 import static com.google.appengine.api.datastore.KeyFactory.stringToKey;
 
+import org.apache.tapestry5.annotations.Meta;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import dmitrygusev.ping.entities.Job;
+import dmitrygusev.ping.services.AppModule;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.dao.JobDAO;
 
+@Meta(AppModule.NO_MARKUP)
 public class RunJobTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(RunJobTask.class);

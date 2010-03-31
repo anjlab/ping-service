@@ -14,38 +14,39 @@
 </head>
 <body>
 	<t:topbar/>
+
+    <t:if test="admin">
+       <div class="adminTasks">
+           Admin tasks:
+               <t:actionlink t:id="runCountJobResultsTask">Count Job Results</t:actionlink>
+               &#160;
+               <t:actionlink t:id="runBackupAndDeleteOldJobResultsTask">Backup and Delete Old Job Results</t:actionlink>
+       </div>
+    </t:if>
 	
    	<h2>Analytics Workspace</h2>
-   	
-   	<p>for ${job.titleFriendly} (statistics based on data from ${dateFrom} to ${dateTo})</p>
-   	
-   	<font color="red"><p>${message}</p></font>
-
-	<t:if test="admin">
-		Admin tasks: 
-			<t:actionlink t:id="runCountJobResultsTask">Count Job Results</t:actionlink>
-			&#160;
-			<t:actionlink t:id="runBackupAndDeleteOldJobResultsTask">Backup and Delete Old Job Results</t:actionlink>
-	</t:if>
-
-	<p>
-	<t:form>
-		View: <t:select t:id="view" model="viewModel" value="view"/>
-		<t:submit value="Show" />
-		&#160;
-		<a href="javascript:collapseAll();">Collapse All</a>&#160;
-		<a href="javascript:collapseOne();">&#xAB; Less</a>&#160;
-		<a href="javascript:expandOne();">More &#xBB;</a>&#160;
-		<a href="javascript:expandAll();">Expand All</a>
-	</t:form>
-	</p>
+    <div>for "${job.titleFriendly}" (statistics based on data from ${dateFrom} to ${dateTo})</div>
+    <font color="red"><p>${message}</p></font>
    	
    	<table>
 	   	<tr valign="top">
 		   	<td>
-				<p>
-					<a href="/feedback?subject=Request for custom View">Need more views? Send a request (it's free)</a>
-				</p>
+			    <t:form>
+			        View: <t:select t:id="view" model="viewModel" value="view" onchange="document.forms[0].submit();"/>
+			        <t:submit t:id="changeView" value="Show" />
+			        &#160;
+			        <a href="/feedback?subject=Request for custom View">Need more views? Send a request (it's free)</a>
+			    </t:form>
+			    
+				<div class="cubeToolbar">
+                     <a href="javascript:collapseAll();">Collapse All</a>&#160;
+                     <a href="javascript:collapseOne();">&#xAB; Less</a>&#160;
+                     <a href="javascript:expandOne();">More &#xBB;</a>&#160;
+                     <a href="javascript:expandAll();">Expand All</a>
+                     <div class="overviewChartsButton" id="overviewChartsButton">
+                         <a href="javascript:plotOverviewCharts();">Overview</a>
+                     </div>
+				</div>
 		   		<t:outputraw value="cubeHTML" />
 				<p>   	
 			 	    Download raw data in 
@@ -53,26 +54,31 @@
 					for analysis.
 				</p>
 		   	</td>
-		   	<td align="center" style="padding-left: 50px;">
-		   		<p align="right" id="overviewChartsButton">
-		   			<a href="javascript:plotOverviewCharts();">Overview</a>
-		   		</p>
-		   		<div>
-		   			<h4 class="chartTitle">Chart</h4>
-		   			<div style="width: 400px; height: 200px;" id="chart"/>
-		   		</div>
-		   		<div>
-		   			<h4 class="chartTitle">Chart</h4>
-		   			<div style="width: 400px; height: 200px; display: hidden;" id="chart2"/>
-		   		</div>
-		   		<div>
-		   			<h4 class="chartTitle">Chart</h4>
-		   			<div style="width: 400px; height: 200px; display: hidden;" id="chart3"/>
-		   		</div>
-		   		<div>
-		   			<h4 class="chartTitle">Chart</h4>
-		   			<div style="width: 400px; height: 200px; display: hidden;" id="chart4"/>
-		   		</div>
+		   	<td align="center" style="padding-left: 20px;">
+		   		<table>
+		   		<tr>
+			   		<td>
+				   		<div>
+		                    <h4 class="chartTitle">Chart</h4>
+		                    <div style="width: 350px; height: 200px;" id="chart"/>
+		                </div>
+		                <div>
+		                    <h4 class="chartTitle">Chart</h4>
+		                    <div style="width: 350px; height: 200px; display: hidden;" id="chart3"/>
+		                </div>
+	                </td>
+		   		    <td>
+		   		        <div>
+                            <h4 class="chartTitle">Chart</h4>
+                            <div style="width: 350px; height: 200px; display: hidden;" id="chart2"/>
+                        </div>
+		                <div>
+		                    <h4 class="chartTitle">Chart</h4>
+		                    <div style="width: 350px; height: 200px; display: hidden;" id="chart4"/>
+		                </div>
+		   		    </td>
+		   		</tr>
+		   		</table>
 		   	</td>
 	   	</tr>
    	</table>
@@ -92,15 +98,15 @@
    		var overviewCharts = ["#chart2", "#chart3", "#chart4"];
    		
    		function hideOverviewCharts() {
-	   		$(overviewCharts[0]).parent().hide();
-	   		$(overviewCharts[1]).parent().hide();
-	   		$(overviewCharts[2]).parent().hide();
+   		   for (var key in overviewCharts) {
+   		       $(overviewCharts[key]).parent().hide();
+   		   } 
    		}
    		
    		function showOverviewCharts() {
-	   		$(overviewCharts[0]).parent().show();
-	   		$(overviewCharts[1]).parent().show();
-	   		$(overviewCharts[2]).parent().show();
+           for (var key in overviewCharts) {
+               $(overviewCharts[key]).parent().show();
+           } 
    		}
    		
    		function plotOverviewCharts() {
@@ -121,6 +127,10 @@
   			$("#overviewChartsButton").hide();
   			hidePrimaryChart();
   			hideOverviewCharts();
+  			
+  			showPrimaryChart();
+  			removeHighlights();
+            plotLineChart($($(".m-0").filter(".ix-1")), "#chart");
   		}
    	</script>
    	

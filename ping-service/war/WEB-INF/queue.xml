@@ -2,6 +2,7 @@
   <queue>
     <name>default</name>
     <rate>5/s</rate>
+    <bucket-size>2</bucket-size>
   </queue>
   <queue>
     <name>every5minutes</name>
@@ -26,7 +27,12 @@
   </queue>
   <queue>
   	<name>backup</name>
-    <rate>4/d</rate>
+    <rate>6/d</rate>
     <bucket-size>1</bucket-size>
+  </queue>
+  <queue>
+  	<name>test-queue</name>
+    <rate>10/m</rate>
+    <bucket-size>5</bucket-size>
   </queue>
 </queue-entries>

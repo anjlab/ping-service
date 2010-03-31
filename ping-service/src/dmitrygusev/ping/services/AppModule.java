@@ -9,6 +9,7 @@ import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheFactory;
 import net.sf.jsr107cache.CacheManager;
 
+import org.apache.tapestry5.MarkupWriter;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.Translator;
 import org.apache.tapestry5.ioc.Configuration;
@@ -21,8 +22,13 @@ import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.services.ApplicationStateContribution;
 import org.apache.tapestry5.services.ApplicationStateCreator;
 import org.apache.tapestry5.services.ApplicationStateManager;
+import org.apache.tapestry5.services.ComponentEventLinkEncoder;
 import org.apache.tapestry5.services.Dispatcher;
+import org.apache.tapestry5.services.MarkupRenderer;
+import org.apache.tapestry5.services.MarkupRendererFilter;
+import org.apache.tapestry5.services.MetaDataLocator;
 import org.apache.tapestry5.services.PageRenderLinkSource;
+import org.apache.tapestry5.services.PageRenderRequestParameters;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestFilter;
 import org.apache.tapestry5.services.RequestGlobals;
@@ -262,8 +268,44 @@ public class AppModule
     }
     
     @Match("*DAO")
-    public static void adviseTransactions(JPATransactionAdvisor advisor, MethodAdviceReceiver receiver)   {
+    public static void adviseTransactions(JPATransactionAdvisor advisor, MethodAdviceReceiver receiver)
+    {
         advisor.addTransactionCommitAdvice(receiver);
     }
 
+    /*
+     * Support pages without markup
+     */
+    private static final String NO_MARKUP_SYMBOL = "NoMarkup";
+    public static final String NO_MARKUP = NO_MARKUP_SYMBOL + "=true";
+
+    public static void contributeFactoryDefaults(MappedConfiguration<String, String> configuration)
+    {
+        configuration.add(NO_MARKUP_SYMBOL, "");
+    }
+    
+    public void contributeMarkupRenderer(OrderedConfiguration<MarkupRendererFilter> configuration, 
+                                         final MetaDataLocator metaDataLocator, 
+                                         final ComponentEventLinkEncoder linkEncoder, 
+                                         final RequestGlobals globals)
+    {
+    	configuration.add(NO_MARKUP_SYMBOL, 
+        	new MarkupRendererFilter()
+        	{
+    			@Override
+    			public void renderMarkup(MarkupWriter writer, MarkupRenderer renderer) {
+    		        PageRenderRequestParameters parameters = linkEncoder.decodePageRenderRequest(globals.getRequest());
+    
+    				boolean noMarkup = metaDataLocator.findMeta(NO_MARKUP_SYMBOL, parameters.getLogicalPageName(), 
+    				                                            Boolean.class);
+    				
+    				if (noMarkup) {
+                        //  Provide default (empty) markup
+                        writer.element("html");
+    				} else {
+                        renderer.renderMarkup(writer);
+    				}
+    			}
+    		}, "before:*");
+    }
 }

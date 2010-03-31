@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.persistence.Query;
 
+import org.apache.tapestry5.annotations.Meta;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.Request;
 import org.datanucleus.store.appengine.query.JPACursorHelper;
@@ -20,9 +21,11 @@ import com.google.appengine.api.labs.taskqueue.TaskOptions;
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableMultimap;
 import com.google.appengine.repackaged.com.google.common.collect.Multimap;
 
+import dmitrygusev.ping.services.AppModule;
 import dmitrygusev.ping.services.GAEHelper;
 import dmitrygusev.ping.services.Utils;
 
+@Meta(AppModule.NO_MARKUP)
 public abstract class LongRunningQueryTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(LongRunningQueryTask.class);
@@ -74,7 +77,7 @@ public abstract class LongRunningQueryTask {
 	}
 
 	@Inject 
-	private Request request; 
+	private Request request;
 	
 	public void onActivate() {
 		try {

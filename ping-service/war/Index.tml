@@ -7,11 +7,6 @@
 <body>
 	<t:topbar />
 
-	<t:if test="admin">
-		Admin tasks: 
-			<t:actionlink t:id="runCyclicBackupTask">Run Cyclic Backup</t:actionlink>
-	</t:if>
-
 	<table width="100%" cellspacing="0" cellpadding="0" style="padding-bottom: 20px;">
 		<tr>
 			<td width="250">
@@ -23,28 +18,25 @@
 			</td>
 			<td align="center" valign="middle">
 		   		<font color="${messageColor}"><p>${message}</p></font>
-
-				<t:form t:id="sendInvite" autofocus="false">
-					<t:label for="friendEmail">Tell a friend about Ping Service (email):</t:label>&#160;
-					<t:textfield t:id="friendEmail" value="friendEmail" validate="required, email" />&#160;
-					<t:submit value="Send Invite" />
-				</t:form>
-				You may also want to <t:pagelink page="feedback">provide a feedback</t:pagelink>
 			</td>
 		</tr>
 	</table>
 	
     <t:grid empty="No jobs" source="jobs" row="job"
-       	reorder="scheduledBy, pingURL, cronString, edit, analytics, validationSummary, lastPingSummary, statusCounter"
-       	exclude="availabilityPercent, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, totalStatusCounterFriendly, totalSuccessStatusCounterFriendly, previousStatusCounterFriendly, titleFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp, statusCounterFriendly"
+       	reorder="scheduledBy, pingURL, cronString, edit, analytics, upDownTimeInMinutes, availabilityPercent, lastPingSummary"
+       	exclude="statusCounter, statusCounterFriendlyShort, availabilityPercentFriendly, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, totalStatusCounterFriendly, totalSuccessStatusCounterFriendly, previousStatusCounterFriendly, titleFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp, statusCounterFriendly, receiveBackups, validationSummary"
        	add="edit, delete, analytics">
 
 		<t:parameter name="lastPingSummaryCell">
-			<div>${lastPingSummary}</div>
+			<div class="${summaryStatusCssClass}">${lastPingSummary}</div>
 		</t:parameter>
 		
-		<t:parameter name="statusCounterCell">
-			<div align="left">${job.availabilityPercent} / ${job.statusCounterFriendly}</div>
+		<t:parameter name="upDownTimeInMinutesCell">
+			<div align="left">${job.statusCounterFriendlyShort}</div>
+		</t:parameter>
+		
+		<t:parameter name="availabilityPercentCell">
+			<div align="right">${job.availabilityPercentFriendly}</div>
 		</t:parameter>
 		
 		<t:parameter name="pingURLCell">

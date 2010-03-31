@@ -37,7 +37,6 @@ public class Index {
 		account = null;
 		grantedEmail = null;
 		job = null;
-		friendEmail = null;
 		messageColor = null;
 	}
 	
@@ -46,6 +45,19 @@ public class Index {
 	
 	public String getLastPingSummary() {
 		return application.getLastPingSummary(job);
+	}
+	
+	public String getSummaryStatusCssClass() {
+		if (job.isGoogleIOException()) {
+			return "status-warning";
+		}
+		if (job.isLastPingFailed()) {
+			return "status-error";
+		}
+		if (job.getTotalStatusCounter() == 0) {
+			return "status-na";
+		}
+		return "status-okay";
 	}
 	
 	public Long[] getJobContext() {
@@ -134,16 +146,6 @@ public class Index {
 	 		message = e.getMessage();
 			messageColor = "red";
 	 	}
-	}
-	
-	@Property
-	private String friendEmail;
-	
-	public void onSuccessFromSendInvite() {
-		application.sendInvite(friendEmail);
-
-		message = "Your invite has been sent!";
-		messageColor = "green";
 	}
 
 	public boolean isAdmin() {

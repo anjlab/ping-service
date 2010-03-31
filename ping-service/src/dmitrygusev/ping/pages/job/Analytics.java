@@ -130,7 +130,7 @@ public class Analytics {
 		return getExport(CSV);
 	}
 
-	private static final String DEFAULT_VIEW = "year > month > weekOfMonth > day";
+	private static final String DEFAULT_VIEW = "month > day";
 	
 	@Property
 	private final String viewModel = DEFAULT_VIEW + ",dayTime > hour,dayOfWeek > month";
@@ -185,7 +185,6 @@ public class Analytics {
 		
 		render.getDimensionsOptions().
 			setLabel("all", "All").
-			setLabel("year", "Year").
 			setLabel("month", "Month").
 			setLabel("weekOfMonth", "Week Of Month").
 			setLabel("day", "Day").
