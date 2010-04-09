@@ -10,4 +10,7 @@
 		<property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
 	</system-properties>
 	
+    <admin-console>
+        <page name="Appstats" url="/appstats/" />
+    </admin-console>
 </appengine-web-app>

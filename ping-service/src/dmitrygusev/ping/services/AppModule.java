@@ -75,7 +75,9 @@ public class AppModule
 
     public static void contributeIgnoredPathsFilter(Configuration<String> configuration) {
     	//	GAE filters
-    	configuration.add("/_ah/.*");
+        configuration.add("/_ah/.*");
+        //  GAE Appstats
+        configuration.add("/appstats/.*");
     }
     
     public static Application buildApplication(

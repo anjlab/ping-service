@@ -5,14 +5,6 @@
         <param-value>dmitrygusev.ping</param-value>
     </context-param>
     <filter>
-        <filter-name>app</filter-name>
-        <filter-class>org.apache.tapestry5.TapestryFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>app</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    <filter>
         <filter-name>appstats</filter-name>
         <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
         <init-param>
@@ -22,6 +14,14 @@
     </filter>
     <filter-mapping>
         <filter-name>appstats</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>app</filter-name>
+        <filter-class>org.apache.tapestry5.TapestryFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>app</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     <servlet>
