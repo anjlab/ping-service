@@ -2,6 +2,7 @@ package dmitrygusev.ping.pages.task;
 
 import static com.google.appengine.api.labs.taskqueue.QueueFactory.getDefaultQueue;
 import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
+import static dmitrygusev.ping.services.GAEHelper.addTaskNonTransactional;
 
 import java.util.List;
 
@@ -156,7 +157,7 @@ public abstract class LongRunningQueryTask {
 			}
 		}
 		
-		queue.add(null, taskOptions);
+		addTaskNonTransactional(queue, taskOptions);
 	}
 
 	private void logTaskParameters() {

@@ -5,14 +5,20 @@ import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
 import java.security.Principal;
 
 import org.apache.tapestry5.services.RequestGlobals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.appengine.api.labs.taskqueue.Queue;
 import com.google.appengine.api.labs.taskqueue.TaskOptions;
+import com.google.appengine.api.labs.taskqueue.TransientFailureException;
 import com.google.appengine.api.labs.taskqueue.TaskOptions.Method;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
 public class GAEHelper {
 
+    private static final Logger logger = LoggerFactory.getLogger(GAEHelper.class);
+    
 	private RequestGlobals requestGlobals;
     private UserService userService = UserServiceFactory.getUserService();
     
@@ -44,4 +50,12 @@ public class GAEHelper {
 		return url(path.endsWith("/") ? path : path + "/").method(Method.GET);
 	}
 	
+	public static void addTaskNonTransactional(Queue queue, TaskOptions options) {
+	    try {
+	        queue.add(null, options);
+	    } catch (TransientFailureException e) {
+	        logger.debug("Retry after TransientFailureException: {}", e);
+	        queue.add(null, options);
+	    }
+	}
 }

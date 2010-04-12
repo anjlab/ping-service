@@ -3,6 +3,7 @@ package dmitrygusev.ping.services;
 import static com.google.appengine.api.datastore.KeyFactory.keyToString;
 import static com.google.appengine.api.labs.taskqueue.QueueFactory.getDefaultQueue;
 import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
+import static dmitrygusev.ping.services.GAEHelper.addTaskNonTransactional;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -463,30 +464,34 @@ public class Application {
 	public static final String MAIL_QUEUE = "mail";
 
 	public void runCyclicBackupTask() throws URISyntaxException {
-		getQueue(BACKUP_QUEUE)
-			.add(null, buildTaskUrl(CyclicBackupTask.class));
+	    addTaskNonTransactional(
+	        getQueue(BACKUP_QUEUE), 
+	        buildTaskUrl(CyclicBackupTask.class));
 	}
 	
 	public void runBackupAndDeleteTask(Key jobKey) throws URISyntaxException {
 		long id = new Random().nextLong();
 		
-		getDefaultQueue()
-			.add(null, buildTaskUrl(BackupAndDeleteOldJobResultsTask.class)
+		addTaskNonTransactional(
+	        getDefaultQueue(),
+	        buildTaskUrl(BackupAndDeleteOldJobResultsTask.class)
 				.param(BackupAndDeleteOldJobResultsTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey))
 				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, String.valueOf(id)));
 	}
 	
 	public void runMailJobResultsTask(Key jobKey, String taskId, long backupStartTime) throws URISyntaxException {
-		getQueue(MAIL_QUEUE)
-			.add(null, buildTaskUrl(MailJobResultsTask.class)
+	    addTaskNonTransactional(
+	        getQueue(MAIL_QUEUE),
+			buildTaskUrl(MailJobResultsTask.class)
 				.param(LongRunningQueryTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey))
 				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, taskId)
 				.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(backupStartTime)));
 	}
 	
 	public void continueMailJobResultsTask(Key jobKey, String taskId, long backupStartTime, long chunkId, long totalRecords, long fileNumber) throws URISyntaxException {
-		getQueue(MAIL_QUEUE)
-			.add(null, buildTaskUrl(MailJobResultsTask.class)
+	    addTaskNonTransactional(
+		    getQueue(MAIL_QUEUE),
+			buildTaskUrl(MailJobResultsTask.class)
 				.param(LongRunningQueryTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey))
 				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, taskId)
 				.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(backupStartTime))
@@ -496,8 +501,9 @@ public class Application {
 	}
 	
 	public void runCountJobResultsTask(Key jobKey) throws URISyntaxException {
-		getDefaultQueue()
-			.add(null, buildTaskUrl(CountJobResultsTask.class)
+	    addTaskNonTransactional(
+		    getDefaultQueue(),
+		    buildTaskUrl(CountJobResultsTask.class)
 				.param(CountJobResultsTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey)));
 	}
 
@@ -511,8 +517,10 @@ public class Application {
 		Queue queue = getQueue(cronString.replace(" ", ""));
 
 		for (Job job : jobs) {
-			queue.add(null, buildTaskUrl(RunJobTask.class)
-					.param(RunJobTask.JOB_KEY_PARAMETER_NAME, keyToString(job.getKey())));
+		    addTaskNonTransactional(
+	            queue,
+	            buildTaskUrl(RunJobTask.class)
+				    .param(RunJobTask.JOB_KEY_PARAMETER_NAME, keyToString(job.getKey())));
 		}
 		
 		logger.debug("Finished enqueueing jobs");

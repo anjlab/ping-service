@@ -2,6 +2,7 @@ package dmitrygusev.ping.pages.task;
 
 import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
 import static com.google.appengine.api.memcache.MemcacheServiceFactory.getMemcacheService;
+import static dmitrygusev.ping.services.GAEHelper.addTaskNonTransactional;
 
 import java.net.URISyntaxException;
 
@@ -36,8 +37,9 @@ public class GeneratorTask {
 		}
 
 		for (int i = 0; i < 100; i++) {
-			getQueue("test-queue")
-				.add(null, application.buildTaskUrl(SimpleTask.class)
+		    addTaskNonTransactional(
+		        getQueue("test-queue"),
+				application.buildTaskUrl(SimpleTask.class)
 						.param("idx", String.valueOf(i)));
 		}
 

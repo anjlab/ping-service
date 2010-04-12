@@ -30,7 +30,7 @@ public class BackupHealthInsuranceCron {
             return;
         }
 
-        logger.error("Backup Health Insurance Failed");
+        logger.error("Backup Health Insurance found that cyclic backups was inactive. Restarting now.");
         
         application.runCyclicBackupTask();
         
