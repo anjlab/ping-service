@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
 
+import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tapestry5.Link;
@@ -405,9 +406,20 @@ public class Application {
 				//	Register job failure on third fail (see GOOGLE_IO_FAIL_LIMIT)
 				sendReport(job);
 			}
+
+			try {
+			    jobDAO.update(job);
+			} catch (RollbackException e) {
+			    //   This may happen if another job from the same schedule 
+			    //   updating at the same time simultaneously
+			    
+			    //  Give another job a chance to commit
+			    Thread.sleep(100);
+			    
+			    jobDAO.update(job);
+			}
 			
-			jobDAO.update(job);
-			jobResultDAO.persistResult(jobResult);
+            jobResultDAO.persistResult(jobResult);
 		} catch (Exception e) {
 			logger.error("Error executing job " + job.getKey(), e);
 		}

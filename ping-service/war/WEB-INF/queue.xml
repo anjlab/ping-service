@@ -6,7 +6,7 @@
   </queue>
   <queue>
     <name>every5minutes</name>
-    <rate>6/m</rate>
+    <rate>30/m</rate>
   </queue>
   <queue>
     <name>every15minutes</name>
