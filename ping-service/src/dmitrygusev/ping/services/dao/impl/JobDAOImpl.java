@@ -8,6 +8,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.datastore.Key;
 
@@ -18,6 +20,8 @@ import dmitrygusev.ping.services.dao.JobDAO;
 @SuppressWarnings("unchecked")
 public class JobDAOImpl implements JobDAO {
 
+    private static final Logger logger = LoggerFactory.getLogger(JobDAOImpl.class);
+    
 	@Inject
     public EntityManager em;
 	
@@ -28,6 +32,13 @@ public class JobDAOImpl implements JobDAO {
 	}
 	
 	public void update(Job job) {
+	    if (!em.getTransaction().isActive()){
+	        // see Application#internalUpdateJob(Job)
+	        logger.debug("Transaction is not active. Begin new one...");
+	        
+	        // XXX Rewrite this to handle transactions more gracefully
+	        em.getTransaction().begin();
+	    }
 		em.merge(job);
 	}
 	

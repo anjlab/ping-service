@@ -152,13 +152,9 @@ public class Application {
 	}
 
 	public void updateJob(Job job) {
-		assertCanUpdateJob(job);
+	    assertCanModifyJob(job);
 		
-		jobDAO.update(job);
-	}
-
-	private void assertCanUpdateJob(Job job) {
-		assertCanModifyJob(job);
+		internalUpdateJob(job);
 	}
 
 	private void assertCanModifyJob(Job job) {
@@ -407,23 +403,38 @@ public class Application {
 				sendReport(job);
 			}
 
-			try {
-			    jobDAO.update(job);
-			} catch (RollbackException e) {
-			    //   This may happen if another job from the same schedule 
-			    //   updating at the same time simultaneously
-			    
-			    //  Give another job a chance to commit
-			    Thread.sleep(100);
-			    
-			    jobDAO.update(job);
-			}
-			
+			internalUpdateJob(job);
             jobResultDAO.persistResult(jobResult);
 		} catch (Exception e) {
 			logger.error("Error executing job " + job.getKey(), e);
 		}
 	}
+
+    private void internalUpdateJob(Job job) {
+        try {
+            jobDAO.update(job);
+        } catch (RollbackException e) {
+            //   This may happen if another job from the same schedule 
+            //   updating at the same time simultaneously
+            
+            logger.debug("Retrying update for job: {}", job);
+            
+            //  Give another job a chance to commit
+            try {
+                Thread.sleep(1000);
+                
+                try {
+                    //  Transaction will be reopened inside DAO
+                    jobDAO.update(job);
+                    logger.debug("Retry succeeded");
+                } catch (RollbackException e2) {
+                    logger.error("Retry failed: {}", e2);
+                }
+            } catch (InterruptedException e2) {
+                logger.error("Interrupted while waiting for another job to commit: {}", e2);
+            }
+        }
+    }
 
 	public void sendReport(Job job) throws URISyntaxException {
 		String from = Mailer.PING_SERVICE_NOTIFY_GMAIL_COM;
