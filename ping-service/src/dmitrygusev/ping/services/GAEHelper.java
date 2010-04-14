@@ -3,6 +3,7 @@ package dmitrygusev.ping.services;
 import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
 
 import java.security.Principal;
+import java.util.Arrays;
 
 import org.apache.tapestry5.services.RequestGlobals;
 import org.slf4j.Logger;
@@ -51,11 +52,15 @@ public class GAEHelper {
 	}
 	
 	public static void addTaskNonTransactional(Queue queue, TaskOptions options) {
-	    try {
+	    addTaskNonTransactional(queue, Arrays.asList(options));
+	}
+
+    public static void addTaskNonTransactional(Queue queue, Iterable<TaskOptions> options) {
+        try {
 	        queue.add(null, options);
 	    } catch (TransientFailureException e) {
 	        logger.debug("Retry after TransientFailureException: {}", e);
 	        queue.add(null, options);
 	    }
-	}
+    }
 }

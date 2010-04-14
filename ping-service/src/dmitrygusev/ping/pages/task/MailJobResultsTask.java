@@ -220,6 +220,7 @@ public class MailJobResultsTask {
 		MimeBodyPart attachment = new MimeBodyPart();
         attachment.setFileName(
         		"job-" 
+                + job.getKey().getParent().getId() + "-" +
         		+ job.getKey().getId() + "-results-" 
         		+ Application.formatDateForFileName(firstResult.getTimestamp(), timeZoneCity) + "-" 
         		+ Application.formatDateForFileName(lastResult.getTimestamp(), timeZoneCity) + ".txt");

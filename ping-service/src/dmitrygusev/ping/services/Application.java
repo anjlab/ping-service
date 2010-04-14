@@ -428,10 +428,10 @@ public class Application {
                     jobDAO.update(job);
                     logger.debug("Retry succeeded");
                 } catch (RollbackException e2) {
-                    logger.error("Retry failed: {}", e2);
+                    logger.error("Retry failed", e2);
                 }
             } catch (InterruptedException e2) {
-                logger.error("Interrupted while waiting for another job to commit: {}", e2);
+                logger.error("Interrupted while waiting for another job to commit", e2);
             }
         }
     }
@@ -539,13 +539,15 @@ public class Application {
 
 		Queue queue = getQueue(cronString.replace(" ", ""));
 
-		for (Job job : jobs) {
-		    addTaskNonTransactional(
-	            queue,
-	            buildTaskUrl(RunJobTask.class)
-				    .param(RunJobTask.JOB_KEY_PARAMETER_NAME, keyToString(job.getKey())));
-		}
+		List<TaskOptions> tasks = new ArrayList<TaskOptions>(jobs.size());
 		
+		for (Job job : jobs) {
+		    tasks.add(buildTaskUrl(RunJobTask.class)
+				        .param(RunJobTask.JOB_KEY_PARAMETER_NAME, keyToString(job.getKey())));
+		}
+
+        addTaskNonTransactional(queue, tasks);
+
 		logger.debug("Finished enqueueing jobs");
 	}
 
