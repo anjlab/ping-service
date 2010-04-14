@@ -91,12 +91,11 @@ public class AppModule
     		Mailer mailer,
     		ApplicationStateManager stateManager,
     		PageRenderLinkSource linkSource,
-    		RequestGlobals globals,
-    		MemcacheService memcacheService)
+    		RequestGlobals globals)
     {
     	return new Application(accountDAO, jobDAO, scheduleDAO, 
     			refDAO, jobResultDAO, gaeHelper, jobExecutor, mailer,
-    			stateManager, linkSource, globals, memcacheService);
+    			stateManager, linkSource, globals);
     }
 
     public static Cache buildCache(Logger logger) {

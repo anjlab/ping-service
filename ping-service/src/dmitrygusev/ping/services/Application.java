@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.labs.taskqueue.Queue;
 import com.google.appengine.api.labs.taskqueue.TaskOptions;
-import com.google.appengine.api.memcache.MemcacheService;
 
 import dmitrygusev.ping.entities.Account;
 import dmitrygusev.ping.entities.Job;
@@ -63,7 +62,6 @@ public class Application {
 	private AppSessionCache sessionCache;
 	private PageRenderLinkSource linkSource;
 	private RequestGlobals globals;
-	private MemcacheService memcacheService;
 	
 	public Application(
 			AccountDAO accountDAO, 
@@ -76,8 +74,7 @@ public class Application {
 			Mailer mailer,
 			ApplicationStateManager stateManager,
 			PageRenderLinkSource linkSource,
-			RequestGlobals globals,
-			MemcacheService memcacheService) {
+			RequestGlobals globals) {
 		super();
 		this.accountDAO = accountDAO;
 		this.jobDAO = jobDAO;
@@ -90,7 +87,6 @@ public class Application {
 		this.sessionCache = stateManager.get(AppSessionCache.class);
 		this.linkSource = linkSource;
 		this.globals = globals;
-		this.memcacheService = memcacheService;
 	}
 
 	public List<Account> getAccounts(Schedule schedule) {
@@ -416,42 +412,16 @@ public class Application {
 
     private void internalUpdateJob(Job job) {
         try {
-            if (checkSimultaneousJobUpdate(job)) {
-                logger.info("Simultaneous job update detected using MemcacheService trick: {}", job.getKey());
-                
-                //  Give another job a chance to commit, and commit current job after some delay
-                internalUpdateJobAfterDelay(job);
-            } else {
-                jobDAO.update(job);
-            }
+            jobDAO.update(job);
         } catch (RollbackException e) {
+            //  This may happen if another job from the same schedule 
+            //  updating at the same time simultaneously
+            
             logger.debug("Retrying update for job: {}", job.getKey());
             
-            //  MemcacheService trick might not worked (?)
-            //  Still give another job a chance to commit
+            //  Give another job a chance to commit, and commit current job after some delay
             internalUpdateJobAfterDelay(job);
         }
-    }
-
-    private boolean checkSimultaneousJobUpdate(Job job) {
-        //  Update ticket for job's Schedule
-        final String UPDATE_TICKET = "internalUpdateJob-" + job.getKey().getParent().getId(); 
-        
-        Long value = (Long) memcacheService.get(UPDATE_TICKET);
-        if (value == null) {
-            value = 0L;
-        }
-        
-        long delta = 1L;
-        Long newValue = memcacheService.increment(UPDATE_TICKET, delta, value);
-        if (newValue == null) {
-            newValue = 0L;
-        }
-        
-        //  This may happen if another job from the same schedule 
-        //  updating at the same time simultaneously
-
-        return Math.abs(value - newValue) > delta;
     }
 
     private boolean internalUpdateJobAfterDelay(Job job) {
