@@ -4,7 +4,7 @@
 			<b>${principal?.name}</b> | 
 			<t:pagelink page="settings">Settings</t:pagelink> | 
 			<t:pagelink page="help">Help</t:pagelink> | 
-			<a href="${logoutURL}">Sign Out</a>
+			<a href="${logoutURL}">Sign out</a>
 		</div>
 	</t:if>
 </div>

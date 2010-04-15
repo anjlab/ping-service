@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.labs.taskqueue.Queue;
 import com.google.appengine.api.labs.taskqueue.TaskOptions;
+import com.google.appengine.api.users.UserServiceFactory;
 
 import dmitrygusev.ping.entities.Account;
 import dmitrygusev.ping.entities.Job;
@@ -172,7 +173,10 @@ public class Application {
 	public Job findJob(Long scheduleId, Long jobId) {
 		Job job = jobDAO.find(scheduleId, jobId); 
 		
-		assertCanAccessJob(job);
+		//    Grant administrators read-only access to any job
+		if (!UserServiceFactory.getUserService().isUserAdmin()) {
+		    assertCanAccessJob(job);
+		}
 		
 		return job;
 	}
@@ -424,7 +428,7 @@ public class Application {
         }
     }
 
-    private boolean internalUpdateJobAfterDelay(Job job) {
+    private void internalUpdateJobAfterDelay(Job job) {
         try {
             logger.debug("Waiting for another job to commit");
             
@@ -434,14 +438,12 @@ public class Application {
                 //  Transaction will be reopened inside DAO if required
                 jobDAO.update(job);
                 logger.debug("Update after delay succeeded");
-                return true;
             } catch (RollbackException e2) {
                 logger.error("Update after delay failed", e2);
             }
         } catch (InterruptedException e2) {
             logger.error("Interrupted", e2);
         }
-        return false;
     }
 
 	public void sendReport(Job job) throws URISyntaxException {
