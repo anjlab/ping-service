@@ -109,7 +109,7 @@ public abstract class LongRunningQueryTask {
 		
 		long endTime = System.currentTimeMillis();
 		
-		logger.debug("Chunk processing tooked {} ms", endTime - startTime);
+		logger.debug("Chunk processing took {} ms", endTime - startTime);
 		
 		if (taskTerminated) {
 			logger.warn("Task has been terminated.");

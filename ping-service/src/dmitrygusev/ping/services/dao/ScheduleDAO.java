@@ -13,7 +13,7 @@ public interface ScheduleDAO {
 	public abstract void delete(Long id);
 	@CommitAfter
 	public abstract Schedule createSchedule(String name);
-	@CommitAfter
+    @CommitAfter
 	public abstract Schedule find(Key scheduleKey);
 
 }

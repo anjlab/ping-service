@@ -65,4 +65,10 @@ public class JobDAOImpl implements JobDAO {
 	public Job find(Key jobKey) {
 		return em.find(Job.class, jobKey);
 	}
+
+    @Override
+    public List<Job> getAllJobs() {
+        Query q = em.createQuery("SELECT FROM Job");
+        return q.getResultList();
+    }
 }

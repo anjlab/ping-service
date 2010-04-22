@@ -37,12 +37,12 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(BackupAndDeleteOldJobResultsTask.class);
 	
-	private static final int CHUNK_SIZE = 50;
-	private static final String COUNT_PARAMETER_NAME = "count";
+	public static final int CHUNK_SIZE = 100;
+	public static final String COUNT_PARAMETER_NAME = "count";
 	public static final String TASK_ID_PARAMETER_NAME = "taskId";
 	public static final long CACHED_RESULTS_FIRST_CHUNK_ID = 1;
 
-	private static final int NUMBER_OF_RESULTS_LO_SKIP = 1000;
+	private static final int NUMBER_OF_RESULTS_TO_SKIP = 1000;
 
 	@Inject private Request request;
 	@Inject private EntityManager em;
@@ -84,7 +84,7 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 
 	@Override
 	protected int getNumberOfResultsToSkipFirstTime() {
-	    return NUMBER_OF_RESULTS_LO_SKIP;
+	    return NUMBER_OF_RESULTS_TO_SKIP;
 	}
 	
 	@Override

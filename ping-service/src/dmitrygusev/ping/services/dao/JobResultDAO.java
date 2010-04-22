@@ -10,9 +10,9 @@ import dmitrygusev.ping.entities.JobResult;
 public interface JobResultDAO {
 	@CommitAfter
 	public void persistResult(JobResult result);
-	@CommitAfter
+    @CommitAfter
 	public List<JobResult> getResults(Job job);
-	@CommitAfter
+    @CommitAfter
 	public List<JobResult> getResults(Job job, int maxResults);
 	@CommitAfter
 	public void delete(Long id);	

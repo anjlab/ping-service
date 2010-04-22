@@ -27,7 +27,12 @@
   </queue>
   <queue>
   	<name>backup</name>
-    <rate>8/d</rate><!-- If changed, change in CyclicBackupTask.putInsuranceTicket() also -->
+    <rate>6/d</rate><!-- If changed here, should also be changed in CyclicBackupTask.putInsuranceTicket() also -->
+    <bucket-size>1</bucket-size>
+  </queue>
+  <queue>
+    <name>purge-deleted</name>
+    <rate>1/s</rate>
     <bucket-size>1</bucket-size>
   </queue>
 </queue-entries>

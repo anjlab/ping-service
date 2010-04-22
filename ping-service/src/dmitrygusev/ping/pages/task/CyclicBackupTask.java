@@ -57,9 +57,9 @@ public class CyclicBackupTask extends LongRunningQueryTask {
 	}
 	
     private void putInsuranceTicket() {
-        //  This code will run at least every 24/8=3 hours a day (see 'backup' queue in queue.xml), 
+        //  This code will run at least every 24/6=4 hours a day (see 'backup' queue in queue.xml), 
         //  but lets put insurance ticket that will live a bit longer
-        int seconds = (int) TimeUnit.SECONDS.convert(4L, TimeUnit.HOURS);
+        int seconds = (int) TimeUnit.SECONDS.convert(5L, TimeUnit.HOURS);
         
         memcacheService.put(BackupHealthInsuranceCron.INSURANCE_TICKET, "running", byDeltaSeconds(seconds));
     }

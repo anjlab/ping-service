@@ -13,11 +13,11 @@ public interface RefDAO {
 	public abstract Ref addRef(Account account, Schedule schedule, int accessType);
 	@CommitAfter
 	public abstract void removeRef(Long id);
-	@CommitAfter
+    @CommitAfter
 	public abstract List<Ref> getRefs(Account account);
-	@CommitAfter
+    @CommitAfter
 	public abstract List<Ref> getRefs(Schedule schedule);
-	@CommitAfter
+    @CommitAfter
 	public abstract Ref find(Account find, Schedule schedule);
 	
 }
