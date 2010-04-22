@@ -136,11 +136,18 @@ public abstract class LongRunningQueryTask {
 	
 		if (! Utils.isNullOrEmpty(encodedCursor)) {
 			q.setHint(JPACursorHelper.CURSOR_HINT, Cursor.fromWebSafeString(encodedCursor));
+		} else {
+		    q.setFirstResult(getNumberOfResultsToSkipFirstTime());
 		}
+		    
 		return q;
 	}
 
-	private void continueTask(List<?> results) {
+	protected int getNumberOfResultsToSkipFirstTime() {
+        return 0;
+    }
+
+    private void continueTask(List<?> results) {
 		Cursor cursor = JPACursorHelper.getCursor(results);
 		
 		Queue queue = getQueue(getQueueName());

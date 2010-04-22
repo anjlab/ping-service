@@ -178,6 +178,9 @@ public class MailJobResultsTask {
 		builder.append(Application.formatDate(firstResult.getTimestamp(), timeZoneCity, Application.DATETIME_FORMAT));
 		builder.append(" - ");
 		builder.append(Application.formatDate(lastResult.getTimestamp(), timeZoneCity, Application.DATETIME_FORMAT));
+		builder.append(" (");
+		builder.append(Utils.formatTimeMillis(lastResult.getTimestamp().getTime() - firstResult.getTimestamp().getTime()));
+		builder.append(")");
 		builder.append("\nFile #: ");
 		builder.append(++fileNumber);
 		builder.append("\n# of records: ");

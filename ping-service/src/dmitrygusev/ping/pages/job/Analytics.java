@@ -50,6 +50,10 @@ public class Analytics {
 	
 	private Date dateTo;
 
+	public String getTimeDiff() {
+	    return Utils.formatTimeMillis(dateTo.getTime() - dateFrom.getTime());
+	}
+	
 	public String getDateFrom() {
 		return application.formatDate(dateFrom);
 	}

@@ -83,6 +83,11 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 	}
 
 	@Override
+	protected int getNumberOfResultsToSkipFirstTime() {
+	    return NUMBER_OF_RESULTS_LO_SKIP;
+	}
+	
+	@Override
 	protected Query getQuery() {
 		return em.createQuery("SELECT r FROM JobResult r WHERE r.jobKey = :jobKey ORDER BY r.timestamp DESC")
 					.setParameter("jobKey", job.getKey());
@@ -91,12 +96,7 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected boolean processResults(List<?> results) throws Exception {
-		if (isOldResults(results)) {
-			totalCount += backupAndDelete((List<JobResult>)results);
-		} else {
-			logger.debug("Nothing to process here");
-			totalCount += results.size();
-		}
+		totalCount += backupAndDelete((List<JobResult>)results);
 
 		return true;
 	}
@@ -162,10 +162,6 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 			}
 		}
 		return count;
-	}
-
-	private boolean isOldResults(List<?> results) {
-		return (totalCount + results.size()) > NUMBER_OF_RESULTS_LO_SKIP;
 	}
 
 	@Inject

@@ -25,7 +25,7 @@
     </t:if>
 	
    	<h2>Analytics Workspace</h2>
-    <div>for "${job.titleFriendly}" (statistics based on data from ${dateFrom} to ${dateTo})</div>
+    <div>for "${job.titleFriendly}" [statistics based on last ${timeDiff} (from ${dateFrom} to ${dateTo})]</div>
     <font color="red"><p>${message}</p></font>
    	
    	<table>
