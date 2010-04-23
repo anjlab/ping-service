@@ -21,13 +21,6 @@ public class JobResultDAOImpl implements JobResultDAO {
 		em.persist(result);
 	}
 
-	@Override
-	public List<JobResult> getResults(Job job) {
-		int maxResults = 0;
-		
-		return getResults(job, maxResults);
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<JobResult> getResults(Job job, int maxResults) {

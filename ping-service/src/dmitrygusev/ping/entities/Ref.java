@@ -1,5 +1,7 @@
 package dmitrygusev.ping.entities;
 
+import java.io.Serializable;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,9 +11,14 @@ import javax.persistence.Id;
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-public class Ref {
+public class Ref implements Serializable {
 
-	@Id
+	/**
+     * 
+     */
+    private static final long serialVersionUID = -5725956849471055726L;
+    
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	@Basic

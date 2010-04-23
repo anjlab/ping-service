@@ -9,6 +9,8 @@ import javax.persistence.Query;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 
+import com.google.appengine.api.datastore.Key;
+
 import dmitrygusev.ping.entities.Account;
 import dmitrygusev.ping.entities.Ref;
 import dmitrygusev.ping.entities.Schedule;
@@ -72,5 +74,10 @@ public class RefDAOImpl implements RefDAO {
 		
 		return refs.isEmpty() ? null : refs.get(0);
 	}
+	
+	public Ref find(Long id) {
+        Key key = createKey(Ref.class.getSimpleName(), id);
+        return em.find(Ref.class, key);
+    }
 
 }

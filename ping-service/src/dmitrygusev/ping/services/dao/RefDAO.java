@@ -19,5 +19,6 @@ public interface RefDAO {
 	public abstract List<Ref> getRefs(Schedule schedule);
     @CommitAfter
 	public abstract Ref find(Account find, Schedule schedule);
-	
+	@CommitAfter
+	public abstract Ref find(Long id);
 }

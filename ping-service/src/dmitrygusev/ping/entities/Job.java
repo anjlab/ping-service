@@ -1,5 +1,6 @@
 package dmitrygusev.ping.entities;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Locale;
 
@@ -19,8 +20,14 @@ import com.google.appengine.api.datastore.Text;
 import dmitrygusev.ping.services.Utils;
 
 @Entity
-public class Job {
-	@Id
+public class Job implements Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1077399963209971165L;
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Key key;
 
@@ -302,5 +309,22 @@ public class Job {
 	public boolean isReceiveBackups() {
 		return receiveBackups == null ||	//	Receive backups by default 
 			   receiveBackups.booleanValue();
+	}
+	@Override
+	public int hashCode() {
+	    return getKey() == null 
+	         ? super.hashCode()
+	         : getKey().hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	    if (!(obj instanceof Job)) {
+	        return false;
+	    }
+	    Job job = (Job) obj;
+	    return getKey() == null
+	         ? super.equals(obj)
+	         : getKey().equals(job.getKey());
 	}
 }

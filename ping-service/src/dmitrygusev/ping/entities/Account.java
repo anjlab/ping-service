@@ -11,13 +11,13 @@ import javax.persistence.Transient;
 
 @Entity
 public class Account implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	
-	@Id
+	/**
+     * 
+     */
+    private static final long serialVersionUID = -3714340195981301403L;
+    
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Transient

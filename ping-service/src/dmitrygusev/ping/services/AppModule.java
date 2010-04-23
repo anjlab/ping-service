@@ -47,11 +47,11 @@ import dmitrygusev.ping.services.dao.JobDAO;
 import dmitrygusev.ping.services.dao.JobResultDAO;
 import dmitrygusev.ping.services.dao.RefDAO;
 import dmitrygusev.ping.services.dao.ScheduleDAO;
-import dmitrygusev.ping.services.dao.impl.AccountDAOImpl;
-import dmitrygusev.ping.services.dao.impl.JobDAOImpl;
 import dmitrygusev.ping.services.dao.impl.JobResultDAOImpl;
-import dmitrygusev.ping.services.dao.impl.RefDAOImpl;
-import dmitrygusev.ping.services.dao.impl.ScheduleDAOImpl;
+import dmitrygusev.ping.services.dao.impl.cache.AccountDAOImplCache;
+import dmitrygusev.ping.services.dao.impl.cache.JobDAOImplCache;
+import dmitrygusev.ping.services.dao.impl.cache.RefDAOImplCache;
+import dmitrygusev.ping.services.dao.impl.cache.ScheduleDAOImplCache;
 import dmitrygusev.ping.services.security.AccessController;
 import dmitrygusev.tapestry5.TimeTranslator;
 
@@ -66,11 +66,11 @@ public class AppModule
         binder.bind(JobExecutor.class);
         binder.bind(Mailer.class);
         
-        binder.bind(AccountDAO.class, AccountDAOImpl.class);
-        binder.bind(JobDAO.class, JobDAOImpl.class);
+        binder.bind(AccountDAO.class, AccountDAOImplCache.class);
+        binder.bind(JobDAO.class, JobDAOImplCache.class);
         binder.bind(JobResultDAO.class, JobResultDAOImpl.class);
-        binder.bind(RefDAO.class, RefDAOImpl.class);
-        binder.bind(ScheduleDAO.class, ScheduleDAOImpl.class);
+        binder.bind(RefDAO.class, RefDAOImplCache.class);
+        binder.bind(ScheduleDAO.class, ScheduleDAOImplCache.class);
     }
 
     public static void contributeIgnoredPathsFilter(Configuration<String> configuration) {

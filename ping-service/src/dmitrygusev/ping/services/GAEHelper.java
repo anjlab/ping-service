@@ -56,11 +56,21 @@ public class GAEHelper {
 	}
 
     public static void addTaskNonTransactional(Queue queue, Iterable<TaskOptions> options) {
-        try {
-	        queue.add(null, options);
-	    } catch (TransientFailureException e) {
-	        logger.debug("Retry after TransientFailureException: {}", e);
-	        queue.add(null, options);
-	    }
+        int retryCount = 0;
+        while (true) {
+            try {
+    	        queue.add(null, options);
+    	        break;
+    	    } catch (TransientFailureException e) {
+    	        retryCount++;
+    	        
+    	        if (retryCount > 3) {
+    	            logger.error("Give up");
+    	            break;
+    	        }
+    	        
+    	        logger.debug("Retry #{} after TransientFailureException: {}", retryCount, e);
+    	    }
+        }
     }
 }

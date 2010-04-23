@@ -1,5 +1,6 @@
 package dmitrygusev.ping.entities;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,8 +12,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class Schedule {
-	@Id
+public class Schedule implements Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6607545799866087941L;
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
@@ -33,6 +40,12 @@ public class Schedule {
 	public void removeJob(Job job) {
 		jobs.remove(job);
 	}
+    public void updateJob(Job job) {
+        if (jobs.contains(job))  {
+            jobs.remove(job);
+            jobs.add(job);
+        }
+    }
 	public String getName() {
 		return name;
 	}
