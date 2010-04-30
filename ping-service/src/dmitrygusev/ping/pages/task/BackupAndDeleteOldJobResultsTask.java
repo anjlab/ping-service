@@ -7,6 +7,7 @@ import static java.lang.Long.parseLong;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.mail.MessagingException;
@@ -106,8 +107,10 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 	
 	@Override
 	protected void completeTask() throws Exception {
+	    job.setLastBackupTimestamp(new Date());
+	    application.updateJob(job, false);
+	    
 		if (cacheHasResults()) {
-			
 			logger.info("Enqueueing MailJobResultsTask for taskId {}", taskId);
 			
 			application.runMailJobResultsTask(job.getKey(), taskId, getStartTime());
@@ -154,16 +157,16 @@ public class BackupAndDeleteOldJobResultsTask extends LongRunningQueryTask {
 	private int deleteResults(List<JobResult> results) {
 		int count = 0;
 		for (JobResult result : (List<JobResult>) results) {
-			jobResultDAO.delete(result.getId());
+            if (getRequestDuration() > 15000) {
+                //  Spent only around 1/2 of request duration limit to delete job results
+                break;
+            }
+			jobResultDAO.delete(result.getId(), 5000);
 			count++;
-			if (getRequestDuration() > 10000) {
-				//	Spent only around 1/3 of request duration limit to delete job results
-				break;
-			}
 		}
 		return count;
-	}
-
+    }
+	
 	@Inject
 	private Cache cache;
 	

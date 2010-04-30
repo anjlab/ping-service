@@ -18,7 +18,7 @@
 		<div class="t-beaneditor">
 			<t:beaneditor t:id="jobEditor" object="job" 
 				reorder="title, pingURL, cronString, usesValidatingHttpCode, validatingHttpCode, usesValidatingRegexp, validatingRegexp, responseEncoding, reportEmail, lastPingSummary, availabilityPercent, statusCounter, lastPingDetails"
-				exclude="shortenURL, titleFriendly, id, lastPingResult, lastPingTimestamp"
+				exclude="lastBackupTimestamp, shortenURL, titleFriendly, id, lastPingResult, lastPingTimestamp"
 				add="availabilityPercent, statusCounter, lastPingSummary"
 				submitLabel="Apply Edit">
 				

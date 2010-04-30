@@ -44,7 +44,7 @@ public class EditJob {
 		Object resultPage = index;
 		
 		try {
-			application.updateJob(job);
+			application.updateJob(job, true);
 		} catch (NotAuthorizedException e) {
 			index.setExceptionMessage(e.getMessage());
 		} catch (Exception e) {

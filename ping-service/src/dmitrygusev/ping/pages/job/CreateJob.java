@@ -6,22 +6,19 @@ import org.apache.tapestry5.annotations.InjectPage;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import dmitrygusev.ping.entities.Account;
 import dmitrygusev.ping.entities.Job;
-import dmitrygusev.ping.entities.Schedule;
 import dmitrygusev.ping.pages.Index;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.GAEHelper;
 import dmitrygusev.ping.services.Utils;
-import dmitrygusev.ping.services.dao.AccountDAO;
-import dmitrygusev.ping.services.dao.JobDAO;
-import dmitrygusev.ping.services.dao.RefDAO;
-import dmitrygusev.ping.services.dao.ScheduleDAO;
 
 @SuppressWarnings("unused")
 public class CreateJob {
 
+    private static final Logger logger = LoggerFactory.getLogger(CreateJob.class);
 	private Job job;
 	
 	public Job getJob() {
@@ -79,6 +76,7 @@ public class CreateJob {
 			return index;
 		} catch (Exception e) {
 			message = e.getMessage();
+			logger.error("Error creating job", e);
 		}
 		return null;
 	}

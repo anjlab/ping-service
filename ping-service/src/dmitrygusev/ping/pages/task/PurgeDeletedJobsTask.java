@@ -94,7 +94,7 @@ public class PurgeDeletedJobsTask extends LongRunningQueryTask {
             if (!isJobDeleted(result.getJobKey())) {
                 continue;
             }
-            jobResultDAO.delete(result.getId());
+            jobResultDAO.delete(result.getId(), 5000);
             count++;
         }
         return count;

@@ -6,6 +6,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
@@ -13,6 +15,8 @@ import dmitrygusev.ping.services.dao.JobResultDAO;
 
 public class JobResultDAOImpl implements JobResultDAO {
 
+    private static final Logger logger = LoggerFactory.getLogger(JobResultDAOImpl.class);
+    
 	@Inject
     private EntityManager em;
 	
@@ -35,8 +39,16 @@ public class JobResultDAOImpl implements JobResultDAO {
 	}
 	
 	@Override
-	public void delete(Long id) {
+	public void delete(Long id, Integer timeout) {
 		Query q = em.createQuery("DELETE FROM JobResult r WHERE r.id = :id").setParameter("id", id);
-		q.executeUpdate();
+		if (timeout > 0) {
+		    q.setHint("datanucleus.datastoreWriteTimeout", timeout);
+		    q.setHint("javax.persistence.query.timeout", timeout);
+		}
+		try {
+		    q.executeUpdate();
+		} catch (Exception e) {
+		    logger.error("Error deleting job result", e);
+		}
 	}
 }

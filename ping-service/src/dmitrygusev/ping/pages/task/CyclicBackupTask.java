@@ -35,6 +35,7 @@ public class CyclicBackupTask extends LongRunningQueryTask {
 	
 	@Override
 	protected Query getQuery() {
+	    // TODO ORDER BY j.lastBackupTimestamp
 		return em.createQuery("SELECT j FROM Job j");
 	}
 	
@@ -57,9 +58,10 @@ public class CyclicBackupTask extends LongRunningQueryTask {
 	}
 	
     private void putInsuranceTicket() {
-        //  This code will run at least every 24/6=4 hours a day (see 'backup' queue in queue.xml), 
+        //  This code will run at least every X hours a day (see 'backup' queue in queue.xml),
+        long x = Math.round(24d / 5d);
         //  but lets put insurance ticket that will live a bit longer
-        int seconds = (int) TimeUnit.SECONDS.convert(5L, TimeUnit.HOURS);
+        int seconds = (int) TimeUnit.SECONDS.convert(x + 2, TimeUnit.HOURS);
         
         memcacheService.put(BackupHealthInsuranceCron.INSURANCE_TICKET, "running", byDeltaSeconds(seconds));
     }

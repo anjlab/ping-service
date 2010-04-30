@@ -64,6 +64,7 @@ public class Job implements Serializable {
 	private Schedule schedule;
 	
 	private Boolean receiveBackups;
+	private Date lastBackupTimestamp;
 	
 	public static final int PING_RESULT_NOT_AVAILABLE = 1;
 	public static final int PING_RESULT_OK = 2;
@@ -73,6 +74,7 @@ public class Job implements Serializable {
 	
 	public Job() {
 		lastPingResult = PING_RESULT_NOT_AVAILABLE;
+		lastBackupTimestamp = new Date();
 	}
 
 	public boolean isLastPingFailed() {
@@ -135,6 +137,12 @@ public class Job implements Serializable {
 	public void setLastPingTimestamp(Date lastPingTimestamp) {
 		this.lastPingTimestamp = lastPingTimestamp;
 	}
+	public Date getLastBackupTimestamp() {
+        return lastBackupTimestamp;
+    }
+	public void setLastBackupTimestamp(Date lastBackupTimestamp) {
+        this.lastBackupTimestamp = lastBackupTimestamp;
+    }
 	public int getLastPingResult() {
 		return lastPingResult;
 	}

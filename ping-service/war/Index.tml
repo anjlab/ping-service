@@ -24,7 +24,7 @@
 	
     <t:grid empty="No jobs" source="jobs" row="job"
        	reorder="scheduledBy, pingURL, cronString, edit, analytics, upDownTimeInMinutes, availabilityPercent, lastPingSummary"
-       	exclude="statusCounter, statusCounterFriendlyShort, availabilityPercentFriendly, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, totalStatusCounterFriendly, totalSuccessStatusCounterFriendly, previousStatusCounterFriendly, titleFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp, statusCounterFriendly, receiveBackups, validationSummary"
+       	exclude="lastBackupTimestamp, statusCounter, statusCounterFriendlyShort, availabilityPercentFriendly, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, totalStatusCounterFriendly, totalSuccessStatusCounterFriendly, previousStatusCounterFriendly, titleFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp, statusCounterFriendly, receiveBackups, validationSummary"
        	add="edit, delete, analytics">
 
 		<t:parameter name="lastPingSummaryCell">

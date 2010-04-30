@@ -2,6 +2,7 @@ package dmitrygusev.ping.pages;
 
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Persist;
@@ -38,14 +39,24 @@ public class Index {
 		grantedEmail = null;
 		job = null;
 		messageColor = null;
+		timeZone = null;
 	}
+	
+	private TimeZone timeZone;
 	
 	@Property
 	private Job job;
 	
 	public String getLastPingSummary() {
-		return application.getLastPingSummary(job);
+		return application.getLastPingSummary(job, getTimeZone());
 	}
+
+    private TimeZone getTimeZone() {
+        if (timeZone == null) {
+            timeZone = application.getTimeZone();
+        }
+        return timeZone;
+    }
 	
 	public String getSummaryStatusCssClass() {
 		if (job.isGoogleIOException()) {

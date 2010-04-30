@@ -27,7 +27,7 @@
   </queue>
   <queue>
   	<name>backup</name>
-    <rate>6/d</rate><!-- If changed here, should also be changed in CyclicBackupTask.putInsuranceTicket() also -->
+    <rate>5/d</rate><!-- If changed here, should also be changed in CyclicBackupTask.putInsuranceTicket() also -->
     <bucket-size>1</bucket-size>
   </queue>
   <queue>

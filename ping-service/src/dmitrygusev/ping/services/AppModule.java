@@ -1,6 +1,8 @@
 package dmitrygusev.ping.services;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.Date;
 
@@ -14,16 +16,24 @@ import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.Translator;
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
+import org.apache.tapestry5.ioc.MethodAdvice;
 import org.apache.tapestry5.ioc.MethodAdviceReceiver;
+import org.apache.tapestry5.ioc.ObjectLocator;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
+import org.apache.tapestry5.ioc.Predicate;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.InjectService;
 import org.apache.tapestry5.ioc.annotations.Match;
-import org.apache.tapestry5.services.ApplicationStateContribution;
-import org.apache.tapestry5.services.ApplicationStateCreator;
+import org.apache.tapestry5.model.MutableComponentModel;
 import org.apache.tapestry5.services.ApplicationStateManager;
+import org.apache.tapestry5.services.ClassTransformation;
+import org.apache.tapestry5.services.ComponentClassResolver;
+import org.apache.tapestry5.services.ComponentClassTransformWorker;
 import org.apache.tapestry5.services.ComponentEventLinkEncoder;
+import org.apache.tapestry5.services.ComponentMethodAdvice;
+import org.apache.tapestry5.services.ComponentMethodInvocation;
 import org.apache.tapestry5.services.Dispatcher;
+import org.apache.tapestry5.services.InjectionProvider;
 import org.apache.tapestry5.services.MarkupRenderer;
 import org.apache.tapestry5.services.MarkupRendererFilter;
 import org.apache.tapestry5.services.MetaDataLocator;
@@ -34,6 +44,7 @@ import org.apache.tapestry5.services.RequestFilter;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.RequestHandler;
 import org.apache.tapestry5.services.Response;
+import org.apache.tapestry5.services.TransformMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tynamo.jpa.JPASymbols;
@@ -52,6 +63,7 @@ import dmitrygusev.ping.services.dao.impl.cache.AccountDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.JobDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.RefDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.ScheduleDAOImplCache;
+import dmitrygusev.ping.services.profiler.ProfilingAdvice;
 import dmitrygusev.ping.services.security.AccessController;
 import dmitrygusev.tapestry5.TimeTranslator;
 
@@ -66,11 +78,13 @@ public class AppModule
         binder.bind(JobExecutor.class);
         binder.bind(Mailer.class);
         
-        binder.bind(AccountDAO.class, AccountDAOImplCache.class);
-        binder.bind(JobDAO.class, JobDAOImplCache.class);
-        binder.bind(JobResultDAO.class, JobResultDAOImpl.class);
-        binder.bind(RefDAO.class, RefDAOImplCache.class);
-        binder.bind(ScheduleDAO.class, ScheduleDAOImplCache.class);
+        binder.bind(JobResultCSVExporter.class);
+        
+        binder.bind(AccountDAO.class, AccountDAOImplCache.class).preventReloading();
+        binder.bind(JobDAO.class, JobDAOImplCache.class).preventReloading();
+        binder.bind(JobResultDAO.class, JobResultDAOImpl.class).preventReloading();
+        binder.bind(RefDAO.class, RefDAOImplCache.class).preventReloading();
+        binder.bind(ScheduleDAO.class, ScheduleDAOImplCache.class).preventReloading();
     }
 
     public static void contributeIgnoredPathsFilter(Configuration<String> configuration) {
@@ -95,7 +109,7 @@ public class AppModule
     {
     	return new Application(accountDAO, jobDAO, scheduleDAO, 
     			refDAO, jobResultDAO, gaeHelper, jobExecutor, mailer,
-    			stateManager, linkSource, globals);
+    			linkSource, globals);
     }
 
     public static Cache buildCache(Logger logger) {
@@ -128,10 +142,6 @@ public class AppModule
     
     public static Logger buildLogger() {
     	return LoggerFactory.getLogger(AppModule.class);
-    }
-    
-    public static JobResultCSVExporter buildJobResultCSVExporter() {
-    	return new JobResultCSVExporter();
     }
     
     public static void contributeApplicationDefaults(
@@ -247,19 +257,6 @@ public class AppModule
 		};
 	}
     
-    public void contributeApplicationStateManager(
-    		MappedConfiguration<Class<?>, ApplicationStateContribution> configuration,
-    		final GAEHelper helper, final AccountDAO accountDAO)
-    {
-    	ApplicationStateCreator<AppSessionCache> creator = new ApplicationStateCreator<AppSessionCache>() {
-	        public AppSessionCache create() {
-	        	return new AppSessionCache();
-	        }
-    	};
-    
-      configuration.add(AppSessionCache.class, new ApplicationStateContribution("session", creator));
-    }
-    
     public void contributeRegexAuthorizer(Configuration<String> regex)
     {
     	String pathPattern = "([^/.]+/)*[^/.]+\\.((css)|(js)|(jpg)|(jpeg)|(png)|(gif))$";
@@ -285,7 +282,7 @@ public class AppModule
     {
         configuration.add(NO_MARKUP_SYMBOL, "");
     }
-    
+        
     public void contributeMarkupRenderer(OrderedConfiguration<MarkupRendererFilter> configuration, 
                                          final MetaDataLocator metaDataLocator, 
                                          final ComponentEventLinkEncoder linkEncoder, 
@@ -309,5 +306,53 @@ public class AppModule
     				}
     			}
     		}, "before:*");
+    }
+    
+    @SuppressWarnings("unused")
+    @Match("*")
+    public static void adviseProfiler(final MethodAdviceReceiver receiver)
+    {
+        final MethodAdvice advice = new ProfilingAdvice(receiver.getInterface().getName());
+
+        for (Method m : receiver.getInterface().getMethods()) {
+//            receiver.adviseMethod(m, advice);
+        };
+    }
+    
+    public static void contributeComponentClassTransformWorker(
+            OrderedConfiguration<ComponentClassTransformWorker> configuration,
+            ObjectLocator locator,
+            InjectionProvider injectionProvider,
+            ComponentClassResolver resolver)
+    {
+        configuration.add("ProfilerWorker", new ComponentClassTransformWorker() {
+            
+            @SuppressWarnings("unused")
+            @Override
+            public void transform(ClassTransformation transformation, final MutableComponentModel model) {
+                
+                final MethodAdvice profilingAdvice = new ProfilingAdvice(transformation.getClassName());
+
+                for (TransformMethod method : transformation.matchMethods(
+                        new Predicate<TransformMethod>() {
+                            @Override
+                            public boolean accept(TransformMethod method) {
+                                return !method.getMethodIdentifier().contains("getComponentResources")
+                                    && !Modifier.isStatic(method.getSignature().getModifiers())
+                                    && !Modifier.isAbstract(method.getSignature().getModifiers());
+                            }
+                        }))
+                {
+                    ComponentMethodAdvice advice = new ComponentMethodAdvice()
+                    {
+                        public void advise(ComponentMethodInvocation invocation)
+                        {
+                            profilingAdvice.advise(invocation);
+                        }
+                    }; 
+//                    method.addAdvice(advice);
+                }
+            }
+        }, "before:Log");
     }
 }

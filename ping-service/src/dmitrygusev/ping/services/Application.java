@@ -7,6 +7,7 @@ import static dmitrygusev.ping.services.GAEHelper.addTaskNonTransactional;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,7 +20,6 @@ import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tapestry5.Link;
-import org.apache.tapestry5.services.ApplicationStateManager;
 import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.slf4j.Logger;
@@ -60,7 +60,6 @@ public class Application {
 	private GAEHelper gaeHelper;
 	private JobExecutor jobExecutor;
 	private Mailer mailer;
-	private AppSessionCache sessionCache;
 	private PageRenderLinkSource linkSource;
 	private RequestGlobals globals;
 	
@@ -73,7 +72,6 @@ public class Application {
 			GAEHelper gaeHelper,
 			JobExecutor jobExecutor,
 			Mailer mailer,
-			ApplicationStateManager stateManager,
 			PageRenderLinkSource linkSource,
 			RequestGlobals globals) {
 		super();
@@ -85,7 +83,6 @@ public class Application {
 		this.gaeHelper = gaeHelper;
 		this.jobExecutor = jobExecutor;
 		this.mailer = mailer;
-		this.sessionCache = stateManager.get(AppSessionCache.class);
 		this.linkSource = linkSource;
 		this.globals = globals;
 	}
@@ -152,8 +149,10 @@ public class Application {
 		return schedule;
 	}
 
-	public void updateJob(Job job) {
-	    assertCanModifyJob(job);
+	public void updateJob(Job job, boolean checkPermission) {
+	    if (checkPermission) {
+	        assertCanModifyJob(job);
+	    }
 		
 		internalUpdateJob(job);
 	}
@@ -303,10 +302,14 @@ public class Application {
 	public static String formatDate(Date date, String timeZoneCity, DateFormat format) {
 		TimeZone timezone = getTimeZone(timeZoneCity);
 
-		format.setTimeZone(timezone);
+		return formatDate(date, format, timezone);
+	}
+
+    public static String formatDate(Date date, DateFormat format, TimeZone timezone) {
+        format.setTimeZone(timezone);
 		
 		return format.format(date);
-	}
+    }
 
 	public TimeZone getTimeZone() {
 		return getTimeZone(getUserAccount().getTimeZoneCity());
@@ -332,6 +335,20 @@ public class Application {
 		return sb.toString();
 	}
 
+	public String getLastPingSummary(Job job, TimeZone timeZone) {
+        StringBuilder sb = new StringBuilder();
+        
+        if (job.getLastPingTimestamp() != null) {
+            String formattedDate = formatDate(job.getLastPingTimestamp(), DATETIME_FORMAT, timeZone);
+
+            buildLastPingSummary(job, sb, formattedDate);
+        } else {
+            sb.append("N/A");
+        }
+                
+        return sb.toString();
+    }
+	
 	public static void buildLastPingSummary(Job job, StringBuilder sb, String formattedDate) {
 		checkResult(job, sb, Job.PING_RESULT_NOT_AVAILABLE, "N/A");
 		checkResult(job, sb, Job.PING_RESULT_OK, "Okay");
@@ -352,8 +369,17 @@ public class Application {
 		}
 	}
 	
+    private static final Account systemAccount = getSystemAccount();
+    
+    private static Account getSystemAccount() {
+        Account account = new Account();
+        account.setEmail("system");
+        return account;
+    }
+
 	public Account getUserAccount() {
-		return sessionCache.getUserAccount(gaeHelper, accountDAO);
+        Principal principal = gaeHelper.getUserPrincipal();
+        return principal == null ? systemAccount : accountDAO.getAccount(principal.getName());
 	}
 
 	public List<Job> getAvailableJobs() {

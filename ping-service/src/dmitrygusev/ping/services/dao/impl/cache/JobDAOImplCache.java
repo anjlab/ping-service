@@ -1,6 +1,10 @@
 package dmitrygusev.ping.services.dao.impl.cache;
 
 import static dmitrygusev.ping.services.dao.impl.cache.CacheHelper.getEntityCacheKey;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.jsr107cache.Cache;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
@@ -9,6 +13,7 @@ import com.google.appengine.api.datastore.Key;
 
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.Schedule;
+import dmitrygusev.ping.services.Utils;
 import dmitrygusev.ping.services.dao.impl.JobDAOImpl;
 
 public class JobDAOImplCache extends JobDAOImpl {
@@ -64,8 +69,17 @@ public class JobDAOImplCache extends JobDAOImpl {
         super.update(job);
         Object entityCacheKey = getEntityCacheKey(Job.class, getJobWideUniqueData(job.getKey()));
         if (cache.containsKey(entityCacheKey)) {
+            
+            Job cachedJob = (Job)cache.get(entityCacheKey);
+            if (!cachedJob.getCronString().equals(job.getCronString())) {
+                abandonJobsByCronStringCache(cachedJob.getCronString());
+                abandonJobsByCronStringCache(job.getCronString());
+            }
+            
             cache.remove(entityCacheKey);
             cache.put(entityCacheKey, job);
+        } else {
+            abandonJobsByCronStringCache();
         }
         
         updateJobInScheduleCache(job);
@@ -87,6 +101,33 @@ public class JobDAOImplCache extends JobDAOImpl {
 
     private void abandonScheduleCache(Long scheduleId) {
         Object entityCacheKey = getEntityCacheKey(Schedule.class, scheduleId);
+        cache.remove(entityCacheKey);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Job> getJobsByCronString(String cronString) {
+        Object entityCacheKey = getEntityCacheKey(Job.class, cronString);
+        if (cache.containsKey(entityCacheKey)) {
+            return (List<Job>) cache.get(entityCacheKey);
+        }
+        List<Job> result = super.getJobsByCronString(cronString);
+        if (result != null) {
+            ArrayList<Job> serializableList = 
+                new ArrayList<Job>(result.subList(0, result.size()));
+            cache.put(entityCacheKey, serializableList);
+        }
+        return result;
+    }
+    
+    private void abandonJobsByCronStringCache() {
+        for (String cronString : Utils.getCronStringModel().split(",")) {
+            abandonJobsByCronStringCache(cronString);
+        }
+    }
+    
+    private void abandonJobsByCronStringCache(String cronString) {
+        Object entityCacheKey = getEntityCacheKey(Job.class, cronString);
         cache.remove(entityCacheKey);
     }
 }
