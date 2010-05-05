@@ -12,7 +12,6 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.Mailer;
-import dmitrygusev.ping.services.dao.impl.JobDAOImpl;
 
 public class CyclicBackupTask extends LongRunningQueryTask {
 
@@ -31,7 +30,7 @@ public class CyclicBackupTask extends LongRunningQueryTask {
 	
 	@Override
 	protected Query getQuery() {
-		return em.createQuery(JobDAOImpl.FIND_RECENT_JOB_QUERY);
+		return em.createQuery("SELECT j FROM Job j ORDER BY j.lastBackupTimestamp ASC");
 	}
 	
 	@Inject
