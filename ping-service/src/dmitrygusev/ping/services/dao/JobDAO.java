@@ -21,5 +21,7 @@ public interface JobDAO {
 	public abstract Job find(Key stringToKey);
     @CommitAfter
     public abstract List<Job> getAllJobs();
+    @CommitAfter
+    public abstract Job findRecent();
 
 }

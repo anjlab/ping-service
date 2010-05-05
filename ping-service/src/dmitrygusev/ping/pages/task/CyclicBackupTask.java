@@ -1,22 +1,18 @@
 package dmitrygusev.ping.pages.task;
 
-import static com.google.appengine.api.memcache.Expiration.byDeltaSeconds;
 import static dmitrygusev.ping.services.Utils.formatTimeMillis;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 
-import com.google.appengine.api.memcache.MemcacheService;
-
 import dmitrygusev.ping.entities.Job;
-import dmitrygusev.ping.pages.cron.BackupHealthInsuranceCron;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.Mailer;
+import dmitrygusev.ping.services.dao.impl.JobDAOImpl;
 
 public class CyclicBackupTask extends LongRunningQueryTask {
 
@@ -35,20 +31,14 @@ public class CyclicBackupTask extends LongRunningQueryTask {
 	
 	@Override
 	protected Query getQuery() {
-	    // TODO ORDER BY j.lastBackupTimestamp
-		return em.createQuery("SELECT j FROM Job j");
+		return em.createQuery(JobDAOImpl.FIND_RECENT_JOB_QUERY);
 	}
 	
 	@Inject
 	private Application application;
 
-	@Inject
-	private MemcacheService memcacheService;
-	
 	@Override
 	protected boolean processResults(List<?> results) throws Exception {
-        putInsuranceTicket();
-
 	    if (results.size() > 0) {
 			Job job = (Job)results.get(0);
 			application.runBackupAndDeleteTask(job.getKey());
@@ -56,15 +46,6 @@ public class CyclicBackupTask extends LongRunningQueryTask {
 		
 		return true;
 	}
-	
-    private void putInsuranceTicket() {
-        //  This code will run at least every X hours a day (see 'backup' queue in queue.xml),
-        long x = Math.round(24d / 5d);
-        //  but lets put insurance ticket that will live a bit longer
-        int seconds = (int) TimeUnit.SECONDS.convert(x + 2, TimeUnit.HOURS);
-        
-        memcacheService.put(BackupHealthInsuranceCron.INSURANCE_TICKET, "running", byDeltaSeconds(seconds));
-    }
 
 	@Inject
 	private Mailer mailer;

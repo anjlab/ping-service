@@ -21,9 +21,20 @@ import dmitrygusev.ping.services.dao.JobDAO;
 public class JobDAOImpl implements JobDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(JobDAOImpl.class);
-    
+
+    public static final String FIND_RECENT_JOB_QUERY = "SELECT j FROM Job j ORDER BY j.lastBackupTimestamp ASC";
+
 	@Inject
     public EntityManager em;
+	
+	@Override
+	public Job findRecent() {
+        Query q = em.createQuery(FIND_RECENT_JOB_QUERY).setMaxResults(1);
+    
+        List<Job> result = q.getResultList();
+        
+        return result.isEmpty() ? null : result.get(0);
+	}
 	
 	public List<Job> getJobsByCronString(String cronString) {
 		Query q = em.createQuery("SELECT j FROM Job j WHERE j.cronString = :cronString");
