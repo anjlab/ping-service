@@ -31,7 +31,7 @@ public class BackupHealthInsuranceCron {
         //  This code will run at least every X hours a day (see 'backup' queue in queue.xml),
         long x = Math.round(24d / 5d);
         //  but lets put insurance ticket that will live a bit longer
-        int insuranceIntervalMillis = (int) TimeUnit.MILLISECONDS.convert(x + 1, TimeUnit.HOURS);
+        int insuranceIntervalMillis = (int) TimeUnit.MILLISECONDS.convert(x + 2, TimeUnit.HOURS);
         
         long millisecondsFromLastBackup = now.getTime() - job.getLastBackupTimestamp().getTime();
         

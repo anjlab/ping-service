@@ -120,7 +120,7 @@ public class JobResult implements Serializable {
 	}
 	public Integer getPingResult() {
 		if (pingResult == null) {
-			//	For older records (earlier then November 1 2009)
+			//	For older records (earlier than November 1 2009)
 			return failed 
 				 ? Job.PING_RESULT_CONNECTIVITY_PROBLEM		//	This was the major fail reason 
 				 : Job.PING_RESULT_OK;
