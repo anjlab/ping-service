@@ -25,14 +25,4 @@
     <rate>1/m</rate>
     <bucket-size>1</bucket-size>
   </queue>
-  <queue>
-  	<name>backup</name>
-    <rate>5/d</rate><!-- If changed here, should also be changed in BackupHealthInsuranceCron.onActivate() also -->
-    <bucket-size>1</bucket-size>
-  </queue>
-  <queue>
-    <name>purge-deleted</name>
-    <rate>1/s</rate>
-    <bucket-size>1</bucket-size>
-  </queue>
 </queue-entries>

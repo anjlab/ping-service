@@ -5,7 +5,6 @@ package dmitrygusev.ping.pages.job;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -16,7 +15,6 @@ import org.apache.tapestry5.annotations.InjectPage;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.Response;
 
@@ -36,9 +34,7 @@ import dmitrygusev.ping.pages.Index;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.JobResultCSVExporter;
 import dmitrygusev.ping.services.Utils;
-import dmitrygusev.ping.services.dao.JobResultDAO;
 
-@SuppressWarnings("unused")
 public class Analytics {
 
 	private static final String CSV = "csv";
@@ -65,7 +61,8 @@ public class Analytics {
 	@InjectPage
 	private Index index;
 	
-	@Property
+	@SuppressWarnings("unused")
+    @Property
 	@Persist
 	private String message;
 
@@ -136,15 +133,13 @@ public class Analytics {
 
 	private static final String DEFAULT_VIEW = "month > day";
 	
-	@Property
+	@SuppressWarnings("unused")
+    @Property
 	private final String viewModel = DEFAULT_VIEW + ",dayTime > hour,dayOfWeek > month";
 	
 	@Property
 	@Persist
 	private String view;
-	
-	@Inject
-	private JobResultDAO jobResultDAO;
 	
 	private double end;
 
@@ -200,11 +195,11 @@ public class Analytics {
 	}
 
 	private void initResults() {
-		results = jobResultDAO.getResults(job, 1000);
+	    results = job.getRecentJobResults(Application.DEFAULT_NUMBER_OF_JOB_RESULTS);
 
 		if (results.size() > 0) {
-			dateTo = results.get(0).getTimestamp();
-			dateFrom = results.get(results.size() - 1).getTimestamp();
+			dateFrom = results.get(0).getTimestamp();
+			dateTo = results.get(results.size() - 1).getTimestamp();
 		} else {
 			dateTo = dateFrom = new Date();
 		}
@@ -236,16 +231,5 @@ public class Analytics {
 				return "text/csv";					
 			}
 		};
-	}
-	
-	@Inject
-	private PageRenderLinkSource linkSource;
-	
-	public void onActionFromRunCountJobResultsTask() throws URISyntaxException {
-		application.runCountJobResultsTask(job.getKey());
-	}
-
-	public void onActionFromRunBackupAndDeleteOldJobResultsTask() throws URISyntaxException {
-		application.runBackupAndDeleteTask(job.getKey());
 	}
 }

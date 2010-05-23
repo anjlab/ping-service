@@ -17,9 +17,9 @@
 	
 		<div class="t-beaneditor">
 			<t:beaneditor t:id="jobEditor" object="job" 
-				reorder="title, pingURL, cronString, usesValidatingHttpCode, validatingHttpCode, usesValidatingRegexp, validatingRegexp, responseEncoding, reportEmail, lastPingSummary, availabilityPercent, statusCounter, lastPingDetails"
+				reorder="title, pingURL, cronString, usesValidatingHttpCode, validatingHttpCode, usesValidatingRegexp, validatingRegexp, responseEncoding, reportEmail, receiveBackups, recentAvailabilityPercent, totalAvailabilityPercent, statusCounter, lastPingSummary, lastPingDetails"
 				exclude="lastBackupTimestamp, shortenURL, titleFriendly, id, lastPingResult, lastPingTimestamp"
-				add="availabilityPercent, statusCounter, lastPingSummary"
+				add="totalAvailabilityPercent, recentAvailabilityPercent, statusCounter, lastPingSummary"
 				submitLabel="Apply Edit">
 				
 				<t:parameter name="cronString">
@@ -41,13 +41,18 @@
 					<t:outputRaw t:id="lastPingSummary" value="lastPingSummary" />
 				</t:parameter>
 				
-				<t:parameter name="availabilityPercent">
-					<span>Availability:</span>
-					<t:outputRaw t:id="availabilityPercent" value="job.availabilityPercentFriendly" />
-				</t:parameter>
+                <t:parameter name="recentAvailabilityPercent">
+                    <span>Recent Availability:</span>
+                    <t:outputRaw t:id="recentAvailabilityPercent" value="job.recentAvailabilityPercentFriendly" />
+                </t:parameter>
+
+                <t:parameter name="totalAvailabilityPercent">
+                    <span>Total Availability:</span>
+                    <t:outputRaw t:id="totalAvailabilityPercent" value="job.totalAvailabilityPercentFriendly" />
+                </t:parameter>
 
 				<t:parameter name="statusCounter">
-					<span>Status Counter / Prev / Total / OK:</span>
+					<span>Status Counter (Current/Prev/Total/OK):</span>
 					<t:outputRaw t:id="statusCounter" value="job.statusCounterFriendly" /> /
 					<t:outputRaw t:id="previousStatusCounter" value="job.previousStatusCounterFriendly" /> /
 					<t:outputRaw t:id="totalStatusCounter" value="job.totalStatusCounterFriendly" /> /

@@ -24,18 +24,9 @@ public class JobDAOImpl implements JobDAO {
 
 	@Inject
     public EntityManager em;
-	
-	@Override
-	public Job findRecent() {
-        Query q = em.createQuery("SELECT j FROM Job j ORDER BY j.lastBackupTimestamp DESC").setMaxResults(1);
-    
-        List<Job> result = q.getResultList();
-        
-        return result.isEmpty() ? null : result.get(0);
-	}
-	
-	public List<Job> getJobsByCronString(String cronString) {
-		Query q = em.createQuery("SELECT j FROM Job j WHERE j.cronString = :cronString");
+		
+	public List<Key> getJobsByCronString(String cronString) {
+		Query q = em.createQuery("SELECT j.key FROM Job j WHERE j.cronString = :cronString");
 		q.setParameter("cronString", cronString);
 		return q.getResultList();
 	}
@@ -52,22 +43,26 @@ public class JobDAOImpl implements JobDAO {
 	}
 	
 	public void delete(Long scheduleId, Long id) {
-		Job job = find(scheduleId, id);
+	    Job job = internalGetJob(scheduleId, id);
 	
 		if (job != null) {
 			em.remove(job);
 		}
 	}
+
+    private Job internalGetJob(Long scheduleId, Long id) {
+        Query q = em.createQuery("SELECT j FROM Job j WHERE j.key = :key").
+            setParameter("key", createKey(Schedule.class.getSimpleName(), scheduleId).
+                    getChild(Job.class.getSimpleName(), id));
+    
+        List<Job> result = q.getResultList();
+        
+        return result.isEmpty() ? null : result.get(0);
+    }
 	
 	@Override
 	public Job find(Long scheduleId, Long id) {
-		Query q = em.createQuery("SELECT j FROM Job j WHERE j.key = :key").
-			setParameter("key", createKey(Schedule.class.getSimpleName(), scheduleId).
-					getChild(Job.class.getSimpleName(), id));
-		
-		List<Job> result = q.getResultList();
-		
-		return result.isEmpty() ? null : result.get(0);
+		return internalGetJob(scheduleId, id);
 	}
 
 	@Override
@@ -76,7 +71,7 @@ public class JobDAOImpl implements JobDAO {
 	}
 
     @Override
-    public List<Job> getAllJobs() {
+    public List<Job> getAll() {
         Query q = em.createQuery("SELECT FROM Job");
         return q.getResultList();
     }

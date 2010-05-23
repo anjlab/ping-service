@@ -1,9 +1,8 @@
 package dmitrygusev.ping.entities;
 
-import java.io.ByteArrayOutputStream;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,34 +38,58 @@ public class TestJob {
 
 	@Test
 	public void testSerializeJobResults() throws Exception {
-	    List<JobResult> list = new ArrayList<JobResult>();
+	    Job job = new Job();
+	    
+	    job.beginUpdateJobResults();
 	    
 	    for (int i = 0; i < 10000; i += 1) {
-	        list.add(new JobResult());
-	        
 	        if (i % 1000 == 0) {
-	            logObjectSerialization(list);
+	            long startTime = System.currentTimeMillis();
+
+	            job.packJobResults();
+	            
+	            long endTime = System.currentTimeMillis();
+	            
+	            System.out.println(job.getRecentJobResults(100000).size() + " items = " + 
+	                    job.getPackedJobResultsLength() + " bytes " + (endTime - startTime));
 	        }
+            job.addJobResult(new JobResult());
 	    }
 	}
 
-    private void logObjectSerialization(List<JobResult> list)
-            throws IOException {
-        long startTime = System.currentTimeMillis();
+    @Test
+    public void testReadJobResults() throws IOException {
+        Job job = new Job();
+        List<JobResult> results = job.getRecentJobResults(10);
+        assertEquals(0, results.size());
         
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    
-	    ObjectOutputStream oos = new ObjectOutputStream(baos);
-	    
-	    oos.writeObject(list);
-	    
-	    oos.close();
-	    
-	    byte[] data = baos.toByteArray();
-	    
-	    long endTime = System.currentTimeMillis();
-	    
-	    System.out.println(list.size() + " items = " + data.length + " bytes " + (endTime - startTime));
+        JobResult result = new JobResult();
+        result.setResponseTime(1);
+        job.addJobResult(result);
+        
+        result = new JobResult();
+        result.setResponseTime(2);
+        job.addJobResult(result);
+        
+        result = new JobResult();
+        result.setResponseTime(3);
+        job.addJobResult(result);
+        
+        results = job.getRecentJobResults(2);
+        assertEquals(2, results.size());
+        assertEquals(2, results.get(0).getResponseTime());
+        assertEquals(3, results.get(1).getResponseTime());
+
+        results = job.getRecentJobResults(1);
+        assertEquals(1, results.size());
+        assertEquals(3, results.get(0).getResponseTime());
+
+        results = job.getRecentJobResults(3);
+        assertEquals(3, results.size());
+
+        results = job.getRecentJobResults(10);
+        assertEquals(3, results.size());
+        
+        job.packJobResults();
     }
-	
 }

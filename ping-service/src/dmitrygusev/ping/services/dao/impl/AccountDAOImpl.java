@@ -1,5 +1,6 @@
 package dmitrygusev.ping.services.dao.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -41,12 +42,17 @@ public class AccountDAOImpl implements AccountDAO {
 	}
 	
 	private Account createAccount(String email) {
-		Account result;
-		result = new Account();
-		result.setEmail(email);
+		Account account;
 		
-		em.persist(result);
-		return result;
+		account = new Account();
+		account.setEmail(email);
+		Date now = new Date();
+        account.setCreationDate(now);
+		account.setLastVisitDate(now);
+		
+		em.persist(account);
+		
+		return account;
 	}
 
 	@Override

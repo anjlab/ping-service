@@ -2,6 +2,7 @@
 <head>
 	<title>Ping Service</title>
 	<link rel="stylesheet" type="text/css" href="/css/all.css" />
+	<link rel="stylesheet" type="text/css" href="/css/index.css" />
 	<link rel="icon" type="image/png" href="/favicon.png" /> 
 </head>
 <body>
@@ -23,9 +24,10 @@
 	</table>
 	
     <t:grid empty="No jobs" source="jobs" row="job"
-       	reorder="scheduledBy, pingURL, cronString, edit, analytics, upDownTimeInMinutes, availabilityPercent, lastPingSummary"
-       	exclude="lastBackupTimestamp, statusCounter, statusCounterFriendlyShort, availabilityPercentFriendly, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, totalStatusCounterFriendly, totalSuccessStatusCounterFriendly, previousStatusCounterFriendly, titleFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp, statusCounterFriendly, receiveBackups, validationSummary"
-       	add="edit, delete, analytics">
+       	reorder="scheduledBy, pingURL, cronString, details, analytics, upDownTimeInMinutes, recentAvailabilityPercent, totalAvailabilityPercent, lastPingSummary"
+       	exclude="lastBackupTimestamp, statusCounter, statusCounterFriendlyShort, recentAvailabilityPercentFriendly, totalAvailabilityPercentFriendly, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, totalStatusCounterFriendly, totalSuccessStatusCounterFriendly, previousStatusCounterFriendly, titleFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp, statusCounterFriendly, receiveBackups, validationSummary"
+       	add="details, delete, analytics"
+       	rowClass="literal:job">
 
 		<t:parameter name="lastPingSummaryCell">
 			<div class="${summaryStatusCssClass}">${lastPingSummary}</div>
@@ -34,10 +36,14 @@
 		<t:parameter name="upDownTimeInMinutesCell">
 			<div align="left">${job.statusCounterFriendlyShort}</div>
 		</t:parameter>
-		
-		<t:parameter name="availabilityPercentCell">
-			<div align="right">${job.availabilityPercentFriendly}</div>
-		</t:parameter>
+        
+        <t:parameter name="recentAvailabilityPercentCell">
+            <div align="right">${job.recentAvailabilityPercentFriendly}</div>
+        </t:parameter>
+        
+        <t:parameter name="totalAvailabilityPercentCell">
+            <div align="right">${job.totalAvailabilityPercentFriendly}</div>
+        </t:parameter>
 		
 		<t:parameter name="pingURLCell">
 			<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank">${job.titleFriendly}</a>
@@ -47,8 +53,8 @@
        		<t:pagelink t:id="analytics" page="job/analytics" context="jobContext">Analyze</t:pagelink>
        	</t:parameter>
 
-       	<t:parameter name="editCell">
-       		<t:pagelink t:id="edit" page="job/edit" context="jobContext">Edit</t:pagelink>
+       	<t:parameter name="detailsCell">
+       		<t:pagelink t:id="details" page="job/edit" context="jobContext">View</t:pagelink>
        	</t:parameter>
 
        	<t:parameter name="deleteCell">
@@ -71,7 +77,7 @@
 
     <t:grid empty="ACL is empty" source="accounts" row="account"
        	reorder="email, refAccessType" 
-       	exclude="id" add="delete">
+       	exclude="id, creationDate, lastVisitDate" add="delete">
 	       	<t:parameter name="deleteCell">
 	       		<t:if test="deleteAccountLinkEnabled">
 	       			<t:actionlink t:id="removeAccount" context="account.id">Delete</t:actionlink>

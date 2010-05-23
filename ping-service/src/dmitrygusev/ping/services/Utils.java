@@ -3,10 +3,12 @@ package dmitrygusev.ping.services;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
 import dmitrygusev.ping.entities.Job;
+import dmitrygusev.ping.entities.JobResult;
 
 public class Utils {
 
@@ -428,4 +430,28 @@ public class Utils {
 	public static int getTimeInMinutes(int counter, String cronString) {
 		return counter * getCronMinutes(cronString);
 	}
+
+    public static double calculateAvailabilityPercent(List<JobResult> results) {
+        int recentSuccessCount = 0;
+        for (JobResult result : results) {
+            if (!result.isFailed()) {
+                recentSuccessCount++;
+            }
+        }
+        return Utils.calculatePercent(results.size(), recentSuccessCount);
+    }
+
+    public static double calculatePercent(int totalCount, int countOfInterest) {
+        if (totalCount == 0) {
+            return 0;
+        }
+        
+        double percent = 100d * countOfInterest / totalCount;
+        
+        return percent;
+    }
+
+    public static String formatPercent(double value) {
+        return String.format(Locale.ENGLISH, "%.5f", value) + "%";
+    }
 }

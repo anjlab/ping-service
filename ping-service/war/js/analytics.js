@@ -156,14 +156,14 @@ function removeHighlights() {
 }
 
 function getColumnClass(classes) {
-	if (classes[1][0] == "x") {	//	have parent class
+	if (classes[1].substr(0,1) == "x") {	//	have parent class
 		return classes[5];
 	}
 	return classes[4];
 }
 
 function getDimensionClass(classes) {
-	if (classes[1][0] == "x") {	//	have parent class
+	if (classes[1].substr(0,1) == "x") {	//	have parent class
 		return classes[6];
 	}
 	return classes[5];
@@ -199,7 +199,7 @@ function highlightHeaders($this, chartId, chartTitle, chartTitleBuilder) {
 function buildChartTitle($aggregateLabel, $measureLabel, $dimensionLabel, $valueCell) {
 	var aggregateLabel = $aggregateLabel.html();
 	
-	aggregateLabel = aggregateLabel[0].toUpperCase() + aggregateLabel.substring(1);
+	aggregateLabel = aggregateLabel.substr(0,1).toUpperCase() + aggregateLabel.substring(1);
 
 	var classes = $valueCell.attr("class").split(' ');
 	var dimensionClass = getDimensionClass(classes);
@@ -212,7 +212,7 @@ function buildChartTitle($aggregateLabel, $measureLabel, $dimensionLabel, $value
 function buildLineChartTitle($aggregateLabel, $measureLabel, $dimensionLabel, $valueCell) {
 	var aggregateLabel = $aggregateLabel.html();
 	
-	aggregateLabel = aggregateLabel[0].toUpperCase() + aggregateLabel.substring(1);
+	aggregateLabel = aggregateLabel.substr(0,1).toUpperCase() + aggregateLabel.substring(1);
 	
 	return aggregateLabel + " of " + $measureLabel.html() + " by " + $dimensionLabel.html();
 }

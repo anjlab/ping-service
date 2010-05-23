@@ -3,7 +3,7 @@
         <param-name>tapestry.app-package</param-name>
         <param-value>dmitrygusev.ping</param-value>
     </context-param>
-    <filter>
+    <!-- filter>
         <filter-name>appstats</filter-name>
         <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
         <init-param>
@@ -14,7 +14,7 @@
     <filter-mapping>
         <filter-name>appstats</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    </filter-mapping -->
     <filter>
         <filter-name>app</filter-name>
         <filter-class>org.apache.tapestry5.TapestryFilter</filter-class>
@@ -59,29 +59,4 @@
         <error-code>404</error-code>
         <location>/404.html</location>
     </error-page>
- <!--OnPositive Tools-->
-<servlet>
-		<servlet-name>profilerServlet</servlet-name>
-		<servlet-class>com.onpositive.gae.tools.servlets.ProfilerServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-		<servlet-name>profilerServlet</servlet-name>
-		<url-pattern>/appwrench/profiler</url-pattern>
-</servlet-mapping>
-<filter id="profilerFilter">
-	 <filter-name>profileJsp</filter-name>
-     <filter-class>com.onpositive.gae.tools.servlets.JSPFilter</filter-class>
-</filter>
-<filter-mapping>
-        <filter-name>profileJsp</filter-name>
-        <url-pattern>*.jsp</url-pattern>
-</filter-mapping>
-<servlet>
-<servlet-name>SessionAuth</servlet-name>
-<servlet-class>com.onpositive.auth.AuthServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-<servlet-name>SessionAuth</servlet-name>
-<url-pattern>/appwrench/auth</url-pattern>
-</servlet-mapping>
-</web-app>
+ </web-app>

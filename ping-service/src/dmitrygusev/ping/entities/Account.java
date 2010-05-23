@@ -1,6 +1,7 @@
 package dmitrygusev.ping.entities;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,6 +27,10 @@ public class Account implements Serializable {
 	@Column(nullable=false)
 	private String email;
 	private String timeZoneCity;
+	
+	// Since 13.05.2010
+	private Date lastVisitDate;
+	private Date creationDate;
 
 	public Account() {
 	}
@@ -53,4 +58,16 @@ public class Account implements Serializable {
 	public String getTimeZoneCity() {
 		return timeZoneCity;
 	}
+	public Date getCreationDate() {
+        return creationDate;
+    }
+	public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+	public Date getLastVisitDate() {
+        return lastVisitDate;
+    }
+	public void setLastVisitDate(Date lastVisitDate) {
+        this.lastVisitDate = lastVisitDate;
+    }
 }

@@ -51,4 +51,10 @@ public class JobResultDAOImpl implements JobResultDAO {
 		    logger.error("Error deleting job result", e);
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+    @Override
+	public List<JobResult> getAll() {
+	    return em.createQuery("SELECT FROM JobResult").getResultList();
+	}
 }

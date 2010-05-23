@@ -1,7 +1,6 @@
 package dmitrygusev.ping.pages.task;
 
 import static com.google.appengine.api.datastore.KeyFactory.stringToKey;
-import static dmitrygusev.ping.pages.task.BackupAndDeleteOldJobResultsTask.getChunkKeyInCache;
 import static dmitrygusev.ping.services.Utils.formatTimeMillis;
 
 import java.io.IOException;
@@ -12,8 +11,6 @@ import java.util.TimeZone;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
-
-import net.sf.jsr107cache.Cache;
 
 import org.apache.tapestry5.annotations.Meta;
 import org.apache.tapestry5.ioc.annotations.Inject;
@@ -46,10 +43,7 @@ public class MailJobResultsTask {
 	public static final String CHUNK_ID_PARAMETER_NAME = "chunkId";
 
 	private Job job;
-	private String taskId;
 	private long startTime;
-	private long chunkId;
-	private long fileNumber = 0;
 	private long totalRecords = 0;
 	
 	@Inject
@@ -58,19 +52,14 @@ public class MailJobResultsTask {
 	private boolean initTask() {
 		String encodedJobKey = request.getParameter(LongRunningQueryTask.JOB_KEY_PARAMETER_NAME);
 		
-		taskId = request.getParameter(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME);
-
 		startTime = readLongParameter(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, 0);
-		chunkId = readLongParameter(CHUNK_ID_PARAMETER_NAME, BackupAndDeleteOldJobResultsTask.CACHED_RESULTS_FIRST_CHUNK_ID);
-		fileNumber = readLongParameter(FILE_NUMBER_PARAMETER_NAME, 0);
 		totalRecords = readLongParameter(TOTAL_RECORDS_PARAMETER_NAME, 0);
 		
 		if (!Utils.isNullOrEmpty(encodedJobKey)) {
 			job = jobDAO.find(stringToKey(encodedJobKey));
 		}
 		
-		return !Utils.isNullOrEmpty(taskId) 
-			&& job != null;
+		return job != null;
 	}
 
 	private long readLongParameter(String parameterName, long defaultValue) {
@@ -78,79 +67,30 @@ public class MailJobResultsTask {
 		return Utils.isNullOrEmpty(stringValue) ? defaultValue : Long.parseLong(stringValue);
 	}
 	
-	@Inject
-	private Cache cache;
-	
-	private boolean taskCompleted;
-	
-	@SuppressWarnings("unchecked")
 	public void onActivate() {
 		if (!initTask()) {
 			logger.warn("Task initialization failed.");
 			return;
 		}
 		
-		if (cache == null) {
-			logger.warn("Cache is null.");
-			return;
-		}
-		
 		List<JobResult> resultsBuffer = new ArrayList<JobResult>(RESULTS_IN_ONE_EMAIL);
 		
-		String chunkKey = getChunkKeyInCache(taskId, chunkId);
+		resultsBuffer.addAll(job.removeJobResultsExceptRecent(1000));
 
-		boolean reportSent = false;
-		
-		while (cache.containsKey(chunkKey) && !reportSent) {
-			resultsBuffer.addAll((List<JobResult>) cache.get(chunkKey));
-			
-			if (resultsBuffer.size() >= RESULTS_IN_ONE_EMAIL) {
-				
-				taskCompleted = !cache.containsKey(getChunkKeyInCache(taskId, chunkId + 1));
-				
-				sendResults(resultsBuffer);
-				resultsBuffer.clear();
-				
-				reportSent = true;
-			}
-			
-			chunkId++;
-			chunkKey = getChunkKeyInCache(taskId, chunkId);
-		}
-		
-		if (reportSent && !taskCompleted) {
-			continueTask();
-		} else {
-			if (resultsBuffer.size() > 0) {
-				
-				taskCompleted = true;
-				
-				sendResults(resultsBuffer);
-				resultsBuffer.clear();
-			}
-		}
-		
-		if (taskCompleted) {
-			mailer.sendSystemMessageToDeveloper(
-					"Debug: Backup Completed for Job", 
-					"Job: " + job.getTitleFriendly() + " / " + job.getKey() +
-					"\nTotal files: " + fileNumber +
-					"\nTotal records: " + totalRecords +
-					"\nTotal time: " + formatTimeMillis(System.currentTimeMillis() - startTime));
-		}
-	}
+		if (resultsBuffer.size() > 0) {
+            if (application.updateJob(job, false)) {
 
-	@Inject
-	private Application application;
-	
-	private void continueTask() {
-		try {
-			logger.debug("Continue taskId {}", taskId);
-			
-			application.continueMailJobResultsTask(job.getKey(), taskId, startTime, chunkId, totalRecords, fileNumber);
-			
-		} catch (Exception e) {
-			logger.error("Error enqueueing task", e);
+                sendResults(resultsBuffer);
+    
+    			mailer.sendSystemMessageToDeveloper(
+                            "Debug: Backup Completed for Job", 
+                            "Job: " + job.getTitleFriendly() + " / " + job.getPingURL() + " / " + job.getKey() +
+                            "\nTotal files: 1" +
+                            "\nTotal records: " + totalRecords +
+                            "\nTotal time: " + formatTimeMillis(System.currentTimeMillis() - startTime));
+            } else {
+                logger.error("Error saving job. Backup will not be sent to user this time.");
+            }
 		}
 	}
 
@@ -162,11 +102,14 @@ public class MailJobResultsTask {
 		}
 	}
 	
+	@Inject
+	private Application application;
+	
 	public void sendResultsByMail(List<JobResult> results, String reportRecipient) throws MessagingException, IOException, URISyntaxException {
 		totalRecords += results.size();
 		
-		JobResult firstResult = (JobResult) results.get(results.size() - 1);
-		JobResult lastResult = (JobResult) results.get(0);
+		JobResult firstResult = (JobResult) results.get(0);
+		JobResult lastResult = (JobResult) results.get(results.size() - 1);
 		
 		String subject = getReportSubject();
 
@@ -181,8 +124,7 @@ public class MailJobResultsTask {
 		builder.append(" (");
 		builder.append(Utils.formatTimeMillis(lastResult.getTimestamp().getTime() - firstResult.getTimestamp().getTime()));
 		builder.append(")");
-		builder.append("\nFile #: ");
-		builder.append(++fileNumber);
+		builder.append("\nFile #: 1");
 		builder.append("\n# of records: ");
 		builder.append(results.size());
 		builder.append("\nTimeZone: ");
@@ -191,17 +133,12 @@ public class MailJobResultsTask {
 		builder.append(timeZone.getID());
 		builder.append(")");
 		
-		if (taskCompleted) {
-			String totalTimeFormatted = dmitrygusev.ping.services.Utils.formatTimeMillis(System.currentTimeMillis() - startTime);
-			
-			builder.append("\n\nThis is the last email in current backup.");
-			builder.append("\n\tTotal # of files: ");
-			builder.append(fileNumber);
-			builder.append("\n\tTotal # of records: ");
-			builder.append(totalRecords);
-			builder.append("\n\tTotal time requried: ");
-			builder.append(totalTimeFormatted);
-		}
+		builder.append("\n\nThis is the last email in current backup.");
+		builder.append("\n\tTotal # of files: 1");
+		builder.append("\n\tTotal # of records: ");
+		builder.append(totalRecords);
+		builder.append("\n\tAvailability percent for the period: ");
+		builder.append(Utils.formatPercent(Utils.calculateAvailabilityPercent(results)));
 		
 		builder.append("\n\n----"); 
 		builder.append("\nYou can disable receiving statistics backups for the job here: ");
@@ -213,7 +150,9 @@ public class MailJobResultsTask {
 		builder.append("\nDuring next backups you will get approximately one email per week per job (unless, of course, you disable 'Recieve Backups' setting).");
 		builder.append("\nAll these emails should be in the same thread in your inbox so you can simply mute them if you don't want to bother about them.");
 		builder.append("\nOnce you received an email with the statistics, this data will be deleted from Ping Service database.");
-		builder.append("\nPing Service will only store 1000 latest ping results per job.");
+		builder.append("\nPing Service will only store ");
+		builder.append(Application.DEFAULT_NUMBER_OF_JOB_RESULTS);
+		builder.append(" latest ping results per job.");
 		builder.append("\nWe're doing this to keep Ping Service free, since we're running out of free quota limit of Google App Engine infrastructure.");
 		builder.append("\nWe're sorry for any inconvenience you might get from this email.");
 		builder.append("\nThank you for understanding.");
@@ -241,5 +180,9 @@ public class MailJobResultsTask {
 	private String getReportRecipient() {
 		return job.getReportEmail();
 	}
+
+    public static String getChunkKeyInCache(String taskId, long chunkId) {
+    	return taskId + "-" + chunkId;
+    }
 
 }

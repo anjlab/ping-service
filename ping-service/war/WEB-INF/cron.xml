@@ -20,9 +20,4 @@
     <description>Ping every 1 hours</description>
     <schedule>every 1 hours</schedule>
   </cron>
-  <cron>
-    <url>/cron/backuphealthinsurance</url>
-    <description>Backup Health Insurance</description>
-    <schedule>every 6 hours</schedule>
-  </cron>
 </cronentries>

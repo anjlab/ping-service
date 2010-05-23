@@ -1,8 +1,6 @@
 package dmitrygusev.ping.services;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.Date;
 
@@ -16,24 +14,14 @@ import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.Translator;
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
-import org.apache.tapestry5.ioc.MethodAdvice;
 import org.apache.tapestry5.ioc.MethodAdviceReceiver;
-import org.apache.tapestry5.ioc.ObjectLocator;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
-import org.apache.tapestry5.ioc.Predicate;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.InjectService;
 import org.apache.tapestry5.ioc.annotations.Match;
-import org.apache.tapestry5.model.MutableComponentModel;
 import org.apache.tapestry5.services.ApplicationStateManager;
-import org.apache.tapestry5.services.ClassTransformation;
-import org.apache.tapestry5.services.ComponentClassResolver;
-import org.apache.tapestry5.services.ComponentClassTransformWorker;
 import org.apache.tapestry5.services.ComponentEventLinkEncoder;
-import org.apache.tapestry5.services.ComponentMethodAdvice;
-import org.apache.tapestry5.services.ComponentMethodInvocation;
 import org.apache.tapestry5.services.Dispatcher;
-import org.apache.tapestry5.services.InjectionProvider;
 import org.apache.tapestry5.services.MarkupRenderer;
 import org.apache.tapestry5.services.MarkupRendererFilter;
 import org.apache.tapestry5.services.MetaDataLocator;
@@ -44,7 +32,6 @@ import org.apache.tapestry5.services.RequestFilter;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.RequestHandler;
 import org.apache.tapestry5.services.Response;
-import org.apache.tapestry5.services.TransformMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tynamo.jpa.JPASymbols;
@@ -63,7 +50,6 @@ import dmitrygusev.ping.services.dao.impl.cache.AccountDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.JobDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.RefDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.ScheduleDAOImplCache;
-import dmitrygusev.ping.services.profiler.ProfilingAdvice;
 import dmitrygusev.ping.services.security.AccessController;
 import dmitrygusev.tapestry5.TimeTranslator;
 
@@ -108,8 +94,8 @@ public class AppModule
     		RequestGlobals globals)
     {
     	return new Application(accountDAO, jobDAO, scheduleDAO, 
-    			refDAO, jobResultDAO, gaeHelper, jobExecutor, mailer,
-    			linkSource, globals);
+    			refDAO, gaeHelper, jobExecutor, mailer, linkSource,
+    			globals);
     }
 
     public static Cache buildCache(Logger logger) {
@@ -185,7 +171,7 @@ public class AppModule
      * a service named "RequestFilter" we use an explicit service id that we can reference
      * inside the contribution method.
      */    
-    public RequestFilter buildTimingFilter(final Logger log)
+    public RequestFilter buildTimingFilter(final Logger log, final Application application)
     {
         return new RequestFilter()
         {
@@ -196,6 +182,8 @@ public class AppModule
 
                 try
                 {
+                    application.trackUserActivity();
+                    
                     // The responsibility of a filter is to invoke the corresponding method
                     // in the handler. When you chain multiple filters together, each filter
                     // received a handler that is a bridge to the next filter.
@@ -308,51 +296,51 @@ public class AppModule
     		}, "before:*");
     }
     
-    @SuppressWarnings("unused")
-    @Match("*")
-    public static void adviseProfiler(final MethodAdviceReceiver receiver)
-    {
-        final MethodAdvice advice = new ProfilingAdvice(receiver.getInterface().getName());
-
-        for (Method m : receiver.getInterface().getMethods()) {
+//    @SuppressWarnings("unused")
+//    @Match("*")
+//    public static void adviseProfiler(final MethodAdviceReceiver receiver)
+//    {
+//        final MethodAdvice advice = new ProfilingAdvice(receiver.getInterface().getName());
+//
+//        for (Method m : receiver.getInterface().getMethods()) {
 //            receiver.adviseMethod(m, advice);
-        };
-    }
-    
-    public static void contributeComponentClassTransformWorker(
-            OrderedConfiguration<ComponentClassTransformWorker> configuration,
-            ObjectLocator locator,
-            InjectionProvider injectionProvider,
-            ComponentClassResolver resolver)
-    {
-        configuration.add("ProfilerWorker", new ComponentClassTransformWorker() {
-            
-            @SuppressWarnings("unused")
-            @Override
-            public void transform(ClassTransformation transformation, final MutableComponentModel model) {
-                
-                final MethodAdvice profilingAdvice = new ProfilingAdvice(transformation.getClassName());
-
-                for (TransformMethod method : transformation.matchMethods(
-                        new Predicate<TransformMethod>() {
-                            @Override
-                            public boolean accept(TransformMethod method) {
-                                return !method.getMethodIdentifier().contains("getComponentResources")
-                                    && !Modifier.isStatic(method.getSignature().getModifiers())
-                                    && !Modifier.isAbstract(method.getSignature().getModifiers());
-                            }
-                        }))
-                {
-                    ComponentMethodAdvice advice = new ComponentMethodAdvice()
-                    {
-                        public void advise(ComponentMethodInvocation invocation)
-                        {
-                            profilingAdvice.advise(invocation);
-                        }
-                    }; 
+//        };
+//    }
+//    
+//    public static void contributeComponentClassTransformWorker(
+//            OrderedConfiguration<ComponentClassTransformWorker> configuration,
+//            ObjectLocator locator,
+//            InjectionProvider injectionProvider,
+//            ComponentClassResolver resolver)
+//    {
+//        configuration.add("ProfilerWorker", new ComponentClassTransformWorker() {
+//            
+//            @SuppressWarnings("unused")
+//            @Override
+//            public void transform(ClassTransformation transformation, final MutableComponentModel model) {
+//                
+//                final MethodAdvice profilingAdvice = new ProfilingAdvice(transformation.getClassName());
+//
+//                for (TransformMethod method : transformation.matchMethods(
+//                        new Predicate<TransformMethod>() {
+//                            @Override
+//                            public boolean accept(TransformMethod method) {
+//                                return !method.getMethodIdentifier().contains("getComponentResources")
+//                                    && !Modifier.isStatic(method.getSignature().getModifiers())
+//                                    && !Modifier.isAbstract(method.getSignature().getModifiers());
+//                            }
+//                        }))
+//                {
+//                    ComponentMethodAdvice advice = new ComponentMethodAdvice()
+//                    {
+//                        public void advise(ComponentMethodInvocation invocation)
+//                        {
+//                            profilingAdvice.advise(invocation);
+//                        }
+//                    }; 
 //                    method.addAdvice(advice);
-                }
-            }
-        }, "before:Log");
-    }
+//                }
+//            }
+//        }, "before:Log");
+//    }
 }

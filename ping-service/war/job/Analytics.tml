@@ -7,20 +7,20 @@
     <link rel="stylesheet" type="text/css" href="/css/analytics.css" />
     <script type="text/javascript" src="/assets/anjlab/cubics/js/jquery-1.3.2.js"></script>
     <script type="text/javascript" src="/assets/anjlab/cubics/js/cube.js"></script>
-    <!--[if IE]><script language="javascript" type="text/javascript" src="excanvas.min.js"></script><![endif]--> 
+    <script type="text/javascript" src="/js/excanvas.min.js"></script> 
     <script type="text/javascript" src="/js/jquery.flot.js"></script>
     <script type="text/javascript" src="/js/jquery.flot.pie.js"></script>
     <script type="text/javascript" src="/js/analytics.js"></script>
+    <script type="text/javascript" src="/js/ui.core.js"></script>
+    <script type="text/javascript" src="/js/jquery.easing.js"></script>
+    <script type="text/javascript" src="/js/jquery.scrollfollow.js"></script>
 </head>
 <body>
 	<t:topbar/>
 
     <t:if test="admin">
        <div class="adminTasks">
-           Admin tasks:
-               <t:actionlink t:id="runCountJobResultsTask">Count Job Results</t:actionlink>
-               &#160;
-               <t:actionlink t:id="runBackupAndDeleteOldJobResultsTask">Backup and Delete Old Job Results</t:actionlink>
+           Admin tasks: No tasks
        </div>
     </t:if>
 	
@@ -55,7 +55,7 @@
 				</p>
 		   	</td>
 		   	<td align="center" style="padding-left: 20px;">
-		   		<table>
+		   		<table id="charts">
 		   		<tr>
 			   		<td>
 				   		<div>
@@ -132,6 +132,8 @@
   			removeHighlights();
             plotLineChart($($(".m-0").filter(".ix-1")), "#chart");
   		}
+  		
+  		$("#charts").scrollFollow( { speed: 'fast' } );
    	</script>
    	
 	<t:footer/>

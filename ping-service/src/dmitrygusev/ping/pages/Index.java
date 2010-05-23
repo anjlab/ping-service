@@ -1,6 +1,5 @@
 package dmitrygusev.ping.pages;
 
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -8,6 +7,8 @@ import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.users.UserServiceFactory;
 
@@ -19,7 +20,9 @@ import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.Utils;
 
 public class Index {
-	
+
+    private static final Logger logger = LoggerFactory.getLogger(Index.class);
+    
 	@Property
 	@Persist
 	@SuppressWarnings("unused")
@@ -79,7 +82,8 @@ public class Index {
 		try {
 			application.deleteJob(scheduleId, jobId);
 		} catch (Exception e) {
-			message = e.getMessage();
+		    logger.error("Error deleting job", e);
+			message = "Error deleting job";
 			messageColor = "red";
 		}
 	}
@@ -154,7 +158,8 @@ public class Index {
 		try {
 			application.delete(getDefaultSchedule());
 	 	} catch (Exception e) {
-	 		message = e.getMessage();
+	 	    logger.error("Error deleting schedule", e);
+	 		message = "Error deleting schedule";
 			messageColor = "red";
 	 	}
 	}
@@ -163,7 +168,4 @@ public class Index {
 		return UserServiceFactory.getUserService().isUserAdmin();
 	}
 
-	public void onActionFromRunCyclicBackupTask() throws URISyntaxException {
-		application.runCyclicBackupTask();
-	}
 }

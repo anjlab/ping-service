@@ -1,22 +1,35 @@
 package dmitrygusev.ping.entities;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 
 import org.apache.tapestry5.beaneditor.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 
+import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.Utils;
 
 @Entity
@@ -27,6 +40,8 @@ public class Job implements Serializable {
      */
     private static final long serialVersionUID = -1077399963209971165L;
 
+    private static final Logger logger = LoggerFactory.getLogger(Job.class);
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Key key;
@@ -36,6 +51,7 @@ public class Job implements Serializable {
 	@Validate("required,regexp=(http://|https://).+")
 	private String pingURL;
 	//	Validating regexp
+	@Basic(fetch=FetchType.EAGER)
 	private String validatingRegexp;
 	//	Cron string to select jobs against a cron action
 	@Column(nullable=false)
@@ -65,6 +81,14 @@ public class Job implements Serializable {
 	
 	private Boolean receiveBackups;
 	private Date lastBackupTimestamp;
+	
+	// Since 13.05.2010
+	@Basic
+	private Blob packedJobResults;
+	@Transient
+	private List<JobResult> jobResults;
+	@Transient
+	private boolean updatingJobResults;
 	
 	public static final int PING_RESULT_NOT_AVAILABLE = 1;
 	public static final int PING_RESULT_OK = 2;
@@ -153,6 +177,10 @@ public class Job implements Serializable {
 		return lastPingDetails == null ? null : lastPingDetails.getValue();
 	}
 	public void setLastPingDetails(String lastPingDetails) {
+	    if (lastPingDetails != null && lastPingDetails.length() > 1024 * 100) {
+	        // Persist only 100 KB of ping details
+	        lastPingDetails = lastPingDetails.substring(0, 1024 * 100);
+	    }
 		this.lastPingDetails = new Text(lastPingDetails);
 	}
 	public boolean isUsesValidatingRegexp() {
@@ -180,7 +208,7 @@ public class Job implements Serializable {
 		return schedule;
 	}
 	public String getScheduledBy() {
-		return schedule.getName();
+		return schedule == null ? null : schedule.getName();
 	}
 	public String getResponseEncoding() {
 		return responseEncoding;
@@ -283,23 +311,22 @@ public class Job implements Serializable {
 
 		this.totalSuccessStatusCounter = getTotalSuccessStatusCounter() + 1 + correction;
 	}
-	public double getAvailabilityPercent() {
-		int total = getTotalStatusCounter();
-		
-		if (total == 0) {
-			return 0;
-		}
-		
-		int totalSuccess = getTotalSuccessStatusCounter();
-		
-		double percent = 100d * totalSuccess / total;
-		
-		return percent;
+	public double getTotalAvailabilityPercent() {
+		return Utils.calculatePercent(getTotalStatusCounter(), getTotalSuccessStatusCounter());
 	}
-	public String getAvailabilityPercentFriendly() {
-		return String.format(Locale.ENGLISH, "%.5f", getAvailabilityPercent()) + " %";
+	public String getTotalAvailabilityPercentFriendly() {
+		return Utils.formatPercent(getTotalAvailabilityPercent());
 	}
-	public void resetStatusCounter() {
+    public double getRecentAvailabilityPercent() {
+        int recentCount = Application.DEFAULT_NUMBER_OF_JOB_RESULTS;
+        List<JobResult> results = getRecentJobResults(recentCount);
+        return Utils.calculateAvailabilityPercent(results);
+    }
+
+    public String getRecentAvailabilityPercentFriendly() {
+        return Utils.formatPercent(getRecentAvailabilityPercent());
+    }
+    public void resetStatusCounter() {
 		setPreviousStatusCounter(getStatusCounter());
 		setStatusCounter(0);
 		incrementStatusCounter();
@@ -335,4 +362,136 @@ public class Job implements Serializable {
 	         ? super.equals(obj)
 	         : getKey().equals(job.getKey());
 	}
+
+	/**
+	 * If client changes returned results he is responsible 
+	 * for those changes to be persisted back to {@value #packedJobResults}, 
+	 * e.g., by calling {@link #endUpdateJobResults()}. 
+	 * 
+	 * @return At most <code>numberOfResults</code> of recently added job results.
+	 * If <code>numberOfResults == 0</code> returns all results.
+	 * @since 13.05.2010
+	 */
+    public List<JobResult> getRecentJobResults(int numberOfResults) {
+	    readJobResults();
+	    
+	    return numberOfResults == 0
+	         ? jobResults
+	         : (jobResults.size() == 0 
+	                 ? jobResults
+	                 : jobResults.subList(
+	                         jobResults.size() > numberOfResults 
+                                 ? jobResults.size() - numberOfResults 
+                                 : 0, 
+                             jobResults.size()));
+	}
+
+    @SuppressWarnings("unchecked")
+    private void readJobResults() {
+        if (jobResults == null) {
+	        if (packedJobResults == null || packedJobResults.getBytes().length == 0) {
+	            jobResults = new ArrayList<JobResult>();
+	        } else {
+    	        ObjectInputStream ois = null;
+    	        try {
+                    ois = new ObjectInputStream(new ByteArrayInputStream(packedJobResults.getBytes()));
+                    jobResults = (List<JobResult>) ois.readObject();
+                } catch (Exception e) {
+                    logger.error("Error unpacking job results", e);
+                    jobResults = new ArrayList<JobResult>();
+                } finally {
+                    if (ois != null) {
+                        try { ois.close(); } catch (IOException e) { logger.error("Error closing ois", e); }
+                    }
+                }
+	        }
+	    }
+    }
+
+    /**
+     * Call this method before batch adding job results
+     * 
+     * @since 13.05.2010
+     */
+    public void beginUpdateJobResults() {
+        updatingJobResults = true;
+    }
+    
+    /**
+     * Call this method to flush batch added job results
+     * 
+     * @since 13.05.2010
+     */
+    public void endUpdateJobResults() {
+        updatingJobResults = false;
+        packJobResults();
+    }
+    
+    /**
+     * 
+     * @param jobResult
+     * 
+     * @since 13.05.2010
+     */
+	public void addJobResult(JobResult jobResult) {
+	    readJobResults();
+	    jobResults.add(jobResult);
+	    if (!updatingJobResults) {
+	        packJobResults();
+	    }
+	}
+	
+    public void addJobResult(int index, JobResult result) {
+        readJobResults();
+        jobResults.add(index, result);
+        if (!updatingJobResults) {
+            packJobResults();
+        }
+    }
+
+    public List<JobResult> removeJobResultsExceptRecent(int numberOfResultsToLeave) {
+        readJobResults();
+        
+        List<JobResult> results = new ArrayList<JobResult>();
+        
+        while (jobResults.size() > numberOfResultsToLeave) {
+            results.add(jobResults.get(0));
+            jobResults.remove(0);
+        }
+        
+        if (results.size() > 0) {
+            packJobResults();
+        }
+        
+        return results;
+    }
+    
+	/**
+	 * 
+	 * @throws IOException
+	 * @since 13.05.2010
+	 */
+    @PrePersist
+	@PreUpdate
+	void packJobResults() {
+        if (jobResults != null) {
+    	    ByteArrayOutputStream baos = new ByteArrayOutputStream(jobResults.size() * 14 + 365);
+    	    ObjectOutputStream oos = null;
+    	    try {
+        	    oos = new ObjectOutputStream(baos);
+        	    oos.writeObject(jobResults);
+    	    } catch (IOException e) {
+    	        logger.error("Error packing job results", e);
+    	    } finally {
+    	        if (oos != null) {
+    	            try { oos.close(); } catch (IOException e) { logger.error("Error closing oos", e); }
+    	        }
+    	    }
+    	    packedJobResults = new Blob(baos.toByteArray());
+        }
+	}
+    int getPackedJobResultsLength() {
+        return packedJobResults == null ? 0 : packedJobResults.getBytes().length;
+    }
+
 }

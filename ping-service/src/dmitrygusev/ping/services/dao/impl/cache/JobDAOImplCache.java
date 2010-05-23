@@ -106,15 +106,15 @@ public class JobDAOImplCache extends JobDAOImpl {
     
     @SuppressWarnings("unchecked")
     @Override
-    public List<Job> getJobsByCronString(String cronString) {
-        Object entityCacheKey = getEntityCacheKey(Job.class, cronString);
+    public List<Key> getJobsByCronString(String cronString) {
+        Object entityCacheKey = getEntityCacheKey(Job.class, "keys-" + cronString);
         if (cache.containsKey(entityCacheKey)) {
-            return (List<Job>) cache.get(entityCacheKey);
+            return (List<Key>) cache.get(entityCacheKey);
         }
-        List<Job> result = super.getJobsByCronString(cronString);
+        List<Key> result = super.getJobsByCronString(cronString);
         if (result != null) {
-            ArrayList<Job> serializableList = 
-                new ArrayList<Job>(result.subList(0, result.size()));
+            ArrayList<Key> serializableList = 
+                new ArrayList<Key>(result.subList(0, result.size()));
             cache.put(entityCacheKey, serializableList);
         }
         return result;

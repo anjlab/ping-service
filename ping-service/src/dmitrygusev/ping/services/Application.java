@@ -1,7 +1,6 @@
 package dmitrygusev.ping.services;
 
 import static com.google.appengine.api.datastore.KeyFactory.keyToString;
-import static com.google.appengine.api.labs.taskqueue.QueueFactory.getDefaultQueue;
 import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
 import static dmitrygusev.ping.services.GAEHelper.addTaskNonTransactional;
 
@@ -11,10 +10,11 @@ import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,39 +36,44 @@ import dmitrygusev.ping.entities.JobResult;
 import dmitrygusev.ping.entities.Ref;
 import dmitrygusev.ping.entities.Schedule;
 import dmitrygusev.ping.pages.job.Analytics;
-import dmitrygusev.ping.pages.task.BackupAndDeleteOldJobResultsTask;
-import dmitrygusev.ping.pages.task.CountJobResultsTask;
-import dmitrygusev.ping.pages.task.CyclicBackupTask;
 import dmitrygusev.ping.pages.task.LongRunningQueryTask;
 import dmitrygusev.ping.pages.task.MailJobResultsTask;
 import dmitrygusev.ping.pages.task.RunJobTask;
 import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.JobDAO;
-import dmitrygusev.ping.services.dao.JobResultDAO;
 import dmitrygusev.ping.services.dao.RefDAO;
 import dmitrygusev.ping.services.dao.ScheduleDAO;
 
 public class Application {
 
 	private static final Logger logger = LoggerFactory.getLogger(Application.class);
+    private static final Account systemAccount = getSystemAccount();
 	
 	private AccountDAO accountDAO;
 	private JobDAO jobDAO;
 	private ScheduleDAO scheduleDAO;
 	private RefDAO refDAO;
-	private JobResultDAO jobResultDAO;
 	private GAEHelper gaeHelper;
 	private JobExecutor jobExecutor;
 	private Mailer mailer;
 	private PageRenderLinkSource linkSource;
 	private RequestGlobals globals;
-	
+
+    public static final int DEFAULT_NUMBER_OF_JOB_RESULTS = 1000;
+
+    public static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final DateFormat DATETIME_FORMAT = new SimpleDateFormat(DATETIME_PATTERN);
+    public static final DateFormat DATETIME_FORMAT_FOR_FILE_NAME = new SimpleDateFormat("yyyyMMddHHmmss");
+
+    public static final int GOOGLE_IO_FAIL_LIMIT = 3;
+
+    public static final String MAIL_QUEUE = "mail";
+
 	public Application(
 			AccountDAO accountDAO, 
 			JobDAO jobDAO,
 			ScheduleDAO scheduleDAO, 
 			RefDAO refDAO,
-			JobResultDAO jobResultDAO,
 			GAEHelper gaeHelper,
 			JobExecutor jobExecutor,
 			Mailer mailer,
@@ -79,7 +84,6 @@ public class Application {
 		this.jobDAO = jobDAO;
 		this.scheduleDAO = scheduleDAO;
 		this.refDAO = refDAO;
-		this.jobResultDAO = jobResultDAO;
 		this.gaeHelper = gaeHelper;
 		this.jobExecutor = jobExecutor;
 		this.mailer = mailer;
@@ -149,12 +153,12 @@ public class Application {
 		return schedule;
 	}
 
-	public void updateJob(Job job, boolean checkPermission) {
+	public boolean updateJob(Job job, boolean checkPermission) {
 	    if (checkPermission) {
 	        assertCanModifyJob(job);
 	    }
 		
-		internalUpdateJob(job);
+		return internalUpdateJob(job);
 	}
 
 	private void assertCanModifyJob(Job job) {
@@ -279,10 +283,6 @@ public class Application {
 		assertCanModifyJob(job);
 	}
 
-	public static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
-	public static final DateFormat DATETIME_FORMAT = new SimpleDateFormat(DATETIME_PATTERN);
-	public static final DateFormat DATETIME_FORMAT_FOR_FILE_NAME = new SimpleDateFormat("yyyyMMddHHmmss");
-
 	public String formatDateForFileName(Date date) {
 		String timeZoneCity = getUserAccount().getTimeZoneCity();
 
@@ -368,8 +368,6 @@ public class Application {
 			sb.append(message);
 		}
 	}
-	
-    private static final Account systemAccount = getSystemAccount();
     
     private static Account getSystemAccount() {
         Account account = new Account();
@@ -379,8 +377,27 @@ public class Application {
 
 	public Account getUserAccount() {
         Principal principal = gaeHelper.getUserPrincipal();
-        return principal == null ? systemAccount : accountDAO.getAccount(principal.getName());
+        Account account = principal == null 
+                            ? systemAccount 
+                            : accountDAO.getAccount(principal.getName());
+        return account;
 	}
+
+    public synchronized void trackUserActivity() {
+        Account account = getUserAccount();
+        if (account == systemAccount) {
+            return;
+        }
+        Date lastVisitDate = account.getLastVisitDate();
+        if (lastVisitDate == null || visitedLongTimeAgo(lastVisitDate)) {
+            account.setLastVisitDate(new Date());
+            accountDAO.update(account);
+        }
+    }
+
+    private boolean visitedLongTimeAgo(Date lastVisitDate) {
+        return System.currentTimeMillis() - lastVisitDate.getTime() > TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS);
+    }
 
 	public List<Job> getAvailableJobs() {
 		Account account = getUserAccount();
@@ -402,8 +419,6 @@ public class Application {
 		return result;
 	}
 
-	public static final int GOOGLE_IO_FAIL_LIMIT = 3;
-	
 	public void runJob(Job job) {
 		try {
 			boolean prevPingFailed = job.isLastPingFailed();
@@ -433,16 +448,28 @@ public class Application {
 				sendReport(job);
 			}
 
+			job.addJobResult(jobResult);
 			internalUpdateJob(job);
-            jobResultDAO.persistResult(jobResult);
+			
+            backupResultsIfNeeded(job);
+            
 		} catch (Exception e) {
 			logger.error("Error executing job " + job.getKey(), e);
 		}
 	}
 
-    private void internalUpdateJob(Job job) {
+    private void backupResultsIfNeeded(Job job) throws URISyntaxException {
+        int numberOfResults = job.getRecentJobResults(0).size();
+        
+        if ((numberOfResults > 2000) && (numberOfResults % 10 == 0)) {
+            runMailJobResultsTask(job.getKey());
+        }
+    }
+
+    private boolean internalUpdateJob(Job job) {
         try {
             jobDAO.update(job);
+            return true;
         } catch (RollbackException e) {
             //  This may happen if another job from the same schedule 
             //  updating at the same time simultaneously
@@ -450,11 +477,11 @@ public class Application {
             logger.debug("Retrying update for job: {}", job.getKey());
             
             //  Give another job a chance to commit, and commit current job after some delay
-            internalUpdateJobAfterDelay(job);
+            return internalUpdateJobAfterDelay(job);
         }
     }
 
-    private void internalUpdateJobAfterDelay(Job job) {
+    private boolean internalUpdateJobAfterDelay(Job job) {
         try {
             logger.debug("Waiting for another job to commit");
             
@@ -464,12 +491,16 @@ public class Application {
                 //  Transaction will be reopened inside DAO if required
                 jobDAO.update(job);
                 logger.debug("Update after delay succeeded");
+                
+                return true;
             } catch (RollbackException e2) {
                 logger.error("Update after delay failed", e2);
             }
         } catch (InterruptedException e2) {
             logger.error("Interrupted", e2);
         }
+        
+        return false;
     }
 
 	public void sendReport(Job job) throws URISyntaxException {
@@ -518,68 +549,39 @@ public class Application {
 				"This message was sent to you by " + myEmail + " via Ping Service friend invite.\n" +
 				"If you think this message was sent to you by mistake, just ignore it.");
 	}
-
-	public static final String BACKUP_QUEUE = "backup";
-	public static final String MAIL_QUEUE = "mail";
-
-	public void runCyclicBackupTask() throws URISyntaxException {
-	    addTaskNonTransactional(
-	        getQueue(BACKUP_QUEUE), 
-	        buildTaskUrl(CyclicBackupTask.class));
-	}
-	
-	public void runBackupAndDeleteTask(Key jobKey) throws URISyntaxException {
-		long id = new Random().nextLong();
 		
-		addTaskNonTransactional(
-	        getDefaultQueue(),
-	        buildTaskUrl(BackupAndDeleteOldJobResultsTask.class)
-				.param(BackupAndDeleteOldJobResultsTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey))
-				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, String.valueOf(id)));
-	}
-	
-	public void runMailJobResultsTask(Key jobKey, String taskId, long backupStartTime) throws URISyntaxException {
+	public void runMailJobResultsTask(Key jobKey) throws URISyntaxException {
 	    addTaskNonTransactional(
 	        getQueue(MAIL_QUEUE),
 			buildTaskUrl(MailJobResultsTask.class)
 				.param(LongRunningQueryTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey))
-				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, taskId)
-				.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(backupStartTime)));
-	}
-	
-	public void continueMailJobResultsTask(Key jobKey, String taskId, long backupStartTime, long chunkId, long totalRecords, long fileNumber) throws URISyntaxException {
-	    addTaskNonTransactional(
-		    getQueue(MAIL_QUEUE),
-			buildTaskUrl(MailJobResultsTask.class)
-				.param(LongRunningQueryTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey))
-				.param(BackupAndDeleteOldJobResultsTask.TASK_ID_PARAMETER_NAME, taskId)
-				.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(backupStartTime))
-				.param(MailJobResultsTask.CHUNK_ID_PARAMETER_NAME, String.valueOf(chunkId))
-				.param(MailJobResultsTask.TOTAL_RECORDS_PARAMETER_NAME, String.valueOf(totalRecords))
-				.param(MailJobResultsTask.FILE_NUMBER_PARAMETER_NAME, String.valueOf(fileNumber)));
-	}
-	
-	public void runCountJobResultsTask(Key jobKey) throws URISyntaxException {
-	    addTaskNonTransactional(
-		    getDefaultQueue(),
-		    buildTaskUrl(CountJobResultsTask.class)
-				.param(CountJobResultsTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey)));
+				.param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(System.currentTimeMillis())));
 	}
 
 	public void enqueueJobs(String cronString) throws URISyntaxException {
 		logger.debug("Enqueueing jobs for cron string '{}'", cronString);
 		
-		List<Job> jobs = jobDAO.getJobsByCronString(cronString);
+		List<Key> unmodifiableKeys = jobDAO.getJobsByCronString(cronString);
 		
-		logger.debug("Found {} job(s) to enqueue", jobs.size());
+		List<Key> jobKeys = new ArrayList<Key>(unmodifiableKeys.size());
+		for (Key key : unmodifiableKeys) {
+            jobKeys.add(key);
+        }
+		
+		//    We shuffle to avoid simultaneous job runs from the same schedule
+		//    Since we know desired order may eliminate such situations by implementing it
+		//    XXX For now just do random shuffle
+		Collections.shuffle(jobKeys);
+		
+		logger.debug("Found {} job(s) to enqueue", jobKeys.size());
 
 		Queue queue = getQueue(cronString.replace(" ", ""));
 
-		List<TaskOptions> tasks = new ArrayList<TaskOptions>(jobs.size());
+		List<TaskOptions> tasks = new ArrayList<TaskOptions>(jobKeys.size());
 		
-		for (Job job : jobs) {
+		for (Key key : jobKeys) {
 		    tasks.add(buildTaskUrl(RunJobTask.class)
-				        .param(RunJobTask.JOB_KEY_PARAMETER_NAME, keyToString(job.getKey())));
+				        .param(RunJobTask.JOB_KEY_PARAMETER_NAME, keyToString(key)));
 		}
 
         addTaskNonTransactional(queue, tasks);
