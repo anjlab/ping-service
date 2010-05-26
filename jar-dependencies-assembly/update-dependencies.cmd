@@ -28,8 +28,6 @@ ECHO *
 ECHO * Updating filelist.txt file...
 ECHO *
 
-CD %PINGSERVICE_WEBINF_LIB%
-
-CALL create-filelist.cmd
-
 CD %cwd%
+
+dir %PINGSERVICE_WEBINF_LIB% > filelist.txt

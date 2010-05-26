@@ -80,22 +80,22 @@ public class AppModule
         configuration.add("/appstats/.*");
     }
     
-    public static Application buildApplication(
-    		ScheduleDAO scheduleDAO, 
-    		AccountDAO accountDAO, 
-    		JobDAO jobDAO, 
-    		RefDAO refDAO, 
-    		JobResultDAO jobResultDAO,
-    		GAEHelper gaeHelper, 
-    		JobExecutor jobExecutor, 
-    		Mailer mailer,
-    		ApplicationStateManager stateManager,
-    		PageRenderLinkSource linkSource,
-    		RequestGlobals globals)
+    public static Application buildApplication(ScheduleDAO scheduleDAO, 
+                                               AccountDAO accountDAO, 
+                                               JobDAO jobDAO, 
+                                               RefDAO refDAO, 
+                                               JobResultDAO jobResultDAO,
+                                               GAEHelper gaeHelper, 
+                                               JobExecutor jobExecutor, 
+                                               Mailer mailer,
+                                               ApplicationStateManager stateManager,
+                                               PageRenderLinkSource linkSource,
+                                               RequestGlobals globals,
+                                               MemcacheService memcache)
     {
     	return new Application(accountDAO, jobDAO, scheduleDAO, 
     			refDAO, gaeHelper, jobExecutor, mailer, linkSource,
-    			globals);
+    			globals, memcache);
     }
 
     public static Cache buildCache(Logger logger) {
@@ -151,6 +151,8 @@ public class AppModule
         //	DataNucleus' GAE implementation doesn't provide EMF.getMetamodel() which is required for
         //	providing entity value encoders
         configuration.add(JPASymbols.PROVIDE_ENTITY_VALUE_ENCODERS, "false");
+        
+        configuration.add(SymbolConstants.APPLICATION_VERSION, "beta");
     }
 
     /**
@@ -224,9 +226,9 @@ public class AppModule
         configuration.add("Timing", timingFilter);
     }
 
-    public static void contributeTranslatorSource(Configuration<Translator<Date>> configuration)
+    public static void contributeTranslatorSource(MappedConfiguration<Class<?>, Translator<Date>> configuration)
     {
-        configuration.add(new TimeTranslator());
+        configuration.add(Date.class, new TimeTranslator());
     }
     
     public void contributeValidationMessagesSource(OrderedConfiguration<String> configuration) {
@@ -244,15 +246,6 @@ public class AppModule
 			}
 		};
 	}
-    
-    public void contributeRegexAuthorizer(Configuration<String> regex)
-    {
-    	String pathPattern = "([^/.]+/)*[^/.]+\\.((css)|(js)|(jpg)|(jpeg)|(png)|(gif))$";
-    	regex.add("^anjlab/cubics/css/" + pathPattern);
-    	regex.add("^anjlab/cubics/images/" + pathPattern);
-    	regex.add("^anjlab/cubics/js/" + pathPattern);
-    	regex.add("^anjlab/cubics/js/jquery-1.3.2.js");
-    }
     
     @Match("*DAO")
     public static void adviseTransactions(JPATransactionAdvisor advisor, MethodAdviceReceiver receiver)
@@ -296,7 +289,11 @@ public class AppModule
     		}, "before:*");
     }
     
-//    @SuppressWarnings("unused")
+    public static void contributeClasspathAssetAliasManager(MappedConfiguration<String, String> configuration)
+    {
+        configuration.add("cubics", "anjlab/cubics");
+    }
+    
 //    @Match("*")
 //    public static void adviseProfiler(final MethodAdviceReceiver receiver)
 //    {
@@ -315,10 +312,8 @@ public class AppModule
 //    {
 //        configuration.add("ProfilerWorker", new ComponentClassTransformWorker() {
 //            
-//            @SuppressWarnings("unused")
 //            @Override
 //            public void transform(ClassTransformation transformation, final MutableComponentModel model) {
-//                
 //                final MethodAdvice profilingAdvice = new ProfilingAdvice(transformation.getClassName());
 //
 //                for (TransformMethod method : transformation.matchMethods(

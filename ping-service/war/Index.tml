@@ -1,9 +1,9 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
 	<title>Ping Service</title>
-	<link rel="stylesheet" type="text/css" href="/css/all.css" />
-	<link rel="stylesheet" type="text/css" href="/css/index.css" />
-	<link rel="icon" type="image/png" href="/favicon.png" /> 
+    <link rel="icon" type="image/png" href="/favicon.png" /> 
+	<link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
+	<link rel="stylesheet" type="text/css" href="${context:/css/index.css}" />
 </head>
 <body>
 	<t:topbar />

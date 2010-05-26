@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.labs.taskqueue.Queue;
 import com.google.appengine.api.labs.taskqueue.TaskOptions;
+import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.users.UserServiceFactory;
 
 import dmitrygusev.ping.entities.Account;
@@ -58,6 +59,7 @@ public class Application {
 	private Mailer mailer;
 	private PageRenderLinkSource linkSource;
 	private RequestGlobals globals;
+	private MemcacheService memcache;
 
     public static final int DEFAULT_NUMBER_OF_JOB_RESULTS = 1000;
 
@@ -78,7 +80,8 @@ public class Application {
 			JobExecutor jobExecutor,
 			Mailer mailer,
 			PageRenderLinkSource linkSource,
-			RequestGlobals globals) {
+			RequestGlobals globals,
+			MemcacheService memcache) {
 		super();
 		this.accountDAO = accountDAO;
 		this.jobDAO = jobDAO;
@@ -89,6 +92,7 @@ public class Application {
 		this.mailer = mailer;
 		this.linkSource = linkSource;
 		this.globals = globals;
+		this.memcache = memcache;
 	}
 
 	public List<Account> getAccounts(Schedule schedule) {
@@ -383,15 +387,30 @@ public class Application {
         return account;
 	}
 
-    public synchronized void trackUserActivity() {
+    public void trackUserActivity() {
         Account account = getUserAccount();
         if (account == systemAccount) {
             return;
         }
+
         Date lastVisitDate = account.getLastVisitDate();
         if (lastVisitDate == null || visitedLongTimeAgo(lastVisitDate)) {
             account.setLastVisitDate(new Date());
-            accountDAO.update(account);
+
+            String actionKey = "trackUserActivity-" + account.getEmail();
+
+            try {
+                Long barrier = memcache.increment(actionKey, 1L, 1L);
+                
+                if (barrier == null || barrier > 1L) {
+                    return;
+                }
+                
+                accountDAO.update(account);
+                
+            } finally {
+                memcache.increment(actionKey, -1L, 0L);
+            }
         }
     }
 

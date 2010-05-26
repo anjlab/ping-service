@@ -1,19 +1,19 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
     <title>Job Analytics - Ping Service</title>
-    <link rel="stylesheet" type="text/css" href="/css/all.css" />
-	<link rel="icon" type="image/png" href="/favicon.png" /> 
-    <link rel="stylesheet" type="text/css" href="/assets/anjlab/cubics/css/cube.css" />
-    <link rel="stylesheet" type="text/css" href="/css/analytics.css" />
-    <script type="text/javascript" src="/assets/anjlab/cubics/js/jquery-1.3.2.js"></script>
-    <script type="text/javascript" src="/assets/anjlab/cubics/js/cube.js"></script>
-    <script type="text/javascript" src="/js/excanvas.min.js"></script> 
-    <script type="text/javascript" src="/js/jquery.flot.js"></script>
-    <script type="text/javascript" src="/js/jquery.flot.pie.js"></script>
-    <script type="text/javascript" src="/js/analytics.js"></script>
-    <script type="text/javascript" src="/js/ui.core.js"></script>
-    <script type="text/javascript" src="/js/jquery.easing.js"></script>
-    <script type="text/javascript" src="/js/jquery.scrollfollow.js"></script>
+    <link rel="icon" type="image/png" href="/favicon.png" /> 
+    <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
+    <link rel="stylesheet" type="text/css" href="${asset:classpath:/anjlab/cubics/css/cube.css}" />
+    <link rel="stylesheet" type="text/css" href="${context:/css/analytics.css}" />
+    <script type="text/javascript" src="${asset:classpath:/anjlab/cubics/js/jquery-1.3.2.js}"></script>
+    <script type="text/javascript" src="${asset:classpath:/anjlab/cubics/js/cube.js}"></script>
+    <script type="text/javascript" src="${context:/js/excanvas.min.js}"></script> 
+    <script type="text/javascript" src="${context:/js/jquery.flot.js}"></script>
+    <script type="text/javascript" src="${context:/js/jquery.flot.pie.js}"></script>
+    <script type="text/javascript" src="${context:/js/analytics.js}"></script>
+    <script type="text/javascript" src="${context:/js/ui.core.js}"></script>
+    <script type="text/javascript" src="${context:/js/jquery.easing.js}"></script>
+    <script type="text/javascript" src="${context:/js/jquery.scrollfollow.js}"></script>
 </head>
 <body>
 	<t:topbar/>
