@@ -1,14 +1,14 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
 	<title>Help - Ping Service</title>
-    <link rel="icon" type="image/png" href="/favicon.png" /> 
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/help.css}" />
 </head>
 <body>
 	<t:topbar />
 
-	<h2>Ping Service Help</h2>
+	<h2><t:logo/> Help</h2>
 
 	<h3>Quick Start Guide</h3>
 

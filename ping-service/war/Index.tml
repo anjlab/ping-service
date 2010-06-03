@@ -1,17 +1,23 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
 	<title>Ping Service</title>
-    <link rel="icon" type="image/png" href="/favicon.png" /> 
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
 	<link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
 	<link rel="stylesheet" type="text/css" href="${context:/css/index.css}" />
 </head>
 <body>
 	<t:topbar />
+	
+	<t:if test="admin">
+       <div class="admin-tasks">
+           Admin tasks: No tasks
+       </div>
+    </t:if>
 
 	<table width="100%" cellspacing="0" cellpadding="0" style="padding-bottom: 20px;">
 		<tr>
-			<td width="250">
-		   		<h2>Scheduled Jobs</h2>
+			<td width="370">
+		   		<h2><t:logo/> Scheduled Jobs</h2>
 		   		
 		   		<p>
 		   			<t:pagelink page="job/create">Create job...</t:pagelink>
@@ -24,9 +30,9 @@
 	</table>
 	
     <t:grid empty="No jobs" source="jobs" row="job"
-       	reorder="scheduledBy, pingURL, cronString, details, analytics, upDownTimeInMinutes, recentAvailabilityPercent, totalAvailabilityPercent, lastPingSummary"
+       	reorder="pingURL, scheduledBy, cronString, lastPingSummary, upDownTimeInMinutes, recentAvailabilityPercent, totalAvailabilityPercent, analytics"
        	exclude="lastBackupTimestamp, statusCounter, statusCounterFriendlyShort, recentAvailabilityPercentFriendly, totalAvailabilityPercentFriendly, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, totalStatusCounterFriendly, totalSuccessStatusCounterFriendly, previousStatusCounterFriendly, titleFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp, statusCounterFriendly, receiveBackups, validationSummary"
-       	add="details, delete, analytics"
+       	add="analytics, details, delete"
        	rowClass="literal:job">
 
 		<t:parameter name="lastPingSummaryCell">
@@ -46,7 +52,7 @@
         </t:parameter>
 		
 		<t:parameter name="pingURLCell">
-			<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank">${job.titleFriendly}</a>
+			${job.titleFriendly}<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a>
 		</t:parameter>
 
        	<t:parameter name="analyticsCell">
@@ -54,7 +60,7 @@
        	</t:parameter>
 
        	<t:parameter name="detailsCell">
-       		<t:pagelink t:id="details" page="job/edit" context="jobContext">View</t:pagelink>
+       		<t:pagelink t:id="details" page="job/edit" context="jobContext">Edit</t:pagelink>
        	</t:parameter>
 
        	<t:parameter name="deleteCell">
@@ -68,10 +74,10 @@
 
 	<p>
 		<t:form t:id="grantAccessTo" autofocus="false">
-			<t:label for="email">Grant access to your schedule (email):</t:label> 
+			<t:label for="email">Share your schedule with (email):</t:label> 
 			<t:textfield t:id="email" value="grantedEmail" validate="email, required" size="35" />
 			<t:checkbox t:id="readOnly" value="readonly"/><t:label for="readOnly"/>&#160;
-			<t:submit value="Grant"/>
+			<t:submit value="Share"/>
 		</t:form>
 	</p>
 

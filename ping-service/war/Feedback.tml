@@ -1,14 +1,14 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
     <title>Feedback - Ping Service</title>
-    <link rel="icon" type="image/png" href="/favicon.png" /> 
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/feedback.css}" />
 </head>
 <body>
 	<t:topbar />
 
-	<h2>Ping Service Feedback</h2>
+	<h2><t:logo/> Feedback</h2>
 
 	<div align="center">
 	<font color="green" weight="bold"><p>${thanks}</p></font>

@@ -1,14 +1,14 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
     <title>Edit Job - Ping Service</title>
-	<link rel="icon" type="image/png" href="/favicon.png" /> 
+	<link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/job.css}" />
 </head>
 <body>
 	<t:topbar/>
 	
-   	<h2>Edit Job</h2>
+   	<h2><t:logo/> Edit Job</h2>
    	
    	<font color="red"><p>${message}</p></font>
    	

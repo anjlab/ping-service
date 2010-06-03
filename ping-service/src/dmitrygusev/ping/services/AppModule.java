@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletResponse;
+
 import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheFactory;
@@ -19,6 +21,7 @@ import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.InjectService;
 import org.apache.tapestry5.ioc.annotations.Match;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.ApplicationStateManager;
 import org.apache.tapestry5.services.ComponentEventLinkEncoder;
 import org.apache.tapestry5.services.Dispatcher;
@@ -28,6 +31,7 @@ import org.apache.tapestry5.services.MetaDataLocator;
 import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.PageRenderRequestParameters;
 import org.apache.tapestry5.services.Request;
+import org.apache.tapestry5.services.RequestExceptionHandler;
 import org.apache.tapestry5.services.RequestFilter;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.RequestHandler;
@@ -292,6 +296,26 @@ public class AppModule
     public static void contributeClasspathAssetAliasManager(MappedConfiguration<String, String> configuration)
     {
         configuration.add("cubics", "anjlab/cubics");
+    }
+    
+    public RequestExceptionHandler decorateRequestExceptionHandler(
+            final Logger logger,
+            final Response response,
+            @Symbol(SymbolConstants.PRODUCTION_MODE)
+            boolean productionMode,
+            Object service)
+    {
+        if (!productionMode) return null;
+
+        return new RequestExceptionHandler()
+        {
+            public void handleRequestException(Throwable exception) throws IOException
+            {
+                logger.error("Unexpected runtime exception: " + exception.getMessage(), exception);
+                
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
+            }
+        };
     }
     
 //    @Match("*")

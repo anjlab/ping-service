@@ -131,6 +131,6 @@ public class Utils {
 	}
 
 	public static boolean isNullOrEmpty(String s) {
-		return s == null || s.isEmpty();
+		return s == null || s.length() == 0;
 	}
 }

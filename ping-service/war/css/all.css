@@ -15,7 +15,11 @@ h2 {
 
 a.external {
 	background: transparent url(../images/external.png) no-repeat scroll right center;
-	padding-right: 13px; 
+	display: inline-block;
+	margin-left: 2px;
+	height: 11px;
+	width: 11px;
+	zoom: 1;
 }
 
 .status-okay, .status-warning, .status-error, .status-na {
@@ -41,4 +45,15 @@ a.external {
 }
 
 .status-na {
+}
+
+.admin-tasks {
+	float: right;
+	margin-right: 10px;
+	padding: 5px;
+    border: 1px solid gray;
+}
+
+.logo {
+	vertical-align: text-bottom;
 }

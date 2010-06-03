@@ -1,7 +1,7 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
     <title>Job Analytics - Ping Service</title>
-    <link rel="icon" type="image/png" href="/favicon.png" /> 
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     <link rel="stylesheet" type="text/css" href="${asset:classpath:/anjlab/cubics/css/cube.css}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/analytics.css}" />
@@ -19,12 +19,12 @@
 	<t:topbar/>
 
     <t:if test="admin">
-       <div class="adminTasks">
+       <div class="admin-tasks">
            Admin tasks: No tasks
        </div>
     </t:if>
 	
-   	<h2>Analytics Workspace</h2>
+   	<h2><t:logo/> Analytics Workspace</h2>
     <div>for "${job.titleFriendly}" [statistics based on last ${timeDiff} (from ${dateFrom} to ${dateTo})]</div>
     <font color="red"><p>${message}</p></font>
    	

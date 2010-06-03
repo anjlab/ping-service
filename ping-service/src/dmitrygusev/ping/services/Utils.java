@@ -398,15 +398,17 @@ public class Utils {
 	}
 
 	public static String getCSVExportFilename(Job job) {
-		return getExportFilename(job) + ".csv";
+		return getExportFilenameWithoutExtension(job) + ".csv";
 	}
 
 	public static String getZipExportFilename(Job job) {
-		return getExportFilename(job) + ".zip";
+		return getExportFilenameWithoutExtension(job) + ".zip";
 	}
 
-	private static Object getExportFilename(Job job) {
-		return "ping-service-" + String.valueOf(job.getKey().getId());
+	private static Object getExportFilenameWithoutExtension(Job job) {
+		return String.format("ping-service-{0}-{1}", 
+                        String.valueOf(job.getKey().getParent().getId()), 
+                        String.valueOf(job.getKey().getId()));
 	}
 
 	public static boolean isCronStringSupported(String cronString) {

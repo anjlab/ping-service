@@ -1,14 +1,14 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
     <title>Create Job - Ping Service</title>
-    <link rel="icon" type="image/png" href="/favicon.png" /> 
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/job.css}" />
 </head>
 <body>
 	<t:topbar/>
 
-   	<h2>Create Job</h2>
+   	<h2><t:logo/> Create Job</h2>
    	
    	<font color="red"><p>${message}</p></font>
    	
@@ -18,7 +18,7 @@
 		<div class="t-beaneditor">
 			<t:beaneditor object="job" 
 				reorder="title, pingURL, cronString, usesValidatingHttpCode, validatingHttpCode, usesValidatingRegexp, validatingRegexp, responseEncoding, reportEmail"
-				exclude="titleFriendly, shortenURL, id, lastPingTimestamp, lastPingResult, lastPingDetails">
+				exclude="titleFriendly, shortenURL, id, lastPingTimestamp, lastPingResult, lastPingDetails, lastBackupTimestamp">
 	
 				<t:parameter name="cronString">
 					<t:label for="cronString"/>

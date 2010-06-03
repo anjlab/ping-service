@@ -1,13 +1,13 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 	<head>
 		<title>Settings - Ping Service</title>
-        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="icon" type="image/png" href="${context:/favicon.png}" />
 		<link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
 	</head>
 	<body>
 		<t:topbar />
 
-		<h2>Settings</h2>
+		<h2><t:logo/> Settings</h2>
 
 		<font color="${messageColor}">
 			<p>${message}</p>

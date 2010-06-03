@@ -181,6 +181,9 @@ public class Job implements Serializable {
 	        // Persist only 100 KB of ping details
 	        lastPingDetails = lastPingDetails.substring(0, 1024 * 100);
 	    }
+	    if (lastPingDetails == null) {
+	        lastPingDetails = "";
+	    }
 		this.lastPingDetails = new Text(lastPingDetails);
 	}
 	public boolean isUsesValidatingRegexp() {

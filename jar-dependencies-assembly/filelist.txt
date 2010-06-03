@@ -3,8 +3,8 @@
 
  Содержимое папки C:\dev\workspaces\ping-service\ping-service\war\WEB-INF\lib
 
-26.05.2010  12:17    <DIR>          .
-26.05.2010  12:17    <DIR>          ..
+28.05.2010  14:48    <DIR>          .
+28.05.2010  14:48    <DIR>          ..
 28.10.2009  12:09         1 323 005 ant-1.7.1.jar
 28.10.2009  12:11            12 143 ant-launcher-1.7.1.jar
 28.10.2009  12:09           116 205 antlr-runtime-3.1.1.jar
@@ -51,11 +51,11 @@
 19.06.2007  16:12            97 693 servlet-api-2.4.jar
 25.09.2008  18:11            17 384 slf4j-api-1.5.2.jar
 23.03.2010  17:09             8 643 slf4j-jdk14-1.5.2.jar
-26.05.2010  12:15         1 643 347 tapestry-core-5.2.0-SNAPSHOT.jar
-26.05.2010  12:14           445 342 tapestry-ioc-5.2.0-SNAPSHOT.jar
+28.05.2010  14:47         1 659 642 tapestry-core-5.2.0-SNAPSHOT.jar
+28.05.2010  14:46           445 342 tapestry-ioc-5.2.0-SNAPSHOT.jar
 24.05.2010  20:51            15 534 tapestry-jpa-2.0.1-20100408.153044-6.jar
 24.05.2010  20:51            14 810 tapestry-jpa-core-2.0.1-SNAPSHOT.jar
-26.05.2010  12:14            17 052 tapestry5-annotations-5.2.0-SNAPSHOT.jar
+28.05.2010  14:46            17 054 tapestry5-annotations-5.2.0-SNAPSHOT.jar
 28.10.2009  12:08           843 464 testng-5.8-jdk15.jar
-              52 файлов     33 198 325 байт
-               2 папок      57 769 984 байт свободно
+              52 файлов     33 214 622 байт
+               2 папок     280 014 848 байт свободно

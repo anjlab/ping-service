@@ -38,7 +38,7 @@ public class RunJobTask {
 			Job job = jobDAO.find(stringToKey(encodedJobKey));
 		
 			if (job != null) {
-				application.runJob(job);
+			    application.runJob(job);
 			}
 		} catch (Exception e) {
 			//	Prevent to run job once again on failure

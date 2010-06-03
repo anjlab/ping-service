@@ -5,6 +5,10 @@ import org.apache.tapestry5.annotations.InjectPage;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.apphosting.api.DeadlineExceededException;
 
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.pages.Index;
@@ -15,6 +19,8 @@ import dmitrygusev.ping.services.Utils;
 @SuppressWarnings("unused")
 public class EditJob {
 
+    private static final Logger logger = LoggerFactory.getLogger(EditJob.class);
+    
 	@Property
 	private Job job;
 
@@ -49,7 +55,13 @@ public class EditJob {
 			index.setExceptionMessage(e.getMessage());
 		} catch (Exception e) {
 			message = e.getMessage();
+			if (message == null) {
+			    message = e.getClass().getSimpleName();
+			}
+			message = "Error updating job";
 			resultPage = null;
+
+	        logger.error(message, e);
 		}
 
 		return resultPage;
@@ -65,6 +77,7 @@ public class EditJob {
 			}
 		} catch (Exception e) {
 			index.setExceptionMessage(e.getMessage());
+            logger.error("Error activating page", e);
 			return index;
 		}
 		

@@ -167,5 +167,4 @@ public class Index {
 	public boolean isAdmin() {
 		return UserServiceFactory.getUserService().isUserAdmin();
 	}
-
 }

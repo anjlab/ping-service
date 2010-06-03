@@ -4,6 +4,8 @@ import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
 
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.tapestry5.services.RequestGlobals;
 import org.slf4j.Logger;
@@ -21,10 +23,17 @@ public class GAEHelper {
     private static final Logger logger = LoggerFactory.getLogger(GAEHelper.class);
     
 	private RequestGlobals requestGlobals;
-    private UserService userService = UserServiceFactory.getUserService();
+    private UserService userService;
+
+    private Map<String, String> cachedLoginUrls;
+    private Map<String, String> cachedLogoutUrls;
     
     public GAEHelper(RequestGlobals requestGlobals) {
 		this.requestGlobals = requestGlobals;
+		this.userService = UserServiceFactory.getUserService();
+		
+		this.cachedLoginUrls = new HashMap<String, String>();
+		this.cachedLogoutUrls = new HashMap<String, String>();
 	}
     
 	public Principal getUserPrincipal() {
@@ -40,11 +49,17 @@ public class GAEHelper {
 	}
 
 	public String createLogoutURL(String returnURL) {
-		return userService.createLogoutURL(returnURL);
+	    if (!cachedLogoutUrls.containsKey(returnURL)) {
+	        cachedLogoutUrls.put(returnURL, userService.createLogoutURL(returnURL));
+	    }
+	    return cachedLogoutUrls.get(returnURL);
 	}
 
 	public String createLoginURL(String returnURL) {
-		return userService.createLoginURL(returnURL);
+	    if (!cachedLoginUrls.containsKey(returnURL)) {
+            cachedLoginUrls.put(returnURL, userService.createLoginURL(returnURL));
+        }
+        return cachedLoginUrls.get(returnURL);
 	}
 
 	public static TaskOptions buildTaskUrl(String path) {

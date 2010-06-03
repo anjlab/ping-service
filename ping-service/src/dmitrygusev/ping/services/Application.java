@@ -415,7 +415,7 @@ public class Application {
     }
 
     private boolean visitedLongTimeAgo(Date lastVisitDate) {
-        return System.currentTimeMillis() - lastVisitDate.getTime() > TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS);
+        return System.currentTimeMillis() - lastVisitDate.getTime() > TimeUnit.MILLISECONDS.convert(1 * 60 * 60, TimeUnit.SECONDS);
     }
 
 	public List<Job> getAvailableJobs() {
@@ -445,14 +445,14 @@ public class Application {
 			
 			JobResult jobResult = jobExecutor.execute(job);
 
-			if (prevPingFailed ^ job.isLastPingFailed()) {
+			if (isJobStatusChanged(job, prevPingFailed)) {
 				job.resetStatusCounter();
 				
 				if (!job.isLastPingFailed() 
-						&& (!prevIsGoogleIOException 
-								/* No need to notify earlier since user didn't received fail report yet */
-								|| job.getPreviousStatusCounter() >= GOOGLE_IO_FAIL_LIMIT)) {
-					//	The job is up again 
+		                && (!prevIsGoogleIOException 
+		                        /* No need to notify earlier since user haven't received fail report yet */
+		                        || job.getPreviousStatusCounter() >= GOOGLE_IO_FAIL_LIMIT)) {
+					//	The job is up again
 					sendReport(job);
 				} else if (job.isLastPingFailed() && !job.isGoogleIOException()) {
 					//	Non-Google IO failure
@@ -462,22 +462,27 @@ public class Application {
 				job.incrementStatusCounter();
 			}
 			
+			//  Register job failure on third fail (see GOOGLE_IO_FAIL_LIMIT)
 			if (job.getStatusCounter() == GOOGLE_IO_FAIL_LIMIT && job.isGoogleIOException()) {
-				//	Register job failure on third fail (see GOOGLE_IO_FAIL_LIMIT)
 				sendReport(job);
 			}
 
 			job.addJobResult(jobResult);
+
+            scheduleResultsBackupIfNeeded(job);
+
 			internalUpdateJob(job);
-			
-            backupResultsIfNeeded(job);
             
 		} catch (Exception e) {
 			logger.error("Error executing job " + job.getKey(), e);
 		}
 	}
 
-    private void backupResultsIfNeeded(Job job) throws URISyntaxException {
+    private boolean isJobStatusChanged(Job job, boolean prevPingFailed) {
+        return prevPingFailed ^ job.isLastPingFailed();
+    }
+
+    private void scheduleResultsBackupIfNeeded(Job job) throws URISyntaxException {
         int numberOfResults = job.getRecentJobResults(0).size();
         
         if ((numberOfResults > 2000) && (numberOfResults % 10 == 0)) {

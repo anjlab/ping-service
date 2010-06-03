@@ -13,8 +13,12 @@ public class Welcome {
 	@Inject
 	private PageRenderLinkSource linkSource;
 	
+	private static String indexURL;
+	
 	public String getStartURL() {
-		String indexURL = linkSource.createPageRenderLink(Index.class).toString();
+		if (indexURL == null) {
+		    indexURL = linkSource.createPageRenderLink(Index.class).toString();
+		}
 
 		if (gaeHelper.getUserPrincipal() != null) {
 			return indexURL;
