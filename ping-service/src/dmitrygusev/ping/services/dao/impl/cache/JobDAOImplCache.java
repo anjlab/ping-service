@@ -20,6 +20,13 @@ public class JobDAOImplCache extends JobDAOImpl {
 
     @Inject private Cache cache;
     
+    public JobDAOImplCache() {
+    }
+    
+    public JobDAOImplCache(Cache cache) {
+        this.cache = cache;
+    }
+    
     @Override
     public void delete(Long scheduleId, Long id) {
         super.delete(scheduleId, id);

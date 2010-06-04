@@ -24,7 +24,12 @@ public class JobDAOImpl implements JobDAO {
 
 	@Inject
     public EntityManager em;
-		
+	
+	@Override
+	public void setEntityManager(EntityManager em) {
+	    this.em = em;
+	}
+	
 	public List<Key> getJobsByCronString(String cronString) {
 		Query q = em.createQuery("SELECT j.key FROM Job j WHERE j.cronString = :cronString");
 		q.setParameter("cronString", cronString);

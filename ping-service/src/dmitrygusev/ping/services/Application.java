@@ -10,7 +10,6 @@ import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -466,12 +465,13 @@ public class Application {
 			if (job.getStatusCounter() == GOOGLE_IO_FAIL_LIMIT && job.isGoogleIOException()) {
 				sendReport(job);
 			}
-
+			
 			job.addJobResult(jobResult);
 
             scheduleResultsBackupIfNeeded(job);
 
-			internalUpdateJob(job);
+            //  Client should update the job itself
+//			internalUpdateJob(job);
             
 		} catch (Exception e) {
 			logger.error("Error executing job " + job.getKey(), e);
@@ -485,7 +485,7 @@ public class Application {
     private void scheduleResultsBackupIfNeeded(Job job) throws URISyntaxException {
         int numberOfResults = job.getRecentJobResults(0).size();
         
-        if ((numberOfResults > 2000) && (numberOfResults % 10 == 0)) {
+        if ((numberOfResults >= 2000) && (numberOfResults % 10 == 0)) {
             runMailJobResultsTask(job.getKey());
         }
     }
@@ -592,10 +592,12 @@ public class Application {
             jobKeys.add(key);
         }
 		
-		//    We shuffle to avoid simultaneous job runs from the same schedule
-		//    Since we know desired order may eliminate such situations by implementing it
-		//    XXX For now just do random shuffle
-		Collections.shuffle(jobKeys);
+		Iterable<Key> iterable = new SpareIterator<Key, Long>(jobKeys, new Colorer<Key, Long>() {
+		    @Override
+		    public Long getColor(Key item) {
+		        return item.getParent().getId();
+		    }
+        });
 		
 		logger.debug("Found {} job(s) to enqueue", jobKeys.size());
 
@@ -603,7 +605,7 @@ public class Application {
 
 		List<TaskOptions> tasks = new ArrayList<TaskOptions>(jobKeys.size());
 		
-		for (Key key : jobKeys) {
+		for (Key key : iterable) {
 		    tasks.add(buildTaskUrl(RunJobTask.class)
 				        .param(RunJobTask.JOB_KEY_PARAMETER_NAME, keyToString(key)));
 		}
@@ -629,6 +631,10 @@ public class Application {
 
 	public TaskOptions buildTaskUrl(Class<?> pageClass) throws URISyntaxException {
 		String path = getPath(pageClass);
+		
+		if (pageClass == RunJobTask.class) {
+		    path = "/filters/runJob";
+		}
 		
 		return GAEHelper.buildTaskUrl(path);
 	}

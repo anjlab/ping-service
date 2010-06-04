@@ -497,4 +497,13 @@ public class Job implements Serializable {
         return packedJobResults == null ? 0 : packedJobResults.getBytes().length;
     }
 
+    /**
+     * For test purposes
+     * 
+     * @param key
+     */
+    public void setKey(Key key) {
+        this.key = key;
+    }
+
 }

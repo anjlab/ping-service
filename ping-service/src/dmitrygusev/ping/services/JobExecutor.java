@@ -34,7 +34,7 @@ public class JobExecutor {
 				"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"));
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(Job.class);
+	private static final Logger logger = LoggerFactory.getLogger(JobExecutor.class);
 	
 	public JobResult execute(Job job) {
 		JobResult jobResult = new JobResult();

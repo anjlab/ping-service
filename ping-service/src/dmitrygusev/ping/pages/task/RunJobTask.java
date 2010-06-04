@@ -8,6 +8,8 @@ import org.apache.tapestry5.services.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.appengine.api.datastore.Key;
+
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.services.AppModule;
 import dmitrygusev.ping.services.Application;
@@ -31,14 +33,18 @@ public class RunJobTask {
 	
 	public void onActivate() {
 		String encodedJobKey = request.getParameter(JOB_KEY_PARAMETER_NAME);
-		
-		try {
-			logger.debug("Running job: {}", stringToKey(encodedJobKey).toString());
 
-			Job job = jobDAO.find(stringToKey(encodedJobKey));
+        Key key = stringToKey(encodedJobKey);
+
+		try {
+            logger.debug("Running job: {}", key.toString());
+
+			Job job = jobDAO.find(key);
 		
 			if (job != null) {
 			    application.runJob(job);
+			    
+			    application.updateJob(job, false);
 			}
 		} catch (Exception e) {
 			//	Prevent to run job once again on failure

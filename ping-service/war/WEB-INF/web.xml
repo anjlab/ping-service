@@ -16,8 +16,24 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping -->
     <filter>
+        <filter-name>runJob</filter-name>
+        <filter-class>dmitrygusev.ping.filters.RunJobFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>runJob</filter-name>
+        <url-pattern>/filters/runJob/*</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>enqueueJobs</filter-name>
+        <filter-class>dmitrygusev.ping.filters.EnqueueJobsFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>enqueueJobs</filter-name>
+        <url-pattern>/filters/enqueueJobs/*</url-pattern>
+    </filter-mapping>
+    <filter>
         <filter-name>app</filter-name>
-        <filter-class>org.apache.tapestry5.TapestryFilter</filter-class>
+        <filter-class>dmitrygusev.tapestry5.LazyTapestryFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>app</filter-name>
@@ -50,6 +66,14 @@
     <security-constraint>
         <web-resource-collection>
             <url-pattern>/task/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-constraint>
+        <web-resource-collection>
+            <url-pattern>/filters/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
