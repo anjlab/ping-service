@@ -20,12 +20,13 @@
 
     <t:if test="admin">
        <div class="admin-tasks">
-           Admin tasks: No tasks
+           Admin tasks: 
+            <t:actionlink t:id="runJob">Run This Job Now</t:actionlink>
        </div>
     </t:if>
 	
    	<h2><t:logo/> Analytics Workspace</h2>
-    <div>for "${job.titleFriendly}" [statistics based on last ${timeDiff} (from ${dateFrom} to ${dateTo})]</div>
+    <div>for "${job.titleFriendly}"<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a> [statistics based on last ${timeDiff} (from ${dateFrom} to ${dateTo})] <a href="/feedback?subject=Request for earlier data">Need earlier data? Send a request!</a></div>
     <font color="red"><p>${message}</p></font>
    	
    	<table>
@@ -35,7 +36,7 @@
 			        View: <t:select t:id="view" model="viewModel" value="view" onchange="document.forms[0].submit();"/>
 			        <t:submit t:id="changeView" value="Show" />
 			        &#160;
-			        <a href="/feedback?subject=Request for custom View">Need more views? Send a request (it's free)</a>
+			        <a href="/feedback?subject=Request for new Analytics View">Need more views? Send a request!</a>
 			    </t:form>
 			    
 				<div class="cubeToolbar">

@@ -19,9 +19,12 @@ import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.MethodAdviceReceiver;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
+import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.InjectService;
+import org.apache.tapestry5.ioc.annotations.Local;
 import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.ioc.annotations.Symbol;
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.apache.tapestry5.services.ApplicationStateManager;
 import org.apache.tapestry5.services.ComponentEventLinkEncoder;
 import org.apache.tapestry5.services.Dispatcher;
@@ -38,24 +41,26 @@ import org.apache.tapestry5.services.RequestHandler;
 import org.apache.tapestry5.services.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tynamo.jpa.JPAEntityManagerSource;
 import org.tynamo.jpa.JPASymbols;
 import org.tynamo.jpa.JPATransactionAdvisor;
+import org.tynamo.jpa.JPATransactionManager;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 
 import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.JobDAO;
-import dmitrygusev.ping.services.dao.JobResultDAO;
 import dmitrygusev.ping.services.dao.RefDAO;
 import dmitrygusev.ping.services.dao.ScheduleDAO;
-import dmitrygusev.ping.services.dao.impl.JobResultDAOImpl;
 import dmitrygusev.ping.services.dao.impl.cache.AccountDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.JobDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.RefDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.ScheduleDAOImplCache;
 import dmitrygusev.ping.services.security.AccessController;
 import dmitrygusev.tapestry5.TimeTranslator;
+import dmitrygusev.tapestry5.gae.LazyJPAEntityManagerSource;
+import dmitrygusev.tapestry5.gae.LazyJPATransactionManager;
 
 /**
  * This module is automatically included as part of the Tapestry IoC Registry, it's a good place to
@@ -65,14 +70,11 @@ public class AppModule
 {
     public static void bind(ServiceBinder binder)
     {
-        binder.bind(JobExecutor.class);
-        binder.bind(Mailer.class);
-        
-        binder.bind(JobResultCSVExporter.class);
+        binder.bind(JobExecutor.class).preventReloading().preventDecoration();
+        binder.bind(Mailer.class).preventReloading().preventDecoration();
         
         binder.bind(AccountDAO.class, AccountDAOImplCache.class).preventReloading();
         binder.bind(JobDAO.class, JobDAOImplCache.class).preventReloading();
-        binder.bind(JobResultDAO.class, JobResultDAOImpl.class).preventReloading();
         binder.bind(RefDAO.class, RefDAOImplCache.class).preventReloading();
         binder.bind(ScheduleDAO.class, ScheduleDAOImplCache.class).preventReloading();
     }
@@ -88,7 +90,6 @@ public class AppModule
                                                AccountDAO accountDAO, 
                                                JobDAO jobDAO, 
                                                RefDAO refDAO, 
-                                               JobResultDAO jobResultDAO,
                                                GAEHelper gaeHelper, 
                                                JobExecutor jobExecutor, 
                                                Mailer mailer,
@@ -99,13 +100,14 @@ public class AppModule
     {
     	return new Application(accountDAO, jobDAO, scheduleDAO, 
     			refDAO, gaeHelper, jobExecutor, mailer, linkSource,
-    			globals, memcache);
+    			globals);
     }
 
     public static Cache buildCache(Logger logger) {
         try {
         	CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
-			return cacheFactory.createCache(Collections.emptyMap());
+			Cache cache = cacheFactory.createCache(Collections.emptyMap());
+			return new LocalMemorySoftCache(cache);
 		} catch (CacheException e) {
 			logger.error("Error instantiating cache", e);
 			return null;
@@ -126,8 +128,8 @@ public class AppModule
     	return new GAEHelper(requestGlobals);
     }
     
-    public static AccessController buildAccessController(GAEHelper helper) {
-    	return new AccessController(helper);
+    public static AccessController buildAccessController(GAEHelper helper, RequestGlobals globals) {
+    	return new AccessController(helper, globals);
     }
     
     public static Logger buildLogger() {
@@ -188,7 +190,10 @@ public class AppModule
 
                 try
                 {
-                    application.trackUserActivity();
+                    if (!request.getPath().startsWith("/assets/") 
+                            && !request.getPath().startsWith("/favicon.ico")) {
+                        application.trackUserActivity();
+                    }
                     
                     // The responsibility of a filter is to invoke the corresponding method
                     // in the handler. When you chain multiple filters together, each filter
@@ -208,6 +213,9 @@ public class AppModule
     
     public void contributeMasterDispatcher(OrderedConfiguration<Dispatcher> configuration,
             @InjectService("AccessController") Dispatcher accessController) {
+        
+            //  TODO Investigate performance issue here
+        
             configuration.add("AccessController", accessController, "before:PageRender");
     }
 
@@ -250,6 +258,32 @@ public class AppModule
 			}
 		};
 	}
+    
+    public JPAEntityManagerSource buildLazyJPAEntityManagerSource(
+            @Inject @Symbol(JPASymbols.PERSISTENCE_UNIT) String persistenceUnit, 
+            RegistryShutdownHub hub)
+    {
+        LazyJPAEntityManagerSource source = new LazyJPAEntityManagerSource(persistenceUnit);
+        
+        hub.addRegistryShutdownListener(source);
+        
+        return source;
+    }
+    
+    public JPATransactionManager buildLazyJPATransactionManager(final JPAEntityManagerSource source)
+    {
+        return new LazyJPATransactionManager(source);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void contributeServiceOverride(
+            MappedConfiguration<Class, Object> configuration,
+            @Local JPAEntityManagerSource source,
+            @Local JPATransactionManager manager)
+    {
+        configuration.add(JPAEntityManagerSource.class, source);
+        configuration.add(JPATransactionManager.class, manager);
+    }
     
     @Match("*DAO")
     public static void adviseTransactions(JPATransactionAdvisor advisor, MethodAdviceReceiver receiver)
@@ -302,8 +336,7 @@ public class AppModule
             final Logger logger,
             final Response response,
             @Symbol(SymbolConstants.PRODUCTION_MODE)
-            boolean productionMode,
-            Object service)
+            boolean productionMode)
     {
         if (!productionMode) return null;
 

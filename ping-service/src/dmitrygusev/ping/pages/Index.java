@@ -1,7 +1,11 @@
 package dmitrygusev.ping.pages;
 
+import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+
+import net.sf.jsr107cache.Cache;
 
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Persist;
@@ -51,7 +55,15 @@ public class Index {
 	private Job job;
 	
 	public String getLastPingSummary() {
-		return application.getLastPingSummary(job, getTimeZone());
+		return application.getLastPingSummaryWithRelativeTimestamp(job);
+	}
+	
+	public String getLastPingTimestamp() {
+        Date timestamp = job.getLastPingTimestamp();
+        
+        return timestamp != null 
+             ? Application.formatDate(timestamp, Application.DATETIME_FORMAT, getTimeZone()) 
+             : "N/A";
 	}
 
     private TimeZone getTimeZone() {
@@ -166,5 +178,14 @@ public class Index {
 
 	public boolean isAdmin() {
 		return UserServiceFactory.getUserService().isUserAdmin();
+	}
+
+	@Inject
+    private Cache cache;
+	
+	public void onActionFromClearCache() throws URISyntaxException {
+	    cache.clear();
+	    message = "Cache cleared";
+	    messageColor = "green";
 	}
 }

@@ -6,40 +6,22 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Transient;
 
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.memcache.MemcacheServicePb.MemcacheService;
 
-@Entity
 public class JobResult implements Serializable {
 	/**
 	 * Since using {@link MemcacheService} for results backup. 
 	 */
 	private static final long serialVersionUID = -1017360991575189016L;
 	
-	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-	@Basic
-	private Key jobKey;
 	private Integer responseTime;
 	private Boolean failed;
 	private Date timestamp;
 	//	Since November 01 2009
 	private Integer pingResult;
 	
-	public Key getJobKey() {
-		return jobKey;
-	}
-	public void setJobKey(Key jobKey) {
-		this.jobKey = jobKey;
-	}
 	public int getResponseTime() {
 		return responseTime;
 	}
@@ -57,9 +39,6 @@ public class JobResult implements Serializable {
 	}
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
-	}
-	public Long getId() {
-		return id;
 	}
 	
 	@Transient

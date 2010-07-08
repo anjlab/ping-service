@@ -36,7 +36,11 @@ public class TestSpareIterator {
 
     @Test
     public void testIterator2() {
-        SpareIterator<Bean, String> iterator = new SpareIterator<Bean, String>(getEvery15Minutes(), getBeanColorer());
+        List<Bean> items = getEvery15Minutes();
+        
+        System.out.println(items.size());
+        
+        SpareIterator<Bean, String> iterator = new SpareIterator<Bean, String>(items, getBeanColorer());
         
         for (Bean bean : iterator) {
             System.out.println(bean);
@@ -44,14 +48,22 @@ public class TestSpareIterator {
         
         System.out.println("=====");
         
-        iterator = new SpareIterator<Bean, String>(getEvery5Minutes(), getBeanColorer());
+        items = getEvery5Minutes();
+        
+        System.out.println(items.size());
+        
+        iterator = new SpareIterator<Bean, String>(items, getBeanColorer());
         
         for (Bean bean : iterator) {
             System.out.println(bean);
         }        
         System.out.println("=====");
+
+        items = getEvery1Hours();
         
-        iterator = new SpareIterator<Bean, String>(getEvery1Hours(), getBeanColorer());
+        System.out.println(items.size());
+        
+        iterator = new SpareIterator<Bean, String>(items, getBeanColorer());
         
         for (Bean bean : iterator) {
             System.out.println(bean);

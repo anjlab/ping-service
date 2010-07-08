@@ -39,7 +39,6 @@ public class JobExecutor {
 	public JobResult execute(Job job) {
 		JobResult jobResult = new JobResult();
 		jobResult.setTimestamp(new Date());
-		jobResult.setJobKey(job.getKey());
 
 		long startTime = jobResult.getTimestamp().getTime();
 

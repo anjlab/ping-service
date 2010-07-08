@@ -31,19 +31,18 @@ public class JobDAOImplCache extends JobDAOImpl {
     public void delete(Long scheduleId, Long id) {
         super.delete(scheduleId, id);
         Object entityCacheKey = getEntityCacheKey(Job.class, getJobWideUniqueData(scheduleId, id));
-        if (cache.containsKey(entityCacheKey)) {
-            cache.remove(entityCacheKey);
-        }
+        cache.remove(entityCacheKey);
         abandonScheduleCache(scheduleId);
     }
     
     @Override
     public Job find(Key jobKey) {
         Object entityCacheKey = getEntityCacheKey(Job.class, getJobWideUniqueData(jobKey));
-        if (cache.containsKey(entityCacheKey)) {
-            return (Job) cache.get(entityCacheKey);
+        Job result = (Job) cache.get(entityCacheKey);
+        if (result != null) {
+            return result;
         }
-        Job result = super.find(jobKey);
+        result = super.find(jobKey);
         if (result != null) {
             cache.put(entityCacheKey, result);
         }
@@ -61,10 +60,11 @@ public class JobDAOImplCache extends JobDAOImpl {
     @Override
     public Job find(Long scheduleId, Long id) {
         Object entityCacheKey = getEntityCacheKey(Job.class, getJobWideUniqueData(scheduleId, id));
-        if (cache.containsKey(entityCacheKey)) {
-            return (Job) cache.get(entityCacheKey);
+        Job result = (Job) cache.get(entityCacheKey);
+        if (result != null) {
+            return result;
         }
-        Job result = super.find(scheduleId, id);
+        result = super.find(scheduleId, id);
         if (result != null) {
             cache.put(entityCacheKey, result);
         }
@@ -72,18 +72,19 @@ public class JobDAOImplCache extends JobDAOImpl {
     }
     
     @Override
-    public void update(Job job) {
-        super.update(job);
+    public void update(Job job, boolean commitAfter) {
+        super.update(job, commitAfter);
         Object entityCacheKey = getEntityCacheKey(Job.class, getJobWideUniqueData(job.getKey()));
-        if (cache.containsKey(entityCacheKey)) {
+
+        Job cachedJob = (Job)cache.get(entityCacheKey);
+
+        if (cachedJob != null) {
             
-            Job cachedJob = (Job)cache.get(entityCacheKey);
             if (!cachedJob.getCronString().equals(job.getCronString())) {
                 abandonJobsByCronStringCache(cachedJob.getCronString());
                 abandonJobsByCronStringCache(job.getCronString());
             }
             
-            cache.remove(entityCacheKey);
             cache.put(entityCacheKey, job);
         } else {
             abandonJobsByCronStringCache();
@@ -96,11 +97,13 @@ public class JobDAOImplCache extends JobDAOImpl {
         Long scheduleId = job.getKey().getParent().getId();
         
         Object entityCacheKey = getEntityCacheKey(Schedule.class, scheduleId);
-        if (!cache.containsKey(entityCacheKey)) {
+        
+        Schedule schedule = (Schedule) cache.get(entityCacheKey);
+        
+        if (schedule == null) {
             return; //  Nothing to update
         }
         
-        Schedule schedule = (Schedule) cache.get(entityCacheKey);
         schedule.updateJob(job);
         
         cache.put(entityCacheKey, schedule);
@@ -114,11 +117,12 @@ public class JobDAOImplCache extends JobDAOImpl {
     @SuppressWarnings("unchecked")
     @Override
     public List<Key> getJobsByCronString(String cronString) {
-        Object entityCacheKey = getEntityCacheKey(Job.class, "keys-" + cronString);
-        if (cache.containsKey(entityCacheKey)) {
-            return (List<Key>) cache.get(entityCacheKey);
+        Object entityCacheKey = getEntityCacheKey(Job.class, cronString);
+        List<Key> result = (List<Key>) cache.get(entityCacheKey);
+        if (result != null) {
+            return result;
         }
-        List<Key> result = super.getJobsByCronString(cronString);
+        result = super.getJobsByCronString(cronString);
         if (result != null) {
             ArrayList<Key> serializableList = 
                 new ArrayList<Key>(result.subList(0, result.size()));

@@ -75,10 +75,10 @@ public class MailJobResultsTask {
 		
 		List<JobResult> resultsBuffer = new ArrayList<JobResult>(RESULTS_IN_ONE_EMAIL);
 		
-		resultsBuffer.addAll(job.removeJobResultsExceptRecent(1000));
+		resultsBuffer.addAll(job.removeJobResultsExceptRecent(Application.DEFAULT_NUMBER_OF_JOB_RESULTS));
 
 		if (resultsBuffer.size() > 0) {
-            if (application.updateJob(job, false)) {
+            if (application.updateJob(job, false, false)) {
 
                 sendResults(resultsBuffer);
     
@@ -167,7 +167,7 @@ public class MailJobResultsTask {
         		+ Application.formatDateForFileName(firstResult.getTimestamp(), timeZoneCity) + "-" 
         		+ Application.formatDateForFileName(lastResult.getTimestamp(), timeZoneCity) + ".txt");
         
-        byte[] export = new JobResultCSVExporter().export(timeZone, (List<JobResult>)results);
+        byte[] export = JobResultCSVExporter.export(timeZone, (List<JobResult>)results);
 		attachment.setContent(new String(export), "text/plain");
 		
 		mailer.sendMail(Mailer.PING_SERVICE_NOTIFY_GMAIL_COM, reportRecipient, subject, message, attachment);

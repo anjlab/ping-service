@@ -1,24 +1,35 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
     <head>
         <title>Welcome to Ping Service</title>
-		<link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
+        <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
         <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     </head>
     <body>
 
-		<h3>Welcome to Ping Service!</h3>
+        <div align="center">
+            <h2>Welcome to Ping Service!</h2>
 
-		<p>You can <a href="${startURL}">start using the service</a> right now.</p> 
-		
-		<p>
-			Use your Google Account to login. 
-			<br/>
-			If you don't have Google Account yet, you can easily create one 
-			<a target="_blank" href="https://www.google.com/accounts/NewAccount">here</a>.
-		</p>
+            <p><big>You can <a href="${startURL}">start using the service</a> right now.</big></p> 
 
-		<p>You also may find helpful our <t:pagelink page="help">Quick Start Guide</t:pagelink>.</p>
+            <p>
+                Use your Google Account to login. 
+                <br/>
+                If you don't have Google Account yet, you can easily create one 
+                <a target="_blank" href="https://www.google.com/accounts/NewAccount">here</a>.
+            </p>
 
-		<t:footer/>
+            <p>You also may find helpful our <t:pagelink page="help">Quick Start Guide</t:pagelink>.</p>
+
+            <p>
+                <t:pagelink page="job/analytics" context="pingServiceJobContext">Take a tour</t:pagelink> (statistics for Ping Service itself).
+            </p>
+
+            <t:pagelink page="job/analytics" context="pingServiceJobContext">
+	            <img src="images/analytics-demo.png" width="500" height="228" alt="Analytics Workspace Demo"
+	                style="border: 5px lightblue solid; padding: 5px;" />
+            </t:pagelink>
+        </div>
+
+        <t:footer/>
     </body>
 </html>

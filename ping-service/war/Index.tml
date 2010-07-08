@@ -10,7 +10,9 @@
 	
 	<t:if test="admin">
        <div class="admin-tasks">
-           Admin tasks: No tasks
+           Admin tasks: 
+           
+           <t:actionlink t:id="clearCache">Clear Application Cache</t:actionlink>
        </div>
     </t:if>
 
@@ -30,13 +32,13 @@
 	</table>
 	
     <t:grid empty="No jobs" source="jobs" row="job"
-       	reorder="pingURL, scheduledBy, cronString, lastPingSummary, upDownTimeInMinutes, recentAvailabilityPercent, totalAvailabilityPercent, analytics"
-       	exclude="lastBackupTimestamp, statusCounter, statusCounterFriendlyShort, recentAvailabilityPercentFriendly, totalAvailabilityPercentFriendly, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, totalStatusCounterFriendly, totalSuccessStatusCounterFriendly, previousStatusCounterFriendly, titleFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp, statusCounterFriendly, receiveBackups, validationSummary"
+       	reorder="titleFriendly, scheduledBy, cronString, lastPingSummary, upDownTimeInMinutes, recentAvailabilityPercent, totalAvailabilityPercent, analytics"
+       	exclude="pingURL, createdAt, lastBackupTimestamp, statusCounter, statusCounterFriendlyShort, recentAvailabilityPercentFriendly, totalAvailabilityPercentFriendly, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, totalStatusCounterFriendly, totalSuccessStatusCounterFriendly, previousStatusCounterFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp, statusCounterFriendly, receiveBackups, validationSummary"
        	add="analytics, details, delete"
        	rowClass="literal:job">
 
 		<t:parameter name="lastPingSummaryCell">
-			<div class="${summaryStatusCssClass}">${lastPingSummary}</div>
+			<div class="${summaryStatusCssClass}" title="${lastPingTimestamp}">${lastPingSummary}</div>
 		</t:parameter>
 		
 		<t:parameter name="upDownTimeInMinutesCell">
@@ -51,7 +53,7 @@
             <div align="right">${job.totalAvailabilityPercentFriendly}</div>
         </t:parameter>
 		
-		<t:parameter name="pingURLCell">
+		<t:parameter name="titleFriendlyCell">
 			${job.titleFriendly}<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a>
 		</t:parameter>
 

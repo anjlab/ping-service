@@ -1,6 +1,8 @@
 package dmitrygusev.ping.pages.job;
 
 
+import java.util.Date;
+
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.InjectPage;
 import org.apache.tapestry5.annotations.Persist;
@@ -44,6 +46,7 @@ public class CreateJob {
 		result.setValidatingHttpCode(-200);
 		result.setCronString("every 1 hour");
 		result.setResponseEncoding("UTF-8");
+		result.setCreatedAt(new Date());
 		
 		return result;
 	}

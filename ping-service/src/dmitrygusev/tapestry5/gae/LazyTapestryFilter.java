@@ -1,4 +1,4 @@
-package dmitrygusev.tapestry5;
+package dmitrygusev.tapestry5.gae;
 
 import java.io.IOException;
 
@@ -11,17 +11,27 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tapestry5.TapestryFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class LazyTapestryFilter implements Filter {
 
+    private static final Logger logger = LoggerFactory.getLogger(LazyTapestryFilter.class); 
+    
     private Filter tapestryFilter;
     
     private FilterConfig config;
     
+    public static FilterConfig FILTER_CONFIG;
+    
     @Override
     public void init(FilterConfig config) throws ServletException
     {
+        FILTER_CONFIG = config;
         this.config = config;
+        //  Note: Comment this off to profile Google API requests
+//        ApiProxy.setDelegate(new ProfilingDelegate(ApiProxy.getDelegate()));
     }
     
     @Override
@@ -37,8 +47,14 @@ public class LazyTapestryFilter implements Filter {
         
         if (tapestryFilter == null)
         {
+            long startTime = System.currentTimeMillis();
+            
+            logger.info("Creating Tapestry Filter...");
+            
             tapestryFilter = new TapestryFilter();
             tapestryFilter.init(config);
+            
+            logger.info("Tapestry Filter created and initialized ({} ms)", System.currentTimeMillis() - startTime);
         }
         
         tapestryFilter.doFilter(request, response, chain);

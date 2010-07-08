@@ -7,24 +7,27 @@ import dmitrygusev.ping.services.GAEHelper;
 
 public class Welcome {
 
-	@Inject
-	private GAEHelper gaeHelper;
-	
-	@Inject
-	private PageRenderLinkSource linkSource;
-	
-	private static String indexURL;
-	
-	public String getStartURL() {
-		if (indexURL == null) {
-		    indexURL = linkSource.createPageRenderLink(Index.class).toString();
-		}
+    @Inject
+    private GAEHelper gaeHelper;
+    
+    @Inject
+    private PageRenderLinkSource linkSource;
+    
+    private static String indexURL;
+    
+    public String getStartURL() {
+        if (indexURL == null) {
+            indexURL = linkSource.createPageRenderLink(Index.class).toString();
+        }
 
-		if (gaeHelper.getUserPrincipal() != null) {
-			return indexURL;
-		}
-		
-		return gaeHelper.createLoginURL(indexURL);
-	}
-	
+        if (gaeHelper.getUserPrincipal() != null) {
+            return indexURL;
+        }
+        
+        return gaeHelper.createLoginURL(indexURL);
+    }
+
+    public Long[] getPingServiceJobContext() {
+        return new Long[] { 1026L, 5002L };
+    }
 }

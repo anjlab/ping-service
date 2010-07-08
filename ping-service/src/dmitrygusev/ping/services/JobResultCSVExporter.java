@@ -54,7 +54,7 @@ public class JobResultCSVExporter {
 		return buffer.toString();
 	}
 	
-	public byte[] export(TimeZone timeZone, List<JobResult> results) throws IOException {
+	public static byte[] export(TimeZone timeZone, List<JobResult> results) throws IOException {
 		DateFormat dateFormat = Application.DATETIME_FORMAT;
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(

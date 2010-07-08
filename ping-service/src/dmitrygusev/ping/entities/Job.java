@@ -7,13 +7,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -51,7 +51,7 @@ public class Job implements Serializable {
 	@Validate("required,regexp=(http://|https://).+")
 	private String pingURL;
 	//	Validating regexp
-	@Basic(fetch=FetchType.EAGER)
+	@Column(nullable=true)
 	private String validatingRegexp;
 	//	Cron string to select jobs against a cron action
 	@Column(nullable=false)
@@ -89,6 +89,8 @@ public class Job implements Serializable {
 	private List<JobResult> jobResults;
 	@Transient
 	private boolean updatingJobResults;
+
+	private Date createdAt;
 	
 	public static final int PING_RESULT_NOT_AVAILABLE = 1;
 	public static final int PING_RESULT_OK = 2;
@@ -505,5 +507,18 @@ public class Job implements Serializable {
     public void setKey(Key key) {
         this.key = key;
     }
+    public Date getCreatedAt() {
+        if (createdAt == null) {
+            Calendar calendar = Calendar.getInstance();
 
+            int ageInMinutes = Utils.getTimeInMinutes(getTotalStatusCounter(), cronString);
+            calendar.add(Calendar.MINUTE, - ageInMinutes);
+            
+            createdAt = calendar.getTime();
+        }
+        return createdAt;
+    }
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 }

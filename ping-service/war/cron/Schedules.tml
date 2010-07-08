@@ -1,0 +1,34 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<head>
+	<title>Schedules Report - Ping Service</title>
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
+	<link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
+	<link rel="stylesheet" type="text/css" href="${context:/css/index.css}" />
+</head>
+<body>
+	<t:topbar />
+	
+    <t:grid source="schedules" row="schedule"
+        exclude="id"
+        add="cron">
+    
+        <t:parameter name="cronCell">
+            <table>
+            <t:loop source="schedule.jobs" value="job">
+                <tr>
+                    <td>${job.cronString}</td>
+                    <td>${job.pingURL}</td>
+                    <td>${job.totalAvailabilityPercentFriendly}</td>
+                    <td>${job.statusCounterFriendly}</td>
+                    <td>${job.totalStatusCounterFriendly}</td>
+                    <td>${job.reportEmail}</td>
+                </tr>
+            </t:loop>
+            </table>
+        </t:parameter>
+    
+    </t:grid>
+
+	<t:footer/>
+</body>
+</html>

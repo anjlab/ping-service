@@ -15,10 +15,11 @@ public class AccountDAOImplCache extends AccountDAOImpl {
     @Override
     public Account find(Long id) {
         Object entityCacheKey = getEntityCacheKey(Account.class, id);
-        if (cache.containsKey(entityCacheKey)) {
-            return (Account) cache.get(entityCacheKey);
+        Account result = (Account) cache.get(entityCacheKey);
+        if (result != null) {
+            return result;
         }
-        Account result = super.find(id);
+        result = super.find(id);
         if (result != null) {
             cache.put(entityCacheKey, result);
         }
@@ -28,10 +29,11 @@ public class AccountDAOImplCache extends AccountDAOImpl {
     @Override
     public Account getAccount(String email) {
         Object entityCacheKey = getEntityCacheKey(Account.class, email);
-        if (cache.containsKey(entityCacheKey)) {
-            return (Account) cache.get(entityCacheKey);
+        Account result = (Account) cache.get(entityCacheKey);
+        if (result != null) {
+            return result;
         }
-        Account result = super.getAccount(email);
+        result = super.getAccount(email);
         if (result != null) {
             cache.put(entityCacheKey, result);
         }
@@ -42,18 +44,13 @@ public class AccountDAOImplCache extends AccountDAOImpl {
     public void delete(Long id) {
         super.delete(id);
         Object entityCacheKey = getEntityCacheKey(Account.class, id);
-        if (cache.containsKey(entityCacheKey)) {
-            cache.remove(entityCacheKey);
-        }
+        cache.remove(entityCacheKey);
     }
     
     @Override
     public void update(Account account) {
         super.update(account);
         Object entityCacheKey = getEntityCacheKey(Account.class, account.getId());
-        if (cache.containsKey(entityCacheKey)) {
-            cache.remove(entityCacheKey);
-            cache.put(entityCacheKey, account);
-        }
+        cache.put(entityCacheKey, account);
     }
 }

@@ -18,13 +18,13 @@
 		<div class="t-beaneditor">
 			<t:beaneditor object="job" 
 				reorder="title, pingURL, cronString, usesValidatingHttpCode, validatingHttpCode, usesValidatingRegexp, validatingRegexp, responseEncoding, reportEmail"
-				exclude="titleFriendly, shortenURL, id, lastPingTimestamp, lastPingResult, lastPingDetails, lastBackupTimestamp">
+				exclude="createdAt, titleFriendly, shortenURL, id, lastPingTimestamp, lastPingResult, lastPingDetails, lastBackupTimestamp">
 	
 				<t:parameter name="cronString">
 					<t:label for="cronString"/>
 					<t:select t:id="cronString" model="cronStringModel" value="job.cronString"/>
 					&#8194;
-					<a href="/feedback?subject=Request for custom Cron string">Need more? Send a request (it's free)</a>
+					<a href="/feedback?subject=Request for custom Cron string">Need more? Send a request!</a>
 				</t:parameter>
 				
 				<t:parameter name="validatingHttpCode">

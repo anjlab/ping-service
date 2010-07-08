@@ -32,13 +32,23 @@
         <url-pattern>/filters/enqueueJobs/*</url-pattern>
     </filter-mapping>
     <filter>
+        <filter-name>mailJobResults</filter-name>
+        <filter-class>dmitrygusev.ping.filters.MailJobResultsFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>mailJobResults</filter-name>
+        <url-pattern>/filters/mailJobResults/*</url-pattern>
+    </filter-mapping>
+    <filter>
         <filter-name>app</filter-name>
-        <filter-class>dmitrygusev.tapestry5.LazyTapestryFilter</filter-class>
+        <filter-class>dmitrygusev.tapestry5.gae.LazyTapestryFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>app</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+      </filter-mapping>
     <servlet>
         <servlet-name>appstats</servlet-name>
         <servlet-class>com.google.appengine.tools.appstats.AppstatsServlet</servlet-class>

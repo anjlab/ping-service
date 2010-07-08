@@ -1,5 +1,7 @@
 package dmitrygusev.ping.pages.job;
 
+import java.util.Date;
+
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.InjectPage;
 import org.apache.tapestry5.annotations.Persist;
@@ -50,7 +52,7 @@ public class EditJob {
 		Object resultPage = index;
 		
 		try {
-			application.updateJob(job, true);
+			application.updateJob(job, true, false);
 		} catch (NotAuthorizedException e) {
 			index.setExceptionMessage(e.getMessage());
 		} catch (Exception e) {
@@ -96,6 +98,18 @@ public class EditJob {
 	}
 	
 	public String getLastPingSummary() {
-		return application.getLastPingSummary(job);
+		return application.getLastPingSummaryWithRelativeTimestamp(job);
+	}
+	
+	public String getLastPingTimestamp() {
+	    Date timestamp = job.getLastPingTimestamp();
+        
+        return timestamp != null 
+             ? Application.formatDate(timestamp, Application.DATETIME_FORMAT, application.getTimeZone()) 
+             : "N/A";
+	}
+	
+	public String getCreatedAtFormatted() {
+	    return application.formatDate(job.getCreatedAt());
 	}
 }

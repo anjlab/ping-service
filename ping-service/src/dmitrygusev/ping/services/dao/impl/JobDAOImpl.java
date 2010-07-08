@@ -36,7 +36,7 @@ public class JobDAOImpl implements JobDAO {
 		return q.getResultList();
 	}
 	
-	public void update(Job job) {
+	public void update(Job job, boolean commitAfter) {
 	    if (!em.getTransaction().isActive()){
 	        // see Application#internalUpdateJob(Job)
 	        logger.debug("Transaction is not active. Begin new one...");
@@ -45,6 +45,10 @@ public class JobDAOImpl implements JobDAO {
 	        em.getTransaction().begin();
 	    }
 		em.merge(job);
+		
+		if (commitAfter) {
+		    em.getTransaction().commit();
+		}
 	}
 	
 	public void delete(Long scheduleId, Long id) {

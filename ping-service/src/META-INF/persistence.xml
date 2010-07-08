@@ -6,10 +6,16 @@
 
     <persistence-unit name="transactions-optional">
         <provider>org.datanucleus.store.appengine.jpa.DatastorePersistenceProvider</provider>
+        <class>dmitrygusev.ping.entities.Account</class>
+        <class>dmitrygusev.ping.entities.Job</class>
+        <class>dmitrygusev.ping.entities.Ref</class>
+        <class>dmitrygusev.ping.entities.Schedule</class>
+        <exclude-unlisted-classes/>
         <properties>
             <property name="datanucleus.NontransactionalRead" value="true"/>
             <property name="datanucleus.NontransactionalWrite" value="true"/>
             <property name="datanucleus.ConnectionURL" value="appengine"/>
+            <property name="datanucleus.appengine.ignorableMetaDataBehavior" value="NONE"/>
         </properties>
     </persistence-unit>
 

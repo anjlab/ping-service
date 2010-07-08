@@ -39,10 +39,11 @@ public class ScheduleDAOImplCache extends ScheduleDAOImpl {
     @Override
     public Schedule find(Key scheduleKey) {
         Object entityCacheKey = getEntityCacheKey(Schedule.class, scheduleKey.getId());
-        if (cache.containsKey(entityCacheKey)) {
-            return (Schedule) cache.get(entityCacheKey);
+        Schedule result = (Schedule) cache.get(entityCacheKey);
+        if (result != null) {
+            return result;
         }
-        Schedule result = super.find(scheduleKey);
+        result = super.find(scheduleKey);
         if (result != null) {
             cache.put(entityCacheKey, result);
         }
@@ -66,10 +67,7 @@ public class ScheduleDAOImplCache extends ScheduleDAOImpl {
         em.getTransaction().commit();
         em.getTransaction().begin();
         Object entityCacheKey = getEntityCacheKey(Schedule.class, schedule.getId());
-        if (cache.containsKey(entityCacheKey)) {
-            cache.remove(entityCacheKey);
-            cache.put(entityCacheKey, schedule);
-        }
+        cache.put(entityCacheKey, schedule);
     }
     
     private void abandonJobsByCronStringCache(String cronString) {

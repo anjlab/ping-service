@@ -23,17 +23,19 @@ public class TestJob {
 		
 		StringBuilder sb = new StringBuilder();
 		String formattedDate = Application.formatDate(job.getLastPingTimestamp(), "Moscow", Application.DATETIME_FORMAT);
-		Application.buildLastPingSummary(job, sb, formattedDate);
+		Application.buildLastPingSummary(job, sb);
 		
-		Assert.assertEquals("1970-01-01 03:00:00 / N/A", sb.toString());
+		Assert.assertEquals("1970-01-01 03:00:00", formattedDate);
+		Assert.assertEquals("N/A", sb.toString());
 
 		job.setLastPingResult(Job.PING_RESULT_OK);
 
 		sb = new StringBuilder();
 		formattedDate = Application.formatDate(job.getLastPingTimestamp(), "Moscow", Application.DATETIME_FORMAT);
-		Application.buildLastPingSummary(job, sb, formattedDate);
+		Application.buildLastPingSummary(job, sb);
 		
-		Assert.assertEquals("1970-01-01 03:00:00 / Okay", sb.toString());
+		Assert.assertEquals("1970-01-01 03:00:00", formattedDate);
+		Assert.assertEquals("Okay", sb.toString());
 	}
 
 	@Test

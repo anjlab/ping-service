@@ -1,5 +1,7 @@
 package dmitrygusev.ping.services.dao;
 
+import java.util.List;
+
 import org.tynamo.jpa.annotations.CommitAfter;
 
 import com.google.appengine.api.datastore.Key;
@@ -15,5 +17,7 @@ public interface ScheduleDAO {
 	public abstract Schedule createSchedule(String name);
     @CommitAfter
 	public abstract Schedule find(Key scheduleKey);
+    @CommitAfter
+    public abstract List<Schedule> getAll();
 
 }

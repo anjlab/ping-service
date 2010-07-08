@@ -17,7 +17,7 @@ public interface JobDAO {
 	@CommitAfter
 	public abstract void delete(Long scheduleId, Long jobId);
 	@CommitAfter
-	public abstract void update(Job job);
+	public abstract void update(Job job, boolean commitAfter);
     @CommitAfter
 	public abstract Job find(Long scheduleId, Long jobId);
     @CommitAfter

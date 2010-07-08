@@ -35,10 +35,11 @@ public class RefDAOImplCache extends RefDAOImpl {
     @Override
     public Ref find(Account account, Schedule schedule) {
         Object entityCacheKey = getEntityCacheKey(Ref.class, getRefWideUniqueData(account.getId(), schedule.getId()));
-        if (cache.containsKey(entityCacheKey)) {
-            return (Ref) cache.get(entityCacheKey);
+        Ref result = (Ref) cache.get(entityCacheKey); 
+        if (result != null) {
+            return result;
         }
-        Ref result = super.find(account, schedule);
+        result = super.find(account, schedule);
         if (result != null) {
             cache.put(entityCacheKey, result);
         }
@@ -48,10 +49,11 @@ public class RefDAOImplCache extends RefDAOImpl {
     @Override
     public Ref find(Long id) {
         Object entityCacheKey = getEntityCacheKey(Ref.class, id);
-        if (cache.containsKey(entityCacheKey)) {
-            return (Ref) cache.get(entityCacheKey);
+        Ref result = (Ref) cache.get(entityCacheKey); 
+        if (result != null) {
+            return result;
         }
-        Ref result = super.find(id);
+        result = super.find(id);
         if (result != null) {
             cache.put(entityCacheKey, result);
         }
@@ -62,10 +64,11 @@ public class RefDAOImplCache extends RefDAOImpl {
     @Override
     public List<Ref> getRefs(Account account) {
         Object entityCacheKey = getEntityCacheKey(Ref.class, getRefAccountEntityCacheKey(account.getId()));
-        if (cache.containsKey(entityCacheKey)) {
-            return (List<Ref>) cache.get(entityCacheKey);
+        List<Ref> result = (List<Ref>) cache.get(entityCacheKey); 
+        if (result != null) {
+            return result;
         }
-        List<Ref> result = super.getRefs(account);
+        result = super.getRefs(account);
         if (result != null) {
             ArrayList<Ref> serializableList = 
                 new ArrayList<Ref>(result.subList(0, result.size()));
@@ -78,10 +81,11 @@ public class RefDAOImplCache extends RefDAOImpl {
     @Override
     public List<Ref> getRefs(Schedule schedule) {
         Object entityCacheKey = getEntityCacheKey(Ref.class, getRefScheduleEntityCacheKey(schedule.getId()));
-        if (cache.containsKey(entityCacheKey)) {
-            return (List<Ref>) cache.get(entityCacheKey);
+        List<Ref> result = (List<Ref>) cache.get(entityCacheKey); 
+        if (result != null) {
+            return result;
         }
-        List<Ref> result = super.getRefs(schedule);
+        result = super.getRefs(schedule);
         if (result != null) {
             ArrayList<Ref> serializableList = 
                 new ArrayList<Ref>(result.subList(0, result.size()));

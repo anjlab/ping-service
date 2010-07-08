@@ -1,10 +1,19 @@
 package dmitrygusev.ping.filters;
 
+import java.io.IOException;
+
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.servlet.Filter;
+import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.tapestry5.EventContext;
 import org.apache.tapestry5.Link;
@@ -91,13 +100,63 @@ public abstract class AbstractFilter implements Filter {
                                                                   null);
                                           }
                                       }, 
-                                      globals, 
-                                      null);
+                                      globals);
     }
 
     @Override
     public void destroy() {
         
+    }
+
+    protected abstract void processRequest() throws Exception;
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException
+    {
+        long startTime = System.currentTimeMillis();
+        
+        if (emf == null) {
+            lazyInit();
+        }
+        
+        EntityManager em = emf.createEntityManager();
+    
+        EntityTransaction tx = null;
+        
+        try {
+            
+            tx = em.getTransaction();
+            
+            tx.begin();
+            
+            jobDAO.setEntityManager(em);
+            
+            globals.storeServletRequestResponse((HttpServletRequest)request, (HttpServletResponse)response);
+
+            processRequest();
+            
+            if (tx.isActive()) {
+                tx.commit();
+            }
+        }
+        catch (Exception e)
+        {
+            logger.warn("Error enqueueing job", e);
+        }
+        finally
+        {
+            if (tx != null && tx.isActive())
+            {
+                tx.rollback();
+            }
+            
+            em.close();
+        }
+        
+        long endTime = System.currentTimeMillis();
+        
+        logger.debug("Total time: " + (endTime - startTime));
     }
 
 }

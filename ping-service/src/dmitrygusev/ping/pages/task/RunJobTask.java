@@ -44,7 +44,7 @@ public class RunJobTask {
 			if (job != null) {
 			    application.runJob(job);
 			    
-			    application.updateJob(job, false);
+			    application.updateJob(job, false, false);
 			}
 		} catch (Exception e) {
 			//	Prevent to run job once again on failure
