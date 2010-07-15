@@ -1,7 +1,5 @@
 package dmitrygusev.ping.services.dao.impl;
 
-import static com.google.appengine.api.datastore.KeyFactory.createKey;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -34,8 +32,9 @@ public class ScheduleDAOImpl implements ScheduleDAO {
 
     @Override
     public void delete(Long id) {
-        Schedule schedule = find(createKey(Schedule.class.getSimpleName(), id));
-        em.remove(schedule);
+        em.createQuery("DELETE FROM Schedule s WHERE s.id = :id")
+               .setParameter("id", id)
+               .executeUpdate();
     }
 
     @Override

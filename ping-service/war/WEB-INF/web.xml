@@ -67,7 +67,7 @@
     </security-constraint>
     <security-constraint>
         <web-resource-collection>
-            <url-pattern>/cron/*</url-pattern>
+            <url-pattern>/report/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>

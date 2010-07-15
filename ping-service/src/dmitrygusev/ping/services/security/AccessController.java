@@ -32,7 +32,6 @@ public class AccessController implements Dispatcher {
         if (principal != null 
                 || thisURL.startsWith("/job/analytics/1026/5002")   //  Share PingService analytics with everyone
                 || thisURL.startsWith("/assets")
-                || thisURL.startsWith("/cron/")
                 || thisURL.startsWith("/job/run/")
                 || thisURL.startsWith("/task/")
                 || thisURL.startsWith("/welcome")

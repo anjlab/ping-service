@@ -14,11 +14,15 @@ public class Feedback {
 
 	@Property
 	private String message;
+	@SuppressWarnings("unused")
+    @Property
+    private String note;
 	
 	@AfterRender
 	public void cleanup() {
 		message = null;
 		thanks = null;
+		note = null;
 	}
 	
 	@Property
@@ -32,6 +36,10 @@ public class Feedback {
 	public void onActivate() {
 		String subject = request.getParameter("subject");
 		this.message = Utils.isNullOrEmpty(subject) ? null : subject + "\n\n";
+		
+		if (gaeHelper.getUserPrincipal() == null) {
+		    this.note = "Please, provide your email address in the message so we could contact you.";
+		}
 	}
 	
 	@Inject

@@ -16,7 +16,8 @@
 		<table>
 		<tr>
 			<td valign="top"><t:label for="message">Message:</t:label></td> 
-			<td><t:textarea t:id="message" value="message" /></td>
+			<td><t:textarea t:id="message" value="message" />
+			<br/><font color="Gray">${note}</font></td>
 		</tr>
 		<tr>
 			<td colspan="2" align="right"><t:submit value="Send Feedback"/></td>

@@ -98,7 +98,7 @@ public class EditJob {
 	}
 	
 	public String getLastPingSummary() {
-		return application.getLastPingSummaryWithRelativeTimestamp(job);
+		return job.getLastPingSummary();
 	}
 	
 	public String getLastPingTimestamp() {

@@ -450,6 +450,8 @@ public class Utils {
         
         double percent = 100d * countOfInterest / totalCount;
         
+        percent = Math.round(percent * 100d) / 100d;
+        
         return percent;
     }
 

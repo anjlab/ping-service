@@ -337,34 +337,7 @@ public class Application {
                                 : TimeZone.getTimeZone(Utils.getTimeZoneId(timeZoneCity));
     }
 
-    public String getLastPingSummaryWithRelativeTimestamp(Job job) {
-        StringBuilder sb = new StringBuilder();
-        
-        if (job.getLastPingTimestamp() != null) {
-            long milliseconds = System.currentTimeMillis() - job.getLastPingTimestamp().getTime();
-            
-            String timeAgo = Utils.formatTimeMillis(milliseconds) + " ago";
-            
-            buildLastPingSummary(job, sb);
-            
-            sb.append(" / ");
-            sb.append(timeAgo);
-        } else {
-            sb.append("N/A");
-        }
-        
-        return sb.toString();
-    }
-    
-    public static void buildLastPingSummary(Job job, StringBuilder sb) {
-        checkResult(job, sb, Job.PING_RESULT_NOT_AVAILABLE, "N/A");
-        checkResult(job, sb, Job.PING_RESULT_OK, "Okay");
-        checkResult(job, sb, Job.PING_RESULT_HTTP_ERROR, "HTTP failed");
-        checkResult(job, sb, Job.PING_RESULT_CONNECTIVITY_PROBLEM, "Failed connecting");
-        checkResult(job, sb, Job.PING_RESULT_REGEXP_VALIDATION_FAILED, "Regexp failed");
-    }
-
-    private static void checkResult(Job job, StringBuilder sb, int resultCode, String message) {
+    public static void checkResult(Job job, StringBuilder sb, int resultCode, String message) {
         if (job.containsResult(resultCode)) {
             if (sb.length() > 0) {
                 sb.append(", ");
@@ -500,6 +473,12 @@ public class Application {
         }
     }
 
+    /**
+     * 
+     * @param job
+     * @param commitAfter Commit transaction manually (may be required when running out of Tapestry context)
+     * @return
+     */
     private boolean internalUpdateJob(Job job, boolean commitAfter) {
         try {
             jobDAO.update(job, commitAfter);
@@ -670,6 +649,19 @@ public class Application {
 
     public Mailer getMailer() {
         return mailer;
+    }
+
+    /**
+     * Move job to new schedule.
+     * 
+     * @param job
+     * @param target
+     */
+    public void moveJob(Job job, Schedule target) {
+        jobDAO.delete(target.getId(), job.getKey().getId());
+        Job copy = job.copy();
+        target.addJob(copy);
+        scheduleDAO.update(target);
     }
 
 }

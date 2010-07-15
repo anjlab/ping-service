@@ -22,6 +22,8 @@ public class RefDAOImplCache extends RefDAOImpl {
     public Ref addRef(Account account, Schedule schedule, int accessType) {
         Ref result = super.addRef(account, schedule, accessType);
         
+        abandonCache(result);
+        
         Object entityCacheKey = getEntityCacheKey(Ref.class, getRefWideUniqueData(account.getId(), schedule.getId()));
         cache.put(entityCacheKey, result);
         
@@ -63,7 +65,7 @@ public class RefDAOImplCache extends RefDAOImpl {
     @SuppressWarnings("unchecked")
     @Override
     public List<Ref> getRefs(Account account) {
-        Object entityCacheKey = getEntityCacheKey(Ref.class, getRefAccountEntityCacheKey(account.getId()));
+        Object entityCacheKey = getRefAccountEntityCacheKey(account.getId());
         List<Ref> result = (List<Ref>) cache.get(entityCacheKey); 
         if (result != null) {
             return result;
@@ -80,7 +82,7 @@ public class RefDAOImplCache extends RefDAOImpl {
     @SuppressWarnings("unchecked")
     @Override
     public List<Ref> getRefs(Schedule schedule) {
-        Object entityCacheKey = getEntityCacheKey(Ref.class, getRefScheduleEntityCacheKey(schedule.getId()));
+        Object entityCacheKey = getRefScheduleEntityCacheKey(schedule.getId());
         List<Ref> result = (List<Ref>) cache.get(entityCacheKey); 
         if (result != null) {
             return result;

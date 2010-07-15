@@ -23,7 +23,7 @@ public class TestJob {
 		
 		StringBuilder sb = new StringBuilder();
 		String formattedDate = Application.formatDate(job.getLastPingTimestamp(), "Moscow", Application.DATETIME_FORMAT);
-		Application.buildLastPingSummary(job, sb);
+		Job.buildLastPingSummary(job, sb);
 		
 		Assert.assertEquals("1970-01-01 03:00:00", formattedDate);
 		Assert.assertEquals("N/A", sb.toString());
@@ -32,7 +32,7 @@ public class TestJob {
 
 		sb = new StringBuilder();
 		formattedDate = Application.formatDate(job.getLastPingTimestamp(), "Moscow", Application.DATETIME_FORMAT);
-		Application.buildLastPingSummary(job, sb);
+		Job.buildLastPingSummary(job, sb);
 		
 		Assert.assertEquals("1970-01-01 03:00:00", formattedDate);
 		Assert.assertEquals("Okay", sb.toString());

@@ -1,0 +1,36 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<head>
+    <title>Jobs Report - Ping Service</title>
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
+    <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
+</head>
+<body>
+    <t:topbar />
+    
+    <h2><t:logo/> Jobs Report</h2>
+    
+    <t:grid t:id="grid" source="jobs" row="job" 
+        model="model" 
+        rowsperpage="1000"
+        rowClass="literal:job">
+
+        <t:parameter name="lastPingSummaryCell">
+            <div class="${summaryStatusCssClass}" title="${lastPingTimestamp}">${job.lastPingSummary}</div>
+        </t:parameter>
+    
+        <t:parameter name="titleFriendlyCell">
+            ${job.titleFriendly}<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a>
+        </t:parameter>
+
+        <t:parameter name="analyticsCell">
+            <t:pagelink t:id="analytics" page="job/analytics" context="jobContext">Analyze</t:pagelink>
+        </t:parameter>
+
+        <t:parameter name="detailsCell">
+            <t:pagelink t:id="details" page="job/edit" context="jobContext">Edit</t:pagelink>
+        </t:parameter>
+    </t:grid>
+
+    <t:footer/>
+</body>
+</html>

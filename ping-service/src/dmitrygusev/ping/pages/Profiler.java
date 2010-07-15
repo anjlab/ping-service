@@ -5,14 +5,12 @@ import static dmitrygusev.ping.services.profiler.ProfilingAdvice.dumpPlainMetric
 import static dmitrygusev.ping.services.profiler.ProfilingAdvice.getLeaf;
 import static java.lang.Integer.toHexString;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.tapestry5.PropertyConduit;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.beaneditor.BeanModel;
 import org.apache.tapestry5.ioc.Messages;
@@ -22,6 +20,7 @@ import org.apache.tapestry5.services.BeanModelSource;
 import dmitrygusev.ping.services.profiler.Leaf;
 import dmitrygusev.ping.services.profiler.ProfilerMetric;
 import dmitrygusev.ping.services.profiler.ProfilingAdvice;
+import dmitrygusev.tapestry5.AbstractReadonlyPropertyConduit;
 
 public class Profiler {
 
@@ -78,28 +77,28 @@ public class Profiler {
     
     public BeanModel<?> getModel() {
         BeanModel<?> beanModel = beanModelSource.createDisplayModel(String.class, messages);
-        beanModel.add("signature", new AbstractPropertyConduit() 
+        beanModel.add("signature", new AbstractReadonlyPropertyConduit() 
         {
             @Override 
             public Object get(Object instance) { 
                 return instance; 
             }
         });
-        beanModel.add("invocationCount", new AbstractPropertyConduit() 
+        beanModel.add("invocationCount", new AbstractReadonlyPropertyConduit() 
         {
             @Override 
             public Object get(Object instance) { 
                 return metrics.get(instance).getMetric().invocationCount; 
             }
         });
-        beanModel.add("totalTimeMillis", new AbstractPropertyConduit()
+        beanModel.add("totalTimeMillis", new AbstractReadonlyPropertyConduit()
         {
             @Override 
             public Object get(Object instance) { 
                 return metrics.get(instance).getMetric().totalTimeMillis; 
             }
         });
-        beanModel.add("avgTimeMillis", new AbstractPropertyConduit()
+        beanModel.add("avgTimeMillis", new AbstractReadonlyPropertyConduit()
         {
             @Override 
             public Object get(Object instance) { 
@@ -117,22 +116,6 @@ public class Profiler {
         }
         beanModel.exclude("empty");
         return beanModel;
-    }
-    
-    private abstract class AbstractPropertyConduit implements PropertyConduit {
-        @Override
-        public <T extends Annotation> T getAnnotation(Class<T> arg0) {
-            return null;
-        }
-
-        @Override
-        public void set(Object instance, Object value) {
-        }
-
-        @Override
-        public Class<?> getPropertyType() {
-            return String.class;
-        }
     }
     
     @Property private String item;

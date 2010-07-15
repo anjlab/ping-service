@@ -57,3 +57,7 @@ a.external {
 .logo {
 	vertical-align: text-bottom;
 }
+
+.job:nth-child(even) {
+    background-color: #E8E8E8;
+}

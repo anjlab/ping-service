@@ -237,6 +237,6 @@ public class Analytics {
         application.runJob(job);
         application.updateJob(job, false, false);
         
-        message = application.getLastPingSummaryWithRelativeTimestamp(job);
+        message = job.getLastPingSummary();
     }
 }

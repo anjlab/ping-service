@@ -64,6 +64,7 @@ public class ScheduleDAOImplCache extends ScheduleDAOImpl {
             }
         }
         super.update(schedule);
+        //  Cache requires new transaction to put object
         em.getTransaction().commit();
         em.getTransaction().begin();
         Object entityCacheKey = getEntityCacheKey(Schedule.class, schedule.getId());

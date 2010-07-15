@@ -44,7 +44,9 @@ public class LazyJPATransactionManager implements JPATransactionManager
 
                     tx.begin();
                     
-                    logger.info("Transaction created ({} ms)", System.currentTimeMillis() - startTime);
+                    StringBuilder trace = ProfilingDelegate.buildStackTrace();
+                    
+                    logger.info("Transaction created ({} ms) for context {}", System.currentTimeMillis() - startTime, trace);
                 }
             }
 
