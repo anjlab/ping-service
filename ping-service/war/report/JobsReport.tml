@@ -23,7 +23,7 @@
         </t:parameter>
 
         <t:parameter name="userLastVisitCell">
-            <div title="${lastBackupTimestamp}">${userLastVisitFriendly}</div>
+            <div title="${userLastVisit}">${userLastVisitFriendly}</div>
         </t:parameter>
 
         <t:parameter name="lastPingSummaryCell">
