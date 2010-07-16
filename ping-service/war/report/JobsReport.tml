@@ -14,6 +14,18 @@
         rowsperpage="1000"
         rowClass="literal:job">
 
+        <t:parameter name="createdAtCell">
+            <div title="${createdAt}">${createdAtFriendly}</div>
+        </t:parameter>
+
+        <t:parameter name="lastBackupTimestampCell">
+            <div title="${lastBackupTimestamp}">${lastBackupTimestampFriendly}</div>
+        </t:parameter>
+
+        <t:parameter name="userLastVisitCell">
+            <div title="${lastBackupTimestamp}">${userLastVisitFriendly}</div>
+        </t:parameter>
+
         <t:parameter name="lastPingSummaryCell">
             <div class="${summaryStatusCssClass}" title="${lastPingTimestamp}">${job.lastPingSummary}</div>
         </t:parameter>

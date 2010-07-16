@@ -287,7 +287,7 @@ public class Job implements Serializable {
           return formatCounterShort(counter) + " (" + counter + ")";
      }
      private String formatCounterShort(int counter) {
-          return Utils.formatTime(Utils.getTimeInMinutes(counter, cronString));
+          return Utils.formatMinutesToWordsUpToMinutes(Utils.getTimeInMinutes(counter, cronString));
      }
      private void setStatusCounter(int statusCounter) {
           this.statusCounter = statusCounter;
@@ -564,11 +564,9 @@ public class Job implements Serializable {
         StringBuilder sb = new StringBuilder();
         
         if (getLastPingTimestamp() != null) {
-            long milliseconds = System.currentTimeMillis() - getLastPingTimestamp().getTime();
+            String timeAgo = Utils.getTimeAgoUpToMinutes(getLastPingTimestamp());
             
-            String timeAgo = Utils.formatTimeMillis(milliseconds) + " ago";
-            
-            Job.buildLastPingSummary(this, sb);
+            buildLastPingSummary(this, sb);
             
             sb.append(" / ");
             sb.append(timeAgo);

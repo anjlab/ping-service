@@ -85,7 +85,7 @@ public class MailJobResultsFilter extends AbstractFilter {
         builder.append(" - ");
         builder.append(Application.formatDate(lastResult.getTimestamp(), timeZoneCity, Application.DATETIME_FORMAT));
         builder.append(" (");
-        builder.append(Utils.formatTimeMillis(lastResult.getTimestamp().getTime() - firstResult.getTimestamp().getTime()));
+        builder.append(Utils.formatMillisecondsToWordsUpToMinutes(lastResult.getTimestamp().getTime() - firstResult.getTimestamp().getTime()));
         builder.append(")");
         builder.append("\n# of records: ");
         builder.append(results.size());

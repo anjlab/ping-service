@@ -1,7 +1,7 @@
 package dmitrygusev.ping.pages.task;
 
 import static com.google.appengine.api.datastore.KeyFactory.stringToKey;
-import static dmitrygusev.ping.services.Utils.formatTimeMillis;
+import static dmitrygusev.ping.services.Utils.formatMillisecondsToWordsUpToMinutes;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -87,7 +87,7 @@ public class MailJobResultsTask {
                             "Job: " + job.getTitleFriendly() + " / " + job.getPingURL() + " / " + job.getKey() +
                             "\nTotal files: 1" +
                             "\nTotal records: " + totalRecords +
-                            "\nTotal time: " + formatTimeMillis(System.currentTimeMillis() - startTime));
+                            "\nTotal time: " + formatMillisecondsToWordsUpToMinutes(System.currentTimeMillis() - startTime));
             } else {
                 logger.error("Error saving job. Backup will not be sent to user this time.");
             }
@@ -122,7 +122,7 @@ public class MailJobResultsTask {
 		builder.append(" - ");
 		builder.append(Application.formatDate(lastResult.getTimestamp(), timeZoneCity, Application.DATETIME_FORMAT));
 		builder.append(" (");
-		builder.append(Utils.formatTimeMillis(lastResult.getTimestamp().getTime() - firstResult.getTimestamp().getTime()));
+		builder.append(Utils.formatMillisecondsToWordsUpToMinutes(lastResult.getTimestamp().getTime() - firstResult.getTimestamp().getTime()));
 		builder.append(")");
 		builder.append("\nFile #: 1");
 		builder.append("\n# of records: ");

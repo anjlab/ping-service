@@ -1,6 +1,7 @@
 package dmitrygusev.ping.services;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -322,8 +323,17 @@ public class Utils {
 		}
 	}
 	
-	public static String formatTime(int numberOfMinutes) {
-		int numberOfMinutesInYear = 365 * 24 * 60;
+	public enum TimeGranularity {
+	    MINUTE,
+	    DAY
+	}
+	
+	public static String formatMinutesToWordsUpToMinutes(int numberOfMinutes) {
+	    return formatMinutesToWords(numberOfMinutes, TimeGranularity.MINUTE);
+	}
+	
+    private static String formatMinutesToWords(int numberOfMinutes, TimeGranularity timeGranularity) {
+        int numberOfMinutesInYear = 365 * 24 * 60;
 		int numberOfMinutesInMonth = 30 * 24 * 60;
 		int numberOfMinutesInDay = 24 * 60;
 		int numberOfMinutesInHour = 60;
@@ -346,8 +356,11 @@ public class Utils {
 		pairs.add(new Pair(years, " year"));
 		pairs.add(new Pair(months, " month"));
 		pairs.add(new Pair(days, " day"));
-		pairs.add(new Pair(hours, " hour"));
-		pairs.add(new Pair(minutes, " minute"));
+		
+        if (!(timeGranularity == TimeGranularity.DAY)) {
+    		pairs.add(new Pair(hours, " hour"));
+    		pairs.add(new Pair(minutes, " minute"));
+        }
 		
 		StringBuilder sb = new StringBuilder();
 		
@@ -363,7 +376,7 @@ public class Utils {
 		}
 		
 		return sb.toString();
-	}
+    }
 	
 	private static void appendIfPlural(StringBuilder builder, String appendWhat, int number) {
 		if (number == 0 || number > 1) {
@@ -419,16 +432,6 @@ public class Utils {
 		return cronModel.containsKey(cronString);
 	}
 
-	public static String formatTimeMillis(long totalTimeMillis) {
-		String totalTimeFormatted;
-		if (totalTimeMillis < 1000 * 60) {
-			totalTimeFormatted = "Less than a minute";
-		} else {
-			totalTimeFormatted = formatTime((int)(totalTimeMillis / 1000 / 60));
-		}
-		return totalTimeFormatted;
-	}
-
 	public static int getTimeInMinutes(int counter, String cronString) {
 		return counter * getCronMinutes(cronString);
 	}
@@ -455,5 +458,59 @@ public class Utils {
 
     public static String formatPercent(double value) {
         return String.format(Locale.ENGLISH, "%.5f", value) + "%";
+    }
+
+    public static String getTimeAgoUpToMinutes(Date timestamp) {
+        if (timestamp == null) {
+            return null;
+        }
+        
+        long milliseconds = System.currentTimeMillis() - timestamp.getTime();
+        
+        String timeAgo = formatMillisecondsToWordsUpToMinutes(milliseconds) + " ago";
+        
+        return timeAgo;
+    }
+
+    public static String getTimeAgoUpToDays(Date timestamp) {
+        if (timestamp == null) {
+            return null;
+        }
+        
+        long milliseconds = System.currentTimeMillis() - timestamp.getTime();
+        
+        String timeAgo = formatMillisecondsToWordsUpToDays(milliseconds) + " ago";
+        
+        return timeAgo + " ago";
+    }
+
+    public static String formatMillisecondsToWordsUpToMinutes(long totalTimeMillis) {
+        return formatMillisecondsToWords(totalTimeMillis, TimeGranularity.MINUTE);
+    }
+
+    public static String formatMillisecondsToWordsUpToDays(long totalTimeMillis) {
+        return formatMillisecondsToWords(totalTimeMillis, TimeGranularity.DAY);
+    }
+
+    private static String formatMillisecondsToWords(long totalTimeMillis, TimeGranularity timeGranularity) {
+        String totalTimeFormatted;
+        if (totalTimeMillis < getNumberOfMilliseconds(timeGranularity)) {
+            totalTimeFormatted = "Less than a " + timeGranularity.name().toLowerCase();
+        } else {
+            totalTimeFormatted = formatMinutesToWords((int)(totalTimeMillis / 1000 / 60), timeGranularity);
+        }
+        return totalTimeFormatted;
+    }
+
+    private static int getNumberOfMilliseconds(TimeGranularity timeGranularity) {
+        switch (timeGranularity) {
+        case MINUTE:
+            return 1000 * 60;
+        case DAY:
+            return 1000 * 60 * 60 * 24;
+
+        default:
+            return 0;
+        }
     }
 }

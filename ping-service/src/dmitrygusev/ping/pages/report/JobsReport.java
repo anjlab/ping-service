@@ -187,11 +187,36 @@ public class JobsReport {
     }
 
     public String getLastPingTimestamp() {
-        Date timestamp = job.getLastPingTimestamp();
-        
+        return formatTime(job.getLastPingTimestamp());
+    }
+
+    private String formatTime(Date timestamp) {
         return timestamp != null 
              ? Application.DATETIME_FORMAT.format(timestamp) 
              : "N/A";
     }
 
+    public String getLastBackupTimestampFriendly() {
+        return Utils.getTimeAgoUpToDays(job.getLastBackupTimestamp());
+    }
+    
+    public String getCreatedAtFriendly() {
+        return Utils.getTimeAgoUpToDays(job.getCreatedAt());
+    }
+    
+    public String getUserLastVisitFriendly() {
+        return Utils.getTimeAgoUpToDays(accountDAO.getAccount((job).getSchedule().getName()).getLastVisitDate());
+    }
+
+    public String getLastBackupTimestamp() {
+        return formatTime(job.getLastBackupTimestamp());
+    }
+    
+    public String getCreatedAt() {
+        return formatTime(job.getCreatedAt());
+    }
+    
+    public String getUserLastVisit() {
+        return formatTime(accountDAO.getAccount((job).getSchedule().getName()).getLastVisitDate());
+    }
 }
