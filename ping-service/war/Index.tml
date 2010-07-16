@@ -25,7 +25,7 @@
                    <h2><t:logo/> Scheduled Jobs</h2>
                    
                    <p>
-                       <t:pagelink page="job/create">Create job...</t:pagelink>
+                       <t:pagelink page="job/create">Create new job...</t:pagelink>
                    </p>
             </td>
             <td align="center" valign="middle">
@@ -35,10 +35,8 @@
     </table>
     
     <t:grid empty="No jobs" source="jobs" row="job"
-           reorder="titleFriendly, scheduledBy, cronString, lastPingSummary, upDownTimeInMinutes, recentAvailabilityPercent, totalAvailabilityPercent, analytics"
-           exclude="pingURL, createdAt, lastBackupTimestamp, statusCounter, statusCounterFriendlyShort, recentAvailabilityPercentFriendly, totalAvailabilityPercentFriendly, googleIOException, totalStatusCounter, totalSuccessStatusCounter, previousStatusCounter, totalStatusCounterFriendly, totalSuccessStatusCounterFriendly, previousStatusCounterFriendly, title, shortenURL, lastPingFailed, responseEncoding, validatingRegexp, validatingHttpCode, lastPingDetails, reportEmail, lastPingResult, usesValidatingRegexp, usesValidatingHttpCode, lastPingTimestamp, statusCounterFriendly, receiveBackups, validationSummary"
-           add="analytics, details, delete"
-           rowClass="literal:job">
+            model="model" t:id="grid"
+            rowClass="literal:job">
 
         <t:parameter name="lastPingSummaryCell">
             <div class="${summaryStatusCssClass}" title="${lastPingTimestamp}">${job.lastPingSummary}</div>

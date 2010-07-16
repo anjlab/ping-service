@@ -8,9 +8,15 @@ import java.util.TimeZone;
 import net.sf.jsr107cache.Cache;
 
 import org.apache.tapestry5.annotations.AfterRender;
+import org.apache.tapestry5.annotations.BeforeRenderTemplate;
+import org.apache.tapestry5.annotations.Component;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
+import org.apache.tapestry5.beaneditor.BeanModel;
+import org.apache.tapestry5.corelib.components.Grid;
+import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.services.BeanModelSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +28,7 @@ import dmitrygusev.ping.entities.Ref;
 import dmitrygusev.ping.entities.Schedule;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.Utils;
+import dmitrygusev.tapestry5.AbstractReadonlyPropertyConduit;
 
 public class Index {
 
@@ -184,4 +191,82 @@ public class Index {
         message = "Cache cleared";
         messageColor = "green";
     }
+    
+    private int counter = 0;
+    
+    @Component(id="grid")
+    private Grid grid;
+    
+    @BeforeRenderTemplate
+    void beforeRender() {
+        if (grid.getSortModel().getSortConstraints().isEmpty()) {
+            //  ascending
+            grid.getSortModel().updateSort("titleFriendly");
+        }
+    }
+    
+    @Inject private BeanModelSource beanModelSource;
+    @Inject private Messages messages;
+    
+    public BeanModel<?> getModel() {
+        BeanModel<?> beanModel = beanModelSource.createDisplayModel(Job.class, messages);
+
+        beanModel.add("SN", new AbstractReadonlyPropertyConduit() 
+        {
+            @Override 
+            public Object get(Object instance) { 
+                return ++counter;
+            }
+        }).sortable(false);
+
+        beanModel.add("analytics", null);
+        beanModel.add("details", null);
+        beanModel.add("delete", null);
+        
+        beanModel.exclude(
+                "pingURL", 
+                "createdAt", 
+                "lastBackupTimestamp", 
+                "statusCounter", 
+                "statusCounterFriendlyShort", 
+                "recentAvailabilityPercentFriendly", 
+                "totalAvailabilityPercentFriendly", 
+                "googleIOException", 
+                "totalStatusCounter", 
+                "totalSuccessStatusCounter", 
+                "previousStatusCounter", 
+                "totalStatusCounterFriendly", 
+                "totalSuccessStatusCounterFriendly", 
+                "previousStatusCounterFriendly", 
+                "title", 
+                "shortenURL", 
+                "lastPingFailed", 
+                "responseEncoding", 
+                "validatingRegexp", 
+                "validatingHttpCode", 
+                "lastPingDetails", 
+                "reportEmail", 
+                "lastPingResult", 
+                "usesValidatingRegexp", 
+                "usesValidatingHttpCode", 
+                "lastPingTimestamp", 
+                "statusCounterFriendly", 
+                "receiveBackups", 
+                "validationSummary",
+                "resultsCount");
+
+        beanModel.reorder(
+                        "SN", 
+                        "titleFriendly", 
+                        "scheduledBy", 
+                        "cronString", 
+                        "lastPingSummary", 
+                        "upDownTimeInMinutes", 
+                        "recentAvailabilityPercent", 
+                        "totalAvailabilityPercent", 
+                        "analytics");
+        
+        return beanModel;
+    }
+
 }

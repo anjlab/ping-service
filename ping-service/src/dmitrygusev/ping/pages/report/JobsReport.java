@@ -67,7 +67,22 @@ public class JobsReport {
         beanModel.exclude("createdAt");
         beanModel.exclude("lastBackupTimestamp");
         beanModel.exclude("cronString");
+        beanModel.exclude("recentAvailabilityPercent", "totalAvailabilityPercent");
 
+        beanModel.add("recentAvailabilityPercent", new AbstractReadonlyPropertyConduit() 
+        {
+            @Override 
+            public Object get(Object instance) { 
+                return ((Job) instance).getRecentAvailabilityPercentFriendly().replace("%", "");
+            }
+        });
+        beanModel.add("totalAvailabilityPercent", new AbstractReadonlyPropertyConduit() 
+        {
+            @Override 
+            public Object get(Object instance) { 
+                return ((Job) instance).getTotalAvailabilityPercentFriendly().replace("%", "");
+            }
+        });
         beanModel.add("cronString", new AbstractReadonlyPropertyConduit() 
         {
             @Override 
