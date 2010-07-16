@@ -6,8 +6,8 @@
   </queue>
   <queue>
     <name>every5minutes</name>
-    <rate>15/m</rate>
-    <bucket-size>2</bucket-size>
+    <rate>20/m</rate>
+    <bucket-size>3</bucket-size>
   </queue>
   <queue>
     <name>every15minutes</name>
