@@ -5,6 +5,7 @@ import static com.google.appengine.api.datastore.KeyFactory.stringToKey;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -19,22 +20,20 @@ import com.google.appengine.api.datastore.Key;
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
 import dmitrygusev.ping.pages.job.EditJob;
-import dmitrygusev.ping.pages.task.MailJobResultsTask;
-import dmitrygusev.ping.pages.task.RunJobTask;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.JobResultCSVExporter;
 import dmitrygusev.ping.services.Mailer;
 import dmitrygusev.ping.services.Utils;
 
-public class MailJobResultsFilter extends AbstractFilter {
+public class BackupJobResultsFilter extends AbstractFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(MailJobResultsTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(BackupJobResultsFilter.class);
     
     @Override
     protected void processRequest() 
             throws Exception
     {
-        String encodedJobKey = globals.getHTTPServletRequest().getParameter(RunJobTask.JOB_KEY_PARAMETER_NAME);
+        String encodedJobKey = globals.getHTTPServletRequest().getParameter(RunJobFilter.JOB_KEY_PARAMETER_NAME);
 
         if (Utils.isNullOrEmpty(encodedJobKey)) {
             return;
@@ -54,16 +53,23 @@ public class MailJobResultsFilter extends AbstractFilter {
         
         resultsBuffer.addAll(job.removeJobResultsExceptRecent(Application.DEFAULT_NUMBER_OF_JOB_RESULTS));
 
+        job.setLastBackupTimestamp(new Date());
+        
         if (resultsBuffer.size() > 0) {
             if (application.updateJob(job, false, true)) {
 
-                sendResultsByMail(job, resultsBuffer, job.getReportEmail());
+                if (job.isReceiveBackups() && !Utils.isNullOrEmpty(job.getReportEmail())) {
+                    sendResultsByMail(job, resultsBuffer, job.getReportEmail());
+                }
     
                 application.getMailer().sendSystemMessageToDeveloper(
                             "Debug: Backup Completed for Job", 
-                            "Job: " + job.getTitleFriendly() + " / " + job.getPingURL() + " / " + job.getKey() +
-                            "\nTotal files: 1" +
-                            "\nTotal records: " + resultsBuffer.size());
+                            "Job: " + job.getTitleFriendly() + " / " + job.getPingURL()
+                            + "\nhttp://ping-service.appspot.com/job/analytics/" 
+                            + job.getKey().getParent().getId() + "/" + job.getKey().getId()
+                            + "\nhttp://ping-service.appspot.com/job/edit/" 
+                            + job.getKey().getParent().getId() + "/" + job.getKey().getId()
+                            + "\nTotal records: " + resultsBuffer.size());
             } else {
                 logger.error("Error saving job. Backup will not be sent to user this time.");
             }

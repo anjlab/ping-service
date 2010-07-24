@@ -20,37 +20,37 @@
     });
 
     if (!sourceLL.equals(targetLL)) {
-	    var targetMarker = new google.maps.Marker({
-	      position: targetLL, 
-	      map: map, 
-	      title: targetTitle
-	    });
-	    
-	    var line = [sourceLL, targetLL];
-	    
-	    var path = new google.maps.Polyline({
-	      path: line,
-	      strokeColor: "#FF0000",
-	      strokeOpacity: 0.5,
-	      strokeWeight: 2
-	    });
-	
-	    path.setMap(map);
-	    
-	    // Fit to markers:
-	    //     http://blog.shamess.info/2009/09/29/zoom-to-fit-all-markers-on-google-maps-api-v3/
-	
-	    //  Make an array of the LatLng's of the markers you want to show
-	    var LatLngList = new Array (sourceLL, targetLL);
-	    //  Create a new viewpoint bound
-	    var bounds = new google.maps.LatLngBounds ();
-	    //  Go through each...
-	    for (var i = 0, LtLgLen = LatLngList.length; i < LtLgLen; i++) {
-	      //  And increase the bounds to take this point
-	      bounds.extend (LatLngList[i]);
-	    }
-	    //  Fit these bounds to the map
-	    map.fitBounds (bounds);
+        var targetMarker = new google.maps.Marker({
+          position: targetLL, 
+          map: map, 
+          title: targetTitle
+        });
+        
+        var line = [sourceLL, targetLL];
+        
+        var path = new google.maps.Polyline({
+          path: line,
+          strokeColor: "#FF0000",
+          strokeOpacity: 0.5,
+          strokeWeight: 2
+        });
+    
+        path.setMap(map);
+        
+        // Fit to markers:
+        //     http://blog.shamess.info/2009/09/29/zoom-to-fit-all-markers-on-google-maps-api-v3/
+    
+        //  Make an array of the LatLng's of the markers you want to show
+        var LatLngList = new Array (sourceLL, targetLL);
+        //  Create a new viewpoint bound
+        var bounds = new google.maps.LatLngBounds ();
+        //  Go through each...
+        for (var i = 0, LtLgLen = LatLngList.length; i < LtLgLen; i++) {
+          //  And increase the bounds to take this point
+          bounds.extend (LatLngList[i]);
+        }
+        //  Fit these bounds to the map
+        map.fitBounds (bounds);
     }
 
   }

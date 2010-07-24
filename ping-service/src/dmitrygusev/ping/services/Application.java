@@ -35,10 +35,11 @@ import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
 import dmitrygusev.ping.entities.Ref;
 import dmitrygusev.ping.entities.Schedule;
+import dmitrygusev.ping.filters.AbstractFilter;
+import dmitrygusev.ping.filters.BackupJobResultsFilter;
+import dmitrygusev.ping.filters.RunJobFilter;
 import dmitrygusev.ping.pages.job.Analytics;
 import dmitrygusev.ping.pages.task.LongRunningQueryTask;
-import dmitrygusev.ping.pages.task.MailJobResultsTask;
-import dmitrygusev.ping.pages.task.RunJobTask;
 import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.JobDAO;
 import dmitrygusev.ping.services.dao.RefDAO;
@@ -160,7 +161,17 @@ public class Application {
             assertCanModifyJob(job);
         }
         
-        return internalUpdateJob(job, commitAfter);
+        boolean succeeded = internalUpdateJob(job, commitAfter);
+        
+        if (succeeded) {
+            try {
+                scheduleResultsBackupIfNeeded(job);
+            } catch (URISyntaxException e) {
+                logger.error("Error scheduling job backup", e);
+            }
+        }
+        
+        return succeeded;
     }
 
     private void assertCanModifyJob(Job job) {
@@ -451,8 +462,6 @@ public class Application {
             
             job.addJobResult(jobResult);
 
-            scheduleResultsBackupIfNeeded(job);
-
             //  Client should update the job itself
 //            internalUpdateJob(job);
             
@@ -469,7 +478,7 @@ public class Application {
         int numberOfResults = job.getRecentJobResults(0).size();
         
         if ((numberOfResults >= DEFAULT_NUMBER_OF_JOB_RESULTS * 2) && (numberOfResults % 10 == 0)) {
-            runMailJobResultsTask(job.getKey());
+            runBackupJobResultsTask(job.getKey());
         }
     }
 
@@ -517,6 +526,11 @@ public class Application {
     }
 
     public void sendReport(Job job) throws URISyntaxException {
+        if (!job.isReceiveNotifications() || Utils.isNullOrEmpty(job.getReportEmail())) {
+            logger.debug("Job is not configured to recieve reports or no report recepient specified");
+            return;
+        }
+        
         String from = Mailer.PING_SERVICE_NOTIFY_GMAIL_COM;
         String to = job.getReportEmail();
         
@@ -563,10 +577,10 @@ public class Application {
                 "If you think this message was sent to you by mistake, just ignore it.");
     }
         
-    public void runMailJobResultsTask(Key jobKey) throws URISyntaxException {
+    public void runBackupJobResultsTask(Key jobKey) throws URISyntaxException {
         addTaskNonTransactional(
             getQueue(MAIL_QUEUE),
-            buildTaskUrl(MailJobResultsTask.class)
+            buildTaskUrl(BackupJobResultsFilter.class)
                 .param(LongRunningQueryTask.JOB_KEY_PARAMETER_NAME, keyToString(jobKey))
                 .param(LongRunningQueryTask.STARTTIME_PARAMETER_NAME, String.valueOf(System.currentTimeMillis())));
     }
@@ -597,8 +611,8 @@ public class Application {
         List<TaskOptions> tasks = new ArrayList<TaskOptions>(jobKeys.size());
         
         for (Key key : jobKeys) {
-            tasks.add(buildTaskUrl(RunJobTask.class)
-                        .param(RunJobTask.JOB_KEY_PARAMETER_NAME, keyToString(key)));
+            tasks.add(buildTaskUrl(RunJobFilter.class)
+                        .param(RunJobFilter.JOB_KEY_PARAMETER_NAME, keyToString(key)));
         }
 
         addTaskNonTransactional(queue, tasks);
@@ -621,12 +635,13 @@ public class Application {
     }
 
     public TaskOptions buildTaskUrl(Class<?> pageClass) throws URISyntaxException {
-        String path = getPath(pageClass);
+        String path;
         
-        if (pageClass == RunJobTask.class) {
-            path = "/filters/runJob";
-        } else if (pageClass == MailJobResultsTask.class) {
-            path = "/filters/mailJobResults";
+        if (AbstractFilter.class.isAssignableFrom(pageClass)) {
+            String filterName = pageClass.getSimpleName().replace("Filter", "");
+            path = "/filters/" + Character.toLowerCase(filterName.charAt(0)) + filterName.substring(1);
+        } else {
+            path = getPath(pageClass);
         }
         
         return GAEHelper.buildTaskUrl(path);

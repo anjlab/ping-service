@@ -224,6 +224,7 @@ public class Index {
         beanModel.add("delete", null);
         
         beanModel.exclude(
+                "receiveNotifications",
                 "pingURL", 
                 "createdAt", 
                 "lastBackupTimestamp", 

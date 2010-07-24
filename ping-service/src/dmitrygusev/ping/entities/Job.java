@@ -46,86 +46,88 @@ public class Job implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Key key;
 
-     //     URL to ping
-     @Column(nullable=false)
-     @Validate("required,regexp=(http://|https://).+")
-     private String pingURL;
-     //     Validating regexp
-     @Column(nullable=true)
-     private String validatingRegexp;
-     //     Cron string to select jobs against a cron action
-     @Column(nullable=false)
-     @Validate("required")
-     private String cronString;
-     //     Email to send reports to
-     @Validate("email")
-     private String reportEmail;
-     private Date lastPingTimestamp;
-     private int lastPingResult;
-     @Basic
-     private Text lastPingDetails;
-     private boolean usesValidatingRegexp;
-     private boolean usesValidatingHttpCode;
-     private Integer validatingHttpCode;
-     private String responseEncoding;
-     private String title;
-     
-     //     Number of times this job stays in failed or okay status
-     private Integer statusCounter;
-     private Integer previousStatusCounter;
-     private Integer totalStatusCounter;
-     private Integer totalSuccessStatusCounter;
-     
-     @Transient
-     private Schedule schedule;
-     
-     private Boolean receiveBackups;
-     private Date lastBackupTimestamp;
-     
-     // Since 13.05.2010
-     @Basic
-     private Blob packedJobResults;
-     @Transient
-     private List<JobResult> jobResults;
-     @Transient
-     private boolean updatingJobResults;
+    //     URL to ping
+    @Column(nullable=false)
+    @Validate("required,regexp=(http://|https://).+")
+    private String pingURL;
+    //     Validating regexp
+    @Column(nullable=true)
+    private String validatingRegexp;
+    //     Cron string to select jobs against a cron action
+    @Column(nullable=false)
+    @Validate("required")
+    private String cronString;
+    //     Email to send reports to
+    @Validate("email")
+    private String reportEmail;
+    private Date lastPingTimestamp;
+    private int lastPingResult;
+    @Basic
+    private Text lastPingDetails;
+    private boolean usesValidatingRegexp;
+    private boolean usesValidatingHttpCode;
+    private Integer validatingHttpCode;
+    private String responseEncoding;
+    private String title;
+    
+    //     Number of times this job stays in failed or okay status
+    private Integer statusCounter;
+    private Integer previousStatusCounter;
+    private Integer totalStatusCounter;
+    private Integer totalSuccessStatusCounter;
+    
+    @Transient
+    private Schedule schedule;
+    
+    private Boolean receiveNotifications;
+    private Boolean receiveBackups;
+    private Date lastBackupTimestamp;
+    
+    // Since 13.05.2010
+    @Basic
+    private Blob packedJobResults;
+    @Transient
+    private List<JobResult> jobResults;
+    @Transient
+    private boolean updatingJobResults;
 
-     private Date createdAt;
-     
-     public static final int PING_RESULT_NOT_AVAILABLE = 1;
-     public static final int PING_RESULT_OK = 2;
-     public static final int PING_RESULT_CONNECTIVITY_PROBLEM = 4;
-     public static final int PING_RESULT_HTTP_ERROR = 8;
-     public static final int PING_RESULT_REGEXP_VALIDATION_FAILED = 16;
-     
-     public Job copy() {
-         Job copy = new Job();
-         
-         copy.createdAt = createdAt;
-         copy.updatingJobResults = updatingJobResults;
-         copy.jobResults = jobResults;
-         copy.packedJobResults = packedJobResults;
-         copy.lastBackupTimestamp = lastBackupTimestamp;
-         copy.receiveBackups = receiveBackups;
-         copy.totalSuccessStatusCounter = totalSuccessStatusCounter;
-         copy.totalStatusCounter = totalStatusCounter;
-         copy.previousStatusCounter = previousStatusCounter;
-         copy.statusCounter = statusCounter;
-         copy.title = title;
-         copy.responseEncoding = responseEncoding;
-         copy.validatingHttpCode = validatingHttpCode;
-         copy.usesValidatingHttpCode = usesValidatingHttpCode;
-         copy.usesValidatingRegexp = usesValidatingRegexp;
-         copy.lastPingDetails = lastPingDetails;
-         copy.lastPingResult = lastPingResult;
-         copy.lastPingTimestamp = lastPingTimestamp;
-         copy.reportEmail = reportEmail;
-         copy.cronString = cronString;
-         copy.validatingRegexp = validatingRegexp;
-         copy.pingURL = pingURL;
-         
-         return copy;
-     }
+    private Date createdAt;
+
+    public static final int PING_RESULT_NOT_AVAILABLE = 1;
+    public static final int PING_RESULT_OK = 2;
+    public static final int PING_RESULT_CONNECTIVITY_PROBLEM = 4;
+    public static final int PING_RESULT_HTTP_ERROR = 8;
+    public static final int PING_RESULT_REGEXP_VALIDATION_FAILED = 16;
+    
+    public Job copy() {
+        Job copy = new Job();
+        
+        copy.createdAt = createdAt;
+        copy.updatingJobResults = updatingJobResults;
+        copy.jobResults = jobResults;
+        copy.packedJobResults = packedJobResults;
+        copy.lastBackupTimestamp = lastBackupTimestamp;
+        copy.receiveBackups = receiveBackups;
+        copy.receiveNotifications = receiveNotifications;
+        copy.totalSuccessStatusCounter = totalSuccessStatusCounter;
+        copy.totalStatusCounter = totalStatusCounter;
+        copy.previousStatusCounter = previousStatusCounter;
+        copy.statusCounter = statusCounter;
+        copy.title = title;
+        copy.responseEncoding = responseEncoding;
+        copy.validatingHttpCode = validatingHttpCode;
+        copy.usesValidatingHttpCode = usesValidatingHttpCode;
+        copy.usesValidatingRegexp = usesValidatingRegexp;
+        copy.lastPingDetails = lastPingDetails;
+        copy.lastPingResult = lastPingResult;
+        copy.lastPingTimestamp = lastPingTimestamp;
+        copy.reportEmail = reportEmail;
+        copy.cronString = cronString;
+        copy.validatingRegexp = validatingRegexp;
+        copy.pingURL = pingURL;
+        
+        return copy;
+    }
 
      
      public Job() {
@@ -370,12 +372,19 @@ public class Job implements Serializable {
           setStatusCounter(getStatusCounter() + 1);
           incrementTotalStatusCounter();
      }
+     public void setReceiveNotifications(boolean receiveNotifications) {
+        this.receiveNotifications = receiveNotifications;
+     }
+     public boolean isReceiveNotifications() {
+         return receiveNotifications == null || //  Receive notifications by default
+                receiveNotifications.booleanValue();
+     }
      public void setReceiveBackups(boolean receiveBackups) {
           this.receiveBackups = receiveBackups;
      }
      public boolean isReceiveBackups() {
           return receiveBackups == null ||     //     Receive backups by default 
-                  receiveBackups.booleanValue();
+                 receiveBackups.booleanValue();
      }
      @Override
      public int hashCode() {

@@ -8,16 +8,16 @@ import org.slf4j.LoggerFactory;
 import com.google.appengine.api.datastore.Key;
 
 import dmitrygusev.ping.entities.Job;
-import dmitrygusev.ping.pages.task.RunJobTask;
 import dmitrygusev.ping.services.Utils;
 
 public class RunJobFilter extends AbstractFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(RunJobFilter.class);
+    public static final String JOB_KEY_PARAMETER_NAME = "job";
     
     @Override
     protected void processRequest() throws Exception {
-        String encodedJobKey = globals.getHTTPServletRequest().getParameter(RunJobTask.JOB_KEY_PARAMETER_NAME);
+        String encodedJobKey = globals.getHTTPServletRequest().getParameter(RunJobFilter.JOB_KEY_PARAMETER_NAME);
 
         if (Utils.isNullOrEmpty(encodedJobKey)) {
             return;

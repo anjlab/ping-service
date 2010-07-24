@@ -32,12 +32,12 @@
         <url-pattern>/filters/enqueueJobs/*</url-pattern>
     </filter-mapping>
     <filter>
-        <filter-name>mailJobResults</filter-name>
-        <filter-class>dmitrygusev.ping.filters.MailJobResultsFilter</filter-class>
+        <filter-name>backupJobResults</filter-name>
+        <filter-class>dmitrygusev.ping.filters.BackupJobResultsFilter</filter-class>
     </filter>
     <filter-mapping>
-        <filter-name>mailJobResults</filter-name>
-        <url-pattern>/filters/mailJobResults/*</url-pattern>
+        <filter-name>backupJobResults</filter-name>
+        <url-pattern>/filters/backupJobResults/*</url-pattern>
     </filter-mapping>
     <filter>
         <filter-name>app</filter-name>

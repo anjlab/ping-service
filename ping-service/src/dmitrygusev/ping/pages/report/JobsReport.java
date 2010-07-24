@@ -87,7 +87,10 @@ public class JobsReport {
         {
             @Override 
             public Object get(Object instance) { 
-                return ((Job) instance).getCronString().replace("every ", "");
+                return ((Job) instance).getCronString()
+                            .replace("every ", "")
+                            .replace(" hours", "h")
+                            .replace(" minutes", "m");
             }
         });
         beanModel.add("lastBackupTimestamp", new AbstractReadonlyPropertyConduit() 
