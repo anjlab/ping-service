@@ -30,7 +30,7 @@ public class IPUtils {
             
             HTTPResponse fetch = urlFetchService.fetch(request);
             
-            Matcher matcher = Pattern.compile("(\\d+.\\d+.\\d+.\\d+)").matcher(new String(fetch.getContent()));
+            Matcher matcher = Pattern.compile("(\\d+\\.\\d+\\.\\d+\\.\\d+)").matcher(new String(fetch.getContent()));
             
             if (matcher.find()) {
                 return matcher.group(0);
