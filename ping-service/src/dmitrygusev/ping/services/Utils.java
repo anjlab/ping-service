@@ -513,4 +513,10 @@ public class Utils {
             return 0;
         }
     }
+
+    public static String formatTime(Date timestamp) {
+        return timestamp != null 
+             ? Application.DATETIME_FORMAT.format(timestamp) 
+             : "N/A";
+    }
 }

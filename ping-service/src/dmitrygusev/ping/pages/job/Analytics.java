@@ -33,8 +33,10 @@ import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
 import dmitrygusev.ping.pages.Index;
 import dmitrygusev.ping.services.Application;
+import dmitrygusev.ping.services.IPUtils;
 import dmitrygusev.ping.services.JobResultCSVExporter;
 import dmitrygusev.ping.services.Utils;
+import dmitrygusev.ping.services.IPUtils.IPLocation;
 
 public class Analytics {
 
@@ -239,4 +241,34 @@ public class Analytics {
         
         message = job.getLastPingSummary();
     }
+    
+    public String getLocationMetrics() {
+        IPLocation pingServiceLocation = getPingServiceLocation();
+        IPLocation pingURLLocation = getJobLocation();
+        
+        return "It is " + pingServiceLocation.distanceInMeters(pingURLLocation) 
+        + " meters from <span class='hoverable' title='" 
+        + pingServiceLocation + "'>Ping Service</span> to <span class='hoverable' title='" 
+        + pingURLLocation + "'>" 
+        + job.getTitleFriendly() + "</span>.";
+    }
+
+    private IPLocation pingServiceLocation;
+    
+    public IPLocation getPingServiceLocation() {
+        if (pingServiceLocation == null) {
+            pingServiceLocation = IPUtils.resolveLocation(IPUtils.resolveIp("http://ping-service.appspot.com"));
+        }
+        return pingServiceLocation;
+    }
+
+    private IPLocation jobLocation;
+    
+    public IPLocation getJobLocation() {
+        if (jobLocation == null) {
+            jobLocation = IPUtils.resolveLocation(IPUtils.resolveIp(job.getPingURL()));
+        }
+        return jobLocation;
+    }
+
 }

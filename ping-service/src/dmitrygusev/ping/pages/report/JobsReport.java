@@ -187,13 +187,7 @@ public class JobsReport {
     }
 
     public String getLastPingTimestamp() {
-        return formatTime(job.getLastPingTimestamp());
-    }
-
-    private String formatTime(Date timestamp) {
-        return timestamp != null 
-             ? Application.DATETIME_FORMAT.format(timestamp) 
-             : "N/A";
+        return Utils.formatTime(job.getLastPingTimestamp());
     }
 
     public String getLastBackupTimestampFriendly() {
@@ -209,14 +203,14 @@ public class JobsReport {
     }
 
     public String getLastBackupTimestamp() {
-        return formatTime(job.getLastBackupTimestamp());
+        return Utils.formatTime(job.getLastBackupTimestamp());
     }
     
     public String getCreatedAt() {
-        return formatTime(job.getCreatedAt());
+        return Utils.formatTime(job.getCreatedAt());
     }
     
     public String getUserLastVisit() {
-        return formatTime(accountDAO.getAccount((job).getSchedule().getName()).getLastVisitDate());
+        return Utils.formatTime(accountDAO.getAccount((job).getSchedule().getName()).getLastVisitDate());
     }
 }

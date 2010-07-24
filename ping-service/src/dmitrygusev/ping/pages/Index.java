@@ -268,5 +268,4 @@ public class Index {
         
         return beanModel;
     }
-
 }

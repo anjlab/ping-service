@@ -2,6 +2,7 @@ package dmitrygusev.ping.pages.report;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.tapestry5.annotations.BeforeRenderTemplate;
@@ -17,6 +18,7 @@ import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.Schedule;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.Utils;
+import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.ScheduleDAO;
 import dmitrygusev.tapestry5.AbstractReadonlyPropertyConduit;
 
@@ -24,9 +26,10 @@ public class SchedulesReport {
 
     @Inject
     private ScheduleDAO scheduleDAO;
-    @SuppressWarnings("unused")
     @Property
     private Schedule schedule;
+    @Inject
+    private AccountDAO accountDAO;
     
     private List<Schedule> schedules;
     
@@ -44,7 +47,9 @@ public class SchedulesReport {
     void beforeRender() {
         if (grid.getSortModel().getSortConstraints().isEmpty()) {
             //  ascending
-            grid.getSortModel().updateSort("name");
+            grid.getSortModel().updateSort("userLastVisit");
+            //  descending
+            grid.getSortModel().updateSort("userLastVisit");
         }
     }
     
@@ -64,6 +69,14 @@ public class SchedulesReport {
                 return ((Schedule) instance).getJobs().size();
             }
         });
+        beanModel.add("userLastVisit", new AbstractReadonlyPropertyConduit() 
+        {
+            @Override 
+            public Object get(Object instance) { 
+                Date date = accountDAO.getAccount(((Schedule) instance).getName()).getLastVisitDate();
+                return date == null ? null : Application.DATETIME_FORMAT.format(date);
+            }
+        });
         beanModel.add("SN", new AbstractReadonlyPropertyConduit() 
         {
             @Override 
@@ -80,6 +93,7 @@ public class SchedulesReport {
                         "SN",
                         "name",
                         "id",
+                        "userLastVisit",
                         "jobsCount",
                         "meta");
         
@@ -178,5 +192,13 @@ public class SchedulesReport {
         
         target.setMeta(null);
         scheduleDAO.update(target);
+    }
+    
+    public String getUserLastVisitFriendly() {
+        return Utils.getTimeAgoUpToDays(accountDAO.getAccount(schedule.getName()).getLastVisitDate());
+    }
+    
+    public String getUserLastVisit() {
+        return Utils.formatTime(accountDAO.getAccount(schedule.getName()).getLastVisitDate());
     }
 }

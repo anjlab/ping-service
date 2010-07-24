@@ -6,23 +6,23 @@
   </queue>
   <queue>
     <name>every5minutes</name>
-    <rate>20/m</rate>
-    <bucket-size>3</bucket-size>
+    <rate>30/m</rate>
+    <bucket-size>5</bucket-size>
   </queue>
   <queue>
     <name>every15minutes</name>
     <rate>6/m</rate>
-    <bucket-size>2</bucket-size>
+    <bucket-size>5</bucket-size>
   </queue>
   <queue>
     <name>every30minutes</name>
     <rate>6/m</rate>
-    <bucket-size>2</bucket-size>
+    <bucket-size>5</bucket-size>
   </queue>
   <queue>
     <name>every1hours</name>
     <rate>6/m</rate>
-    <bucket-size>2</bucket-size>
+    <bucket-size>5</bucket-size>
   </queue>
   <queue>
     <name>mail</name>

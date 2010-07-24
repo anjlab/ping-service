@@ -85,14 +85,16 @@
     </p>
 
     <t:grid empty="ACL is empty" source="accounts" row="account"
-           reorder="email, refAccessType" 
-           exclude="id, creationDate, lastVisitDate" add="delete">
-               <t:parameter name="deleteCell">
-                   <t:if test="deleteAccountLinkEnabled">
-                       <t:actionlink t:id="removeAccount" context="account.id">Delete</t:actionlink>
-                   </t:if>
-               </t:parameter>
-        </t:grid>
+            reorder="email, refAccessType" 
+            exclude="id, creationDate, lastVisitDate" add="delete">
+        
+        <t:parameter name="deleteCell">
+            <t:if test="deleteAccountLinkEnabled">
+                <t:actionlink t:id="removeAccount" context="account.id">Delete</t:actionlink>
+            </t:if>
+        </t:parameter>
+        
+    </t:grid>
 
     <t:footer/>
 </body>

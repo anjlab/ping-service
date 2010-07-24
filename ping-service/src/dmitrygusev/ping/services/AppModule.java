@@ -48,6 +48,7 @@ import org.tynamo.jpa.JPATransactionManager;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.apphosting.api.DeadlineExceededException;
 
 import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.JobDAO;
@@ -346,7 +347,11 @@ public class AppModule
             {
                 logger.error("Unexpected runtime exception: " + exception.getMessage(), exception);
                 
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
+                if (exception instanceof DeadlineExceededException) {
+                    response.sendError(HttpServletResponse.SC_GATEWAY_TIMEOUT, null);
+                } else {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
+                }
             }
         };
     }

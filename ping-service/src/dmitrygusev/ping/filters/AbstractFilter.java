@@ -121,7 +121,7 @@ public abstract class AbstractFilter implements Filter {
         }
         
         EntityManager em = emf.createEntityManager();
-    
+        
         EntityTransaction tx = null;
         
         try {

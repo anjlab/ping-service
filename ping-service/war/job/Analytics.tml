@@ -10,13 +10,22 @@
     <script type="text/javascript" src="${context:/js/excanvas.min.js}"></script> 
     <script type="text/javascript" src="${context:/js/jquery.flot.js}"></script>
     <script type="text/javascript" src="${context:/js/jquery.flot.pie.js}"></script>
+    <t:if test="!jobLocation.empty">
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        <script type="text/javascript">
+            var sourceLL = new google.maps.LatLng(${pingServiceLocation.latitude}, ${pingServiceLocation.longitude});
+            var targetLL = new google.maps.LatLng(${jobLocation.latitude}, ${jobLocation.longitude});
+            var sourceTitle = "${pingServiceLocation}";
+            var targetTitle = "${jobLocation}";
+        </script>
+    </t:if>
     <script type="text/javascript" src="${context:/js/analytics.js}"></script>
     <script type="text/javascript" src="${context:/js/ui.core.js}"></script>
     <script type="text/javascript" src="${context:/js/jquery.easing.js}"></script>
     <script type="text/javascript" src="${context:/js/jquery.scrollfollow.js}"></script>
 </head>
 <body>
-	<t:topbar/>
+    <t:topbar/>
 
     <t:if test="admin">
        <div class="admin-tasks">
@@ -24,22 +33,22 @@
             <t:actionlink t:id="runJob">Run This Job Now</t:actionlink>
        </div>
     </t:if>
-	
-   	<h2><t:logo/> Analytics Workspace</h2>
+    
+       <h2><t:logo/> Analytics Workspace</h2>
     <div>for "${job.titleFriendly}"<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a> [statistics based on last ${timeDiff} (from ${dateFrom} to ${dateTo})] <a href="/feedback?subject=Request for earlier data">Need earlier data? Send a request!</a></div>
     <font color="red"><p>${message}</p></font>
-   	
-   	<table>
-	   	<tr valign="top">
-		   	<td>
-			    <t:form>
-			        View: <t:select t:id="view" model="viewModel" value="view" onchange="document.forms[0].submit();"/>
-			        <t:submit t:id="changeView" value="Show" />
-			        &#160;
-			        <a href="/feedback?subject=Request for new Analytics View">Need more views? Send a request!</a>
-			    </t:form>
-			    
-				<div class="cubeToolbar">
+       
+       <table>
+           <tr valign="top">
+               <td>
+                <t:form>
+                    View: <t:select t:id="view" model="viewModel" value="view" onchange="document.forms[0].submit();"/>
+                    <t:submit t:id="changeView" value="Show" />
+                    &#160;
+                    <a href="/feedback?subject=Request for new Analytics View">Need more views? Send a request!</a>
+                </t:form>
+                
+                <div class="cubeToolbar">
                      <a href="javascript:collapseAll();">Collapse All</a>&#160;
                      <a href="javascript:collapseOne();">&#xAB; Less</a>&#160;
                      <a href="javascript:expandOne();">More &#xBB;</a>&#160;
@@ -47,96 +56,104 @@
                      <div class="overviewChartsButton" id="overviewChartsButton">
                          <a href="javascript:plotOverviewCharts();">Overview</a>
                      </div>
-				</div>
-		   		<t:outputraw value="cubeHTML" />
-				<p>   	
-			 	    Download raw data in 
-					<t:actionlink t:id="exportCSV">CSV</t:actionlink>
-					for analysis.
-				</p>
-		   	</td>
-		   	<td align="center" style="padding-left: 20px;">
-		   		<table id="charts">
-		   		<tr>
-			   		<td>
-				   		<div>
-		                    <h4 class="chartTitle">Chart</h4>
-		                    <div style="width: 350px; height: 200px;" id="chart"/>
-		                </div>
-		                <div>
-		                    <h4 class="chartTitle">Chart</h4>
-		                    <div style="width: 350px; height: 200px; display: hidden;" id="chart3"/>
-		                </div>
-	                </td>
-		   		    <td>
-		   		        <div>
+                </div>
+                <t:outputraw value="cubeHTML" />
+                <p>       
+                     Download raw data in 
+                    <t:actionlink t:id="exportCSV">CSV</t:actionlink>
+                    for analysis.
+                </p>
+                
+                <t:if test="!jobLocation.empty">
+                    <p>
+                        <t:outputraw value="locationMetrics" />
+                    </p>
+                </t:if>
+                
+                <div id="map_canvas"></div>
+               </td>
+               <td align="center" style="padding-left: 20px;">
+                   <table id="charts">
+                   <tr>
+                       <td>
+                           <div>
+                            <h4 class="chartTitle">Chart</h4>
+                            <div style="width: 350px; height: 200px;" id="chart"/>
+                        </div>
+                        <div>
+                            <h4 class="chartTitle">Chart</h4>
+                            <div style="width: 350px; height: 200px; display: hidden;" id="chart3"/>
+                        </div>
+                    </td>
+                       <td>
+                           <div>
                             <h4 class="chartTitle">Chart</h4>
                             <div style="width: 350px; height: 200px; display: hidden;" id="chart2"/>
                         </div>
-		                <div>
-		                    <h4 class="chartTitle">Chart</h4>
-		                    <div style="width: 350px; height: 200px; display: hidden;" id="chart4"/>
-		                </div>
-		   		    </td>
-		   		</tr>
-		   		</table>
-		   	</td>
-	   	</tr>
-   	</table>
-   	
-   	
-   	<script type="text/javascript">
-   		collapseAll();
-   		
-   		function showPrimaryChart() {
-   			$("#chart").parent().show();
-   		}
-   		
-   		function hidePrimaryChart() {
-   			$("#chart").parent().hide();
-   		}
-   		
-   		var overviewCharts = ["#chart2", "#chart3", "#chart4"];
-   		
-   		function hideOverviewCharts() {
-   		   for (var key in overviewCharts) {
-   		       $(overviewCharts[key]).parent().hide();
-   		   } 
-   		}
-   		
-   		function showOverviewCharts() {
+                        <div>
+                            <h4 class="chartTitle">Chart</h4>
+                            <div style="width: 350px; height: 200px; display: hidden;" id="chart4"/>
+                        </div>
+                       </td>
+                   </tr>
+                   </table>
+               </td>
+           </tr>
+       </table>
+       
+       
+       <script type="text/javascript">
+           collapseAll();
+           
+           function showPrimaryChart() {
+               $("#chart").parent().show();
+           }
+           
+           function hidePrimaryChart() {
+               $("#chart").parent().hide();
+           }
+           
+           var overviewCharts = ["#chart2", "#chart3", "#chart4"];
+           
+           function hideOverviewCharts() {
+              for (var key in overviewCharts) {
+                  $(overviewCharts[key]).parent().hide();
+              } 
+           }
+           
+           function showOverviewCharts() {
            for (var key in overviewCharts) {
                $(overviewCharts[key]).parent().show();
            } 
-   		}
-   		
-   		function plotOverviewCharts() {
-   			showOverviewCharts();
-   			
-   			var pies = $(".m-7");
-   			plotPieChart($($(pies.get(pies.length-1)).children().get(0)), "#chart2", "Total Availability, %");
-   			var histograms = $(".m-4");
-   			plotHistogramChart($($(histograms.get(histograms.length-1)).children().get(0)), "#chart4", "Total Response Time, ms");
-			removeHighlights();
-   			plotLineChart($($(".m-0").get(0)), "#chart3");
-   			plotLineChart($($(".m-5").get(0)), "#chart");
-   		}
-   		
-   		if ($("#view").val().indexOf("day") != 0) {
-   			plotOverviewCharts();
-  		} else {
-  			$("#overviewChartsButton").hide();
-  			hidePrimaryChart();
-  			hideOverviewCharts();
-  			
-  			showPrimaryChart();
-  			removeHighlights();
+           }
+           
+           function plotOverviewCharts() {
+               showOverviewCharts();
+               
+               var pies = $(".m-7");
+               plotPieChart($($(pies.get(pies.length-1)).children().get(0)), "#chart2", "Total Availability, %");
+               var histograms = $(".m-4");
+               plotHistogramChart($($(histograms.get(histograms.length-1)).children().get(0)), "#chart4", "Total Response Time, ms");
+            removeHighlights();
+               plotLineChart($($(".m-0").get(0)), "#chart3");
+               plotLineChart($($(".m-5").get(0)), "#chart");
+           }
+           
+           if ($("#view").val().indexOf("day") != 0) {
+               plotOverviewCharts();
+          } else {
+              $("#overviewChartsButton").hide();
+              hidePrimaryChart();
+              hideOverviewCharts();
+              
+              showPrimaryChart();
+              removeHighlights();
             plotLineChart($($(".m-0").filter(".ix-1")), "#chart");
-  		}
-  		
-  		$("#charts").scrollFollow( { speed: 'fast' } );
-   	</script>
-   	
-	<t:footer/>
+          }
+          
+          $("#charts").scrollFollow( { speed: 'fast' } );
+       </script>
+       
+    <t:footer/>
 </body>
 </html>

@@ -16,6 +16,10 @@
     <t:grid t:id="grid" source="schedules" row="schedule"
         model="model" rowsperpage="1000" rowClass="literal:job">
 
+        <t:parameter name="userLastVisitCell">
+            <div title="${userLastVisit}">${userLastVisitFriendly}</div>
+        </t:parameter>
+
         <t:parameter name="mergeCell">
             <t:if test="schedule.meta">
                 <t:actionlink t:id="merge" context="schedule.id">Merge</t:actionlink>

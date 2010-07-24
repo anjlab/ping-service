@@ -1,11 +1,11 @@
 .c-cd {
-	text-align: center;
-	padding-bottom: 1px !important;
+    text-align: center;
+    padding-bottom: 1px !important;
 }
 
 .chartTitle {
-	text-align: left;
-	border-bottom: 1px #999 solid;
+    text-align: left;
+    border-bottom: 1px #999 solid;
 }
 
 .overviewChartsButton {
@@ -14,5 +14,14 @@
 }
 
 .cubeToolbar {
-	padding-bottom: 2px;
+    padding-bottom: 2px;
+}
+
+.hoverable {
+    border-bottom: 1px dotted gray;
+}
+
+#map_canvas {
+    width: 100%;
+    height: 300px;
 }
