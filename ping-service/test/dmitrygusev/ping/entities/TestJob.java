@@ -14,50 +14,50 @@ import dmitrygusev.ping.services.Application;
 
 public class TestJob {
 
-	@Test
-	public void testJobResult() {
-		Job job = new Job();
-		
-		job.setLastPingTimestamp(new Date(0));
-		job.setLastPingResult(Job.PING_RESULT_NOT_AVAILABLE);
-		
-		StringBuilder sb = new StringBuilder();
-		String formattedDate = Application.formatDate(job.getLastPingTimestamp(), "Moscow", Application.DATETIME_FORMAT);
-		Job.buildLastPingSummary(job, sb);
-		
-		Assert.assertEquals("1970-01-01 03:00:00", formattedDate);
-		Assert.assertEquals("N/A", sb.toString());
+    @Test
+    public void testJobResult() {
+        Job job = new Job();
+        
+        job.setLastPingTimestamp(new Date(0));
+        job.setLastPingResult(Job.PING_RESULT_NOT_AVAILABLE);
+        
+        StringBuilder sb = new StringBuilder();
+        String formattedDate = Application.formatDate(job.getLastPingTimestamp(), "Moscow", Application.DATETIME_FORMAT);
+        Job.buildLastPingSummary(job, sb);
+        
+        Assert.assertEquals("1970-01-01 03:00:00", formattedDate);
+        Assert.assertEquals("N/A", sb.toString());
 
-		job.setLastPingResult(Job.PING_RESULT_OK);
+        job.setLastPingResult(Job.PING_RESULT_OK);
 
-		sb = new StringBuilder();
-		formattedDate = Application.formatDate(job.getLastPingTimestamp(), "Moscow", Application.DATETIME_FORMAT);
-		Job.buildLastPingSummary(job, sb);
-		
-		Assert.assertEquals("1970-01-01 03:00:00", formattedDate);
-		Assert.assertEquals("Okay", sb.toString());
-	}
+        sb = new StringBuilder();
+        formattedDate = Application.formatDate(job.getLastPingTimestamp(), "Moscow", Application.DATETIME_FORMAT);
+        Job.buildLastPingSummary(job, sb);
+        
+        Assert.assertEquals("1970-01-01 03:00:00", formattedDate);
+        Assert.assertEquals("Okay", sb.toString());
+    }
 
-	@Test
-	public void testSerializeJobResults() throws Exception {
-	    Job job = new Job();
-	    
-	    job.beginUpdateJobResults();
-	    
-	    for (int i = 0; i < 10000; i += 1) {
-	        if (i % 1000 == 0) {
-	            long startTime = System.currentTimeMillis();
+    @Test
+    public void testSerializeJobResults() throws Exception {
+        Job job = new Job();
+        
+        job.beginUpdateJobResults();
+        
+        for (int i = 0; i < 10000; i += 1) {
+            if (i % 1000 == 0) {
+                long startTime = System.currentTimeMillis();
 
-	            job.packJobResults();
-	            
-	            long endTime = System.currentTimeMillis();
-	            
-	            System.out.println(job.getRecentJobResults(100000).size() + " items = " + 
-	                    job.getPackedJobResultsLength() + " bytes " + (endTime - startTime));
-	        }
+                job.packJobResults();
+                
+                long endTime = System.currentTimeMillis();
+                
+                System.out.println(job.getRecentJobResults(100000).size() + " items = " + 
+                        job.getPackedJobResultsLength() + " bytes " + (endTime - startTime));
+            }
             job.addJobResult(new JobResult());
-	    }
-	}
+        }
+    }
 
     @Test
     public void testReadJobResults() throws IOException {

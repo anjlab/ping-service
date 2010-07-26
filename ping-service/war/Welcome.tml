@@ -25,8 +25,8 @@
             </p>
 
             <t:pagelink page="job/analytics" context="pingServiceJobContext">
-	            <img src="images/analytics-demo.png" width="500" height="238" alt="Analytics Workspace Demo"
-	                style="border: 5px lightblue solid; padding: 5px;" />
+                <img src="images/analytics-demo.png" width="500" height="238" alt="Analytics Workspace Demo"
+                    style="border: 5px lightblue solid; padding: 5px;" />
             </t:pagelink>
         </div>
 

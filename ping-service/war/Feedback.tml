@@ -6,26 +6,26 @@
     <link rel="stylesheet" type="text/css" href="${context:/css/feedback.css}" />
 </head>
 <body>
-	<t:topbar />
+    <t:topbar />
 
-	<h2><t:logo/> Feedback</h2>
+    <h2><t:logo/> Feedback</h2>
 
-	<div align="center">
-	<font color="green" weight="bold"><p>${thanks}</p></font>
-	<t:form>
-		<table>
-		<tr>
-			<td valign="top"><t:label for="message">Message:</t:label></td> 
-			<td><t:textarea t:id="message" value="message" />
-			<br/><font color="Gray">${note}</font></td>
-		</tr>
-		<tr>
-			<td colspan="2" align="right"><t:submit value="Send Feedback"/></td>
-		</tr>
-		</table>
-	</t:form>
-	</div> 
+    <div align="center">
+    <font color="green" weight="bold"><p>${thanks}</p></font>
+    <t:form>
+        <table>
+        <tr>
+            <td valign="top"><t:label for="message">Message:</t:label></td> 
+            <td><t:textarea t:id="message" value="message" />
+            <br/><font color="Gray">${note}</font></td>
+        </tr>
+        <tr>
+            <td colspan="2" align="right"><t:submit value="Send Feedback"/></td>
+        </tr>
+        </table>
+    </t:form>
+    </div> 
 
-	<t:footer/>
+    <t:footer/>
 </body>
 </html>

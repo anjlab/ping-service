@@ -13,15 +13,15 @@ import dmitrygusev.ping.filters.RunJobFilter;
 
 public interface JobDAO {
     @CommitAfter
-	public abstract List<Key> getJobsByCronString(String cronString);
-	@CommitAfter
-	public abstract void delete(Long scheduleId, Long jobId);
-	@CommitAfter
-	public abstract void update(Job job, boolean commitAfter);
+    public abstract List<Key> getJobsByCronString(String cronString);
     @CommitAfter
-	public abstract Job find(Long scheduleId, Long jobId);
+    public abstract void delete(Long scheduleId, Long jobId);
     @CommitAfter
-	public abstract Job find(Key jobKey);
+    public abstract void update(Job job, boolean commitAfter);
+    @CommitAfter
+    public abstract Job find(Long scheduleId, Long jobId);
+    @CommitAfter
+    public abstract Job find(Key jobKey);
     @CommitAfter
     public abstract List<Job> getAll();
     /**

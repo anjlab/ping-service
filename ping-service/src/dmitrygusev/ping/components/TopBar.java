@@ -8,14 +8,14 @@ import dmitrygusev.ping.services.GAEHelper;
 
 public class TopBar {
 
-	@Inject
-	private GAEHelper gaeHelper;
-	
-	public Principal getPrincipal() {
-		return gaeHelper.getUserPrincipal();
-	}
-	
-	public String getLogoutURL() {
-		return gaeHelper.createLogoutURL("/");
-	}
+    @Inject
+    private GAEHelper gaeHelper;
+    
+    public Principal getPrincipal() {
+        return gaeHelper.getUserPrincipal();
+    }
+    
+    public String getLogoutURL() {
+        return gaeHelper.createLogoutURL("/");
+    }
 }

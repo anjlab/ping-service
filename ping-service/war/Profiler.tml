@@ -1,12 +1,12 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
     <head>
         <title>Profiler</title>
-		<link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
+        <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
         <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     </head>
     <body>
 
-		<h1>Live Profiling Results</h1>
+        <h1>Live Profiling Results</h1>
 
         <t:pagelink page="profiler" context="null">Plain View</t:pagelink>
         &#160;
@@ -17,7 +17,7 @@
         <t:actionlink t:id="resetStatistics">Reset Statistics</t:actionlink>
 
         <ol>
-	        <t:loop source="tracePath" value="item">
+            <t:loop source="tracePath" value="item">
                 <li style="margin-left: ${itemPaddingLeft};">
                     ${itemLeaf.methodName}
                     &#160;
@@ -26,14 +26,14 @@
             </t:loop>
         </ol>
 
-		<t:grid source="methods" row="signature" rowsperpage="1000" model="model">
-		  <t:parameter name="drilldownCell">
+        <t:grid source="methods" row="signature" rowsperpage="1000" model="model">
+          <t:parameter name="drilldownCell">
               <t:pagelink page="profiler" context="${drilldownContext}">View</t:pagelink>
-		  </t:parameter>
-		  <t:parameter name="traceIntoCell">
-		      <t:pagelink page="profiler" context="${traceIntoContext}">View</t:pagelink>
-		  </t:parameter>
-		</t:grid>
-		
+          </t:parameter>
+          <t:parameter name="traceIntoCell">
+              <t:pagelink page="profiler" context="${traceIntoContext}">View</t:pagelink>
+          </t:parameter>
+        </t:grid>
+        
     </body>
 </html>

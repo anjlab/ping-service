@@ -21,66 +21,66 @@ import dmitrygusev.ping.services.Utils;
 public class CreateJob {
 
     private static final Logger logger = LoggerFactory.getLogger(CreateJob.class);
-	private Job job;
-	
-	public Job getJob() {
-		if (job == null) {
-			job = getDefaultJob();
-		}
-		return job;
-	}
-	
-	public void setJob(Job job) {
-		this.job = job;
-	}
+    private Job job;
+    
+    public Job getJob() {
+        if (job == null) {
+            job = getDefaultJob();
+        }
+        return job;
+    }
+    
+    public void setJob(Job job) {
+        this.job = job;
+    }
 
-	@Inject
-	private GAEHelper gaeHelper;
-	
-	private Job getDefaultJob() {
-		Job result = new Job();
-		
-		result.setPingURL("http://");
-		result.setReportEmail(gaeHelper.getUserPrincipal().getName());
-		result.setUsesValidatingHttpCode(true);
-		result.setValidatingHttpCode(-200);
-		result.setCronString("every 1 hour");
-		result.setResponseEncoding("UTF-8");
-		result.setCreatedAt(new Date());
-		
-		return result;
-	}
-	
-	@Property
-	private final String httpCodesModel = Utils.getHttpCodesModel();
-	
-	@Property
-	private final String cronStringModel = Utils.getCronStringModel();
-	
-	@InjectPage
-	private Index index;
-	
-	@Property
-	@Persist
-	private String message;
+    @Inject
+    private GAEHelper gaeHelper;
+    
+    private Job getDefaultJob() {
+        Job result = new Job();
+        
+        result.setPingURL("http://");
+        result.setReportEmail(gaeHelper.getUserPrincipal().getName());
+        result.setUsesValidatingHttpCode(true);
+        result.setValidatingHttpCode(-200);
+        result.setCronString("every 1 hour");
+        result.setResponseEncoding("UTF-8");
+        result.setCreatedAt(new Date());
+        
+        return result;
+    }
+    
+    @Property
+    private final String httpCodesModel = Utils.getHttpCodesModel();
+    
+    @Property
+    private final String cronStringModel = Utils.getCronStringModel();
+    
+    @InjectPage
+    private Index index;
+    
+    @Property
+    @Persist
+    private String message;
 
-	@AfterRender
-	public void cleanup() {
-		message = null;
-	}
+    @AfterRender
+    public void cleanup() {
+        message = null;
+    }
 
-	@Inject
-	private Application application;
-	
-	public Index onSuccess() {
-		try {
-			application.createJob(job);
+    @Inject
+    private Application application;
+    
+    public Index onSuccess() {
+        try {
+            application.createJob(job);
 
-			return index;
-		} catch (Exception e) {
-			message = e.getMessage();
-			logger.error("Error creating job", e);
-		}
-		return null;
-	}
+            return index;
+        } catch (Exception e) {
+            message = e.getMessage();
+            logger.error("Error creating job", e);
+        }
+        return null;
+    }
 }

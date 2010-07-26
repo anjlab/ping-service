@@ -22,70 +22,70 @@ public class GAEHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(GAEHelper.class);
     
-	private RequestGlobals requestGlobals;
+    private RequestGlobals requestGlobals;
     private UserService userService;
 
     private Map<String, String> cachedLoginUrls;
     private Map<String, String> cachedLogoutUrls;
     
     public GAEHelper(RequestGlobals requestGlobals) {
-		this.requestGlobals = requestGlobals;
-		this.userService = UserServiceFactory.getUserService();
-		
-		this.cachedLoginUrls = new HashMap<String, String>();
-		this.cachedLogoutUrls = new HashMap<String, String>();
-	}
+        this.requestGlobals = requestGlobals;
+        this.userService = UserServiceFactory.getUserService();
+        
+        this.cachedLoginUrls = new HashMap<String, String>();
+        this.cachedLogoutUrls = new HashMap<String, String>();
+    }
     
-	public Principal getUserPrincipal() {
-		return requestGlobals.getHTTPServletRequest().getUserPrincipal();
-	}
+    public Principal getUserPrincipal() {
+        return requestGlobals.getHTTPServletRequest().getUserPrincipal();
+    }
 
-	public String createLoginURL() {
-		return createLoginURL(requestGlobals.getHTTPServletRequest().getRequestURI());
-	}
+    public String createLoginURL() {
+        return createLoginURL(requestGlobals.getHTTPServletRequest().getRequestURI());
+    }
 
-	public String createLogoutURL() {
-		return createLogoutURL(requestGlobals.getHTTPServletRequest().getRequestURI());
-	}
+    public String createLogoutURL() {
+        return createLogoutURL(requestGlobals.getHTTPServletRequest().getRequestURI());
+    }
 
-	public String createLogoutURL(String returnURL) {
-	    if (!cachedLogoutUrls.containsKey(returnURL)) {
-	        cachedLogoutUrls.put(returnURL, userService.createLogoutURL(returnURL));
-	    }
-	    return cachedLogoutUrls.get(returnURL);
-	}
+    public String createLogoutURL(String returnURL) {
+        if (!cachedLogoutUrls.containsKey(returnURL)) {
+            cachedLogoutUrls.put(returnURL, userService.createLogoutURL(returnURL));
+        }
+        return cachedLogoutUrls.get(returnURL);
+    }
 
-	public String createLoginURL(String returnURL) {
-	    if (!cachedLoginUrls.containsKey(returnURL)) {
+    public String createLoginURL(String returnURL) {
+        if (!cachedLoginUrls.containsKey(returnURL)) {
             cachedLoginUrls.put(returnURL, userService.createLoginURL(returnURL));
         }
         return cachedLoginUrls.get(returnURL);
-	}
+    }
 
-	public static TaskOptions buildTaskUrl(String path) {
-		return url(path.endsWith("/") ? path : path + "/").method(Method.GET);
-	}
-	
-	public static void addTaskNonTransactional(Queue queue, TaskOptions options) {
-	    addTaskNonTransactional(queue, Arrays.asList(options));
-	}
+    public static TaskOptions buildTaskUrl(String path) {
+        return url(path.endsWith("/") ? path : path + "/").method(Method.GET);
+    }
+    
+    public static void addTaskNonTransactional(Queue queue, TaskOptions options) {
+        addTaskNonTransactional(queue, Arrays.asList(options));
+    }
 
     public static void addTaskNonTransactional(Queue queue, Iterable<TaskOptions> options) {
         int retryCount = 0;
         while (true) {
             try {
-    	        queue.add(null, options);
-    	        break;
-    	    } catch (TransientFailureException e) {
-    	        retryCount++;
-    	        
-    	        if (retryCount > 3) {
-    	            logger.error("Give up");
-    	            break;
-    	        }
-    	        
-    	        logger.debug("Retry #{} after TransientFailureException: {}", retryCount, e);
-    	    }
+                queue.add(null, options);
+                break;
+            } catch (TransientFailureException e) {
+                retryCount++;
+                
+                if (retryCount > 3) {
+                    logger.error("Give up");
+                    break;
+                }
+                
+                logger.debug("Retry #{} after TransientFailureException: {}", retryCount, e);
+            }
         }
     }
 }

@@ -13,49 +13,49 @@ import dmitrygusev.ping.services.dao.AccountDAO;
 
 public class Settings {
 
-	@Property
-	@Persist(PersistenceConstants.FLASH)
-	@SuppressWarnings("unused")
-	private String message;
+    @Property
+    @Persist(PersistenceConstants.FLASH)
+    @SuppressWarnings("unused")
+    private String message;
 
-	@Property
-	@Persist(PersistenceConstants.FLASH)
-	@SuppressWarnings("unused")
-	private String messageColor;
+    @Property
+    @Persist(PersistenceConstants.FLASH)
+    @SuppressWarnings("unused")
+    private String messageColor;
 
-	@Property
-	@SuppressWarnings("unused")
-	private final String timeZoneModel = Utils.getTimeZoneModel();
-	
-	@AfterRender
-	public void cleanup() {
-		userAccount = null;
-	}
-	
-	@Inject
-	private Application application;
-	
-	private Account userAccount;
-	
-	public Account getUserAccount() {
-		if (userAccount == null) {
-			userAccount = application.getUserAccount();
-		}
-		return userAccount;
-	}
-	
-	@Inject
-	private AccountDAO accountDAO;
-	
-	public void onSuccess() {
-		try {
-			accountDAO.update(getUserAccount());
-			
-			this.messageColor = "green";
-		} catch (Exception e) {
-			this.message = e.getMessage();
-			this.messageColor = "red";
-		}
-	}
-	
+    @Property
+    @SuppressWarnings("unused")
+    private final String timeZoneModel = Utils.getTimeZoneModel();
+    
+    @AfterRender
+    public void cleanup() {
+        userAccount = null;
+    }
+    
+    @Inject
+    private Application application;
+    
+    private Account userAccount;
+    
+    public Account getUserAccount() {
+        if (userAccount == null) {
+            userAccount = application.getUserAccount();
+        }
+        return userAccount;
+    }
+    
+    @Inject
+    private AccountDAO accountDAO;
+    
+    public void onSuccess() {
+        try {
+            accountDAO.update(getUserAccount());
+            
+            this.messageColor = "green";
+        } catch (Exception e) {
+            this.message = e.getMessage();
+            this.messageColor = "red";
+        }
+    }
+    
 }

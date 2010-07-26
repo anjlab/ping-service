@@ -1,7 +1,7 @@
 <div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd">
     <t:content>
-	    <a href="/">
-	        <img src="${context:/images/ping-service.png}" class="logo" width="112" height="23" alt="Home"/>
-	    </a>
+        <a href="/">
+            <img src="${context:/images/ping-service.png}" class="logo" width="112" height="23" alt="Home"/>
+        </a>
     </t:content>
 </div>

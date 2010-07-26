@@ -9,16 +9,16 @@ import dmitrygusev.ping.entities.Ref;
 import dmitrygusev.ping.entities.Schedule;
 
 public interface RefDAO {
-	@CommitAfter
-	public abstract Ref addRef(Account account, Schedule schedule, int accessType);
-	@CommitAfter
-	public abstract void removeRef(Long id);
     @CommitAfter
-	public abstract List<Ref> getRefs(Account account);
+    public abstract Ref addRef(Account account, Schedule schedule, int accessType);
     @CommitAfter
-	public abstract List<Ref> getRefs(Schedule schedule);
+    public abstract void removeRef(Long id);
     @CommitAfter
-	public abstract Ref find(Account find, Schedule schedule);
-	@CommitAfter
-	public abstract Ref find(Long id);
+    public abstract List<Ref> getRefs(Account account);
+    @CommitAfter
+    public abstract List<Ref> getRefs(Schedule schedule);
+    @CommitAfter
+    public abstract Ref find(Account find, Schedule schedule);
+    @CommitAfter
+    public abstract Ref find(Long id);
 }

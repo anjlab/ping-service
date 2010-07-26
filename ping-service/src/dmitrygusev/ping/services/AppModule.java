@@ -73,7 +73,7 @@ public class AppModule
     {
         binder.bind(JobExecutor.class).preventReloading().preventDecoration();
         binder.bind(Mailer.class).preventReloading().preventDecoration();
-        
+
         binder.bind(AccountDAO.class, AccountDAOImplCache.class).preventReloading();
         binder.bind(JobDAO.class, JobDAOImplCache.class).preventReloading();
         binder.bind(RefDAO.class, RefDAOImplCache.class).preventReloading();
@@ -81,7 +81,7 @@ public class AppModule
     }
 
     public static void contributeIgnoredPathsFilter(Configuration<String> configuration) {
-    	//	GAE filters
+        //    GAE filters
         configuration.add("/_ah/.*");
         //  GAE Appstats
         configuration.add("/appstats/.*");
@@ -99,42 +99,42 @@ public class AppModule
                                                RequestGlobals globals,
                                                MemcacheService memcache)
     {
-    	return new Application(accountDAO, jobDAO, scheduleDAO, 
-    			refDAO, gaeHelper, jobExecutor, mailer, linkSource,
-    			globals);
+        return new Application(accountDAO, jobDAO, scheduleDAO, 
+                refDAO, gaeHelper, jobExecutor, mailer, linkSource,
+                globals);
     }
 
     public static Cache buildCache(Logger logger) {
         try {
-        	CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
-			Cache cache = cacheFactory.createCache(Collections.emptyMap());
-			return new LocalMemorySoftCache(cache);
-		} catch (CacheException e) {
-			logger.error("Error instantiating cache", e);
-			return null;
-		}
+            CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
+            Cache cache = cacheFactory.createCache(Collections.emptyMap());
+            return cache;
+        } catch (CacheException e) {
+            logger.error("Error instantiating cache", e);
+            return null;
+        }
     }
 
     public static MemcacheService buildMemcacheService(Logger logger) {
-    	MemcacheService memcacheService = MemcacheServiceFactory.getMemcacheService();
-    	
-    	if (memcacheService == null) {
-    		logger.error("MemcacheService is null.");
-    	}
-    	
-    	return memcacheService;
+        MemcacheService memcacheService = MemcacheServiceFactory.getMemcacheService();
+        
+        if (memcacheService == null) {
+            logger.error("MemcacheService is null.");
+        }
+        
+        return memcacheService;
     }
     
     public static GAEHelper buildGAEHelper(RequestGlobals requestGlobals) {
-    	return new GAEHelper(requestGlobals);
+        return new GAEHelper(requestGlobals);
     }
     
     public static AccessController buildAccessController(GAEHelper helper, RequestGlobals globals) {
-    	return new AccessController(helper, globals);
+        return new AccessController(helper, globals);
     }
     
     public static Logger buildLogger() {
-    	return LoggerFactory.getLogger(AppModule.class);
+        return LoggerFactory.getLogger(AppModule.class);
     }
     
     public static void contributeApplicationDefaults(
@@ -155,8 +155,8 @@ public class AppModule
         configuration.add(SymbolConstants.COMPRESS_WHITESPACE, "true");
 
         configuration.add(JPASymbols.PERSISTENCE_UNIT, "transactions-optional");
-        //	DataNucleus' GAE implementation doesn't provide EMF.getMetamodel() which is required for
-        //	providing entity value encoders
+        //    DataNucleus' GAE implementation doesn't provide EMF.getMetamodel() which is required for
+        //    providing entity value encoders
         configuration.add(JPASymbols.PROVIDE_ENTITY_VALUE_ENCODERS, "false");
         
         configuration.add(SymbolConstants.APPLICATION_VERSION, "beta");
@@ -228,14 +228,14 @@ public class AppModule
      * that implement RequestFilter (defined in other modules).
      */
     public void contributeRequestHandler(OrderedConfiguration<RequestFilter> configuration,
-    		@InjectService("TimingFilter") final RequestFilter timingFilter,
+            @InjectService("TimingFilter") final RequestFilter timingFilter,
             @InjectService("Utf8Filter") final RequestFilter utf8Filter)
     {
         // Each contribution to an ordered configuration has a name, When necessary, you may
         // set constraints to precisely control the invocation order of the contributed filter
         // within the pipeline.
         
-    	configuration.add("Utf8Filter", utf8Filter); // handle UTF-8
+        configuration.add("Utf8Filter", utf8Filter); // handle UTF-8
         configuration.add("Timing", timingFilter);
     }
 
@@ -245,20 +245,20 @@ public class AppModule
     }
     
     public void contributeValidationMessagesSource(OrderedConfiguration<String> configuration) {
-		String messagesSource = TimeTranslator.class.getName().replace(".", "/");
-		configuration.add("time-translator", messagesSource);
-	}
+        String messagesSource = TimeTranslator.class.getName().replace(".", "/");
+        configuration.add("time-translator", messagesSource);
+    }
 
     public RequestFilter buildUtf8Filter(
-			@InjectService("RequestGlobals") final RequestGlobals requestGlobals) {
-		return new RequestFilter() {
-			public boolean service(Request request, Response response, 
-					RequestHandler handler) throws IOException {
-				requestGlobals.getHTTPServletRequest().setCharacterEncoding("UTF-8");
-				return handler.service(request, response);
-			}
-		};
-	}
+            @InjectService("RequestGlobals") final RequestGlobals requestGlobals) {
+        return new RequestFilter() {
+            public boolean service(Request request, Response response, 
+                    RequestHandler handler) throws IOException {
+                requestGlobals.getHTTPServletRequest().setCharacterEncoding("UTF-8");
+                return handler.service(request, response);
+            }
+        };
+    }
     
     public JPAEntityManagerSource buildLazyJPAEntityManagerSource(
             @Inject @Symbol(JPASymbols.PERSISTENCE_UNIT) String persistenceUnit, 
@@ -308,24 +308,24 @@ public class AppModule
                                          final ComponentEventLinkEncoder linkEncoder, 
                                          final RequestGlobals globals)
     {
-    	configuration.add(NO_MARKUP_SYMBOL, 
-        	new MarkupRendererFilter()
-        	{
-    			@Override
-    			public void renderMarkup(MarkupWriter writer, MarkupRenderer renderer) {
-    		        PageRenderRequestParameters parameters = linkEncoder.decodePageRenderRequest(globals.getRequest());
+        configuration.add(NO_MARKUP_SYMBOL, 
+            new MarkupRendererFilter()
+            {
+                @Override
+                public void renderMarkup(MarkupWriter writer, MarkupRenderer renderer) {
+                    PageRenderRequestParameters parameters = linkEncoder.decodePageRenderRequest(globals.getRequest());
     
-    				boolean noMarkup = metaDataLocator.findMeta(NO_MARKUP_SYMBOL, parameters.getLogicalPageName(), 
-    				                                            Boolean.class);
-    				
-    				if (noMarkup) {
+                    boolean noMarkup = metaDataLocator.findMeta(NO_MARKUP_SYMBOL, parameters.getLogicalPageName(), 
+                                                                Boolean.class);
+                    
+                    if (noMarkup) {
                         //  Provide default (empty) markup
                         writer.element("html");
-    				} else {
+                    } else {
                         renderer.renderMarkup(writer);
-    				}
-    			}
-    		}, "before:*");
+                    }
+                }
+            }, "before:*");
     }
     
     public static void contributeClasspathAssetAliasManager(MappedConfiguration<String, String> configuration)

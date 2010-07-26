@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-	<application>ping-service</application>
-	<version>beta</version>
-	<sessions-enabled>true</sessions-enabled>
-	<precompilation-enabled>true</precompilation-enabled> 
-	
-	<!-- Configure java.util.logging -->
-	<system-properties>
-		<property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
-	</system-properties>
-	
+    <application>ping-service</application>
+    <version>beta</version>
+    <sessions-enabled>true</sessions-enabled>
+    <precompilation-enabled>true</precompilation-enabled> 
+    
+    <!-- Configure java.util.logging -->
+    <system-properties>
+        <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
+    </system-properties>
+    
     <admin-console>
         <page name="Appstats" url="/appstats/" />
     </admin-console>

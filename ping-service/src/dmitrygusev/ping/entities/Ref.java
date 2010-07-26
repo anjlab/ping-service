@@ -13,7 +13,7 @@ import com.google.appengine.api.datastore.Key;
 @Entity
 public class Ref implements Serializable {
 
-	/**
+    /**
      * 
      */
     private static final long serialVersionUID = -5725956849471055726L;
@@ -21,45 +21,45 @@ public class Ref implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-	@Basic
-	private Key accountKey;
-	@Basic
-	private Key scheduleKey;
-	
-	private int accessType;
-	
-	public static final int ACCESS_TYPE_READONLY = 0;
-	public static final int ACCESS_TYPE_FULL = 1;
+    @Basic
+    private Key accountKey;
+    @Basic
+    private Key scheduleKey;
+    
+    private int accessType;
+    
+    public static final int ACCESS_TYPE_READONLY = 0;
+    public static final int ACCESS_TYPE_FULL = 1;
 
-	public String getAccessTypeFriendly() {
-		switch (accessType) {
-		case ACCESS_TYPE_FULL:
-			return "Full";
-		case ACCESS_TYPE_READONLY:
-			return "Read Only";
-		default:
-			return "?";
-		}
-	}
-	public Key getAccountKey() {
-		return accountKey;
-	}
-	public void setAccountKey(Key accountKey) {
-		this.accountKey = accountKey;
-	}
-	public Key getScheduleKey() {
-		return scheduleKey;
-	}
-	public void setScheduleKey(Key scheduleKey) {
-		this.scheduleKey = scheduleKey;
-	}
-	public int getAccessType() {
-		return accessType;
-	}
-	public void setAccessType(int accessType) {
-		this.accessType = accessType;
-	}
-	public Long getId() {
-		return id;
-	}
+    public String getAccessTypeFriendly() {
+        switch (accessType) {
+        case ACCESS_TYPE_FULL:
+            return "Full";
+        case ACCESS_TYPE_READONLY:
+            return "Read Only";
+        default:
+            return "?";
+        }
+    }
+    public Key getAccountKey() {
+        return accountKey;
+    }
+    public void setAccountKey(Key accountKey) {
+        this.accountKey = accountKey;
+    }
+    public Key getScheduleKey() {
+        return scheduleKey;
+    }
+    public void setScheduleKey(Key scheduleKey) {
+        this.scheduleKey = scheduleKey;
+    }
+    public int getAccessType() {
+        return accessType;
+    }
+    public void setAccessType(int accessType) {
+        this.accessType = accessType;
+    }
+    public Long getId() {
+        return id;
+    }
 }
