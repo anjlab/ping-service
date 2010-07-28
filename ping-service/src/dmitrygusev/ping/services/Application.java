@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Filter;
 
 import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
@@ -482,6 +483,10 @@ public class Application {
         }
     }
 
+    private final static java.util.logging.Logger transactionLogger = 
+        java.util.logging.Logger.getLogger("DataNucleus.Transaction");
+
+    private final static Filter transactionFilter = new DataNucleusTransactionLoggingFilter();
     /**
      * 
      * @param job
@@ -490,6 +495,9 @@ public class Application {
      */
     private boolean internalUpdateJob(Job job, boolean commitAfter) {
         try {
+            //  Configure logger to change level of "Operation commit failed on resource..." error to WARNING
+            transactionLogger.setFilter(transactionFilter);
+
             jobDAO.update(job, commitAfter);
             return true;
         } catch (RollbackException e) {

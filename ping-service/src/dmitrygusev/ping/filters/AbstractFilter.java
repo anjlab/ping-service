@@ -15,6 +15,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.jsr107cache.Cache;
+
 import org.apache.tapestry5.EventContext;
 import org.apache.tapestry5.Link;
 import org.apache.tapestry5.internal.services.LinkImpl;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import dmitrygusev.ping.services.AppModule;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.JobExecutor;
+import dmitrygusev.ping.services.LocalMemorySoftCache;
 import dmitrygusev.ping.services.Mailer;
 import dmitrygusev.ping.services.dao.JobDAO;
 import dmitrygusev.ping.services.dao.impl.cache.JobDAOImplCache;
@@ -44,6 +47,8 @@ public abstract class AbstractFilter implements Filter {
 
     protected final RequestGlobals globals = new RequestGlobalsImpl();
 
+    protected Cache cache; 
+    
     public AbstractFilter() {
         super();
     }
@@ -59,7 +64,9 @@ public abstract class AbstractFilter implements Filter {
         
         emf = Persistence.createEntityManagerFactory("transactions-optional");
         
-        jobDAO = new JobDAOImplCache(AppModule.buildCache(logger));
+        cache = AppModule.buildCache(logger, null);
+        
+        jobDAO = new JobDAOImplCache(cache);
         
         application = new Application(null, 
                                       jobDAO, 
@@ -146,6 +153,10 @@ public abstract class AbstractFilter implements Filter {
         }
         finally
         {
+            if (cache instanceof LocalMemorySoftCache) {
+                ((LocalMemorySoftCache) cache).reset();
+            }
+            
             if (tx != null && tx.isActive())
             {
                 tx.rollback();

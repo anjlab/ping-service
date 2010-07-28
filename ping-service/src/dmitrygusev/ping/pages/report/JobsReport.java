@@ -18,6 +18,7 @@ import dmitrygusev.ping.entities.Schedule;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.Utils;
 import dmitrygusev.ping.services.dao.AccountDAO;
+import dmitrygusev.ping.services.dao.JobDAO;
 import dmitrygusev.ping.services.dao.ScheduleDAO;
 import dmitrygusev.tapestry5.AbstractReadonlyPropertyConduit;
 
@@ -29,16 +30,28 @@ public class JobsReport {
     private Job job;
     @Inject
     private AccountDAO accountDAO;
+    @Inject
+    private JobDAO jobDAO;
+    
+    public List<Job> getUnbindedJobs() {
+        List<Job> unbindedJobs = jobDAO.getAll();
+        unbindedJobs.removeAll(getJobs());
+        return unbindedJobs;
+    }
+    
+    private List<Job> jobs;
     
     public List<Job> getJobs() {
-        List<Schedule> schedules = scheduleDAO.getAll();
-        List<Job> jobs = new ArrayList<Job>();
-        for (Schedule schedule : schedules) {
-            List<Job> scheduleJobs = schedule.getJobs();
-            for (Job job : scheduleJobs) {
-                job.setSchedule(schedule);
+        if (jobs == null) {
+            List<Schedule> schedules = scheduleDAO.getAll();
+            jobs = new ArrayList<Job>();
+            for (Schedule schedule : schedules) {
+                List<Job> scheduleJobs = schedule.getJobs();
+                for (Job job : scheduleJobs) {
+                    job.setSchedule(schedule);
+                }
+                jobs.addAll(scheduleJobs);
             }
-            jobs.addAll(scheduleJobs);
         }
         return jobs;
     }
@@ -202,7 +215,11 @@ public class JobsReport {
     }
     
     public String getUserLastVisitFriendly() {
-        return Utils.getTimeAgoUpToDays(accountDAO.getAccount((job).getSchedule().getName()).getLastVisitDate());
+        Schedule schedule = job.getSchedule();
+        if (schedule == null) {
+            return null;
+        }
+        return Utils.getTimeAgoUpToDays(accountDAO.getAccount(schedule.getName()).getLastVisitDate());
     }
 
     public String getLastBackupTimestamp() {
@@ -214,6 +231,14 @@ public class JobsReport {
     }
     
     public String getUserLastVisit() {
-        return Utils.formatTime(accountDAO.getAccount((job).getSchedule().getName()).getLastVisitDate());
+        Schedule schedule = job.getSchedule();
+        if (schedule == null) {
+            return null;
+        }
+        return Utils.formatTime(accountDAO.getAccount(schedule.getName()).getLastVisitDate());
+    }
+    
+    public void onActionFromDeleteJob(Long scheduleId, Long jobId) {
+        jobDAO.delete(scheduleId, jobId);
     }
 }

@@ -24,6 +24,7 @@ import org.apache.tapestry5.ioc.annotations.InjectService;
 import org.apache.tapestry5.ioc.annotations.Local;
 import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.ioc.annotations.Symbol;
+import org.apache.tapestry5.ioc.services.PerthreadManager;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.apache.tapestry5.services.ApplicationStateManager;
 import org.apache.tapestry5.services.ComponentEventLinkEncoder;
@@ -104,11 +105,18 @@ public class AppModule
                 globals);
     }
 
-    public static Cache buildCache(Logger logger) {
+    public static Cache buildCache(Logger logger, PerthreadManager perthreadManager) {
         try {
             CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
             Cache cache = cacheFactory.createCache(Collections.emptyMap());
-            return cache;
+            
+            LocalMemorySoftCache cache2 = new LocalMemorySoftCache(cache);
+
+            if (perthreadManager != null) {
+                perthreadManager.addThreadCleanupListener(cache2);
+            }
+
+            return cache2;
         } catch (CacheException e) {
             logger.error("Error instantiating cache", e);
             return null;
