@@ -246,11 +246,19 @@ public class Analytics {
         IPLocation pingServiceLocation = getPingServiceLocation();
         IPLocation pingURLLocation = getJobLocation();
         
-        return "It is " + pingServiceLocation.distanceInMeters(pingURLLocation) 
-        + " meters from <span class='hoverable' title='" 
+        long distance = pingServiceLocation.distanceInMeters(pingURLLocation);
+        
+        
+        
+        return "It is " + formatDistanceInKilometers(distance) 
+        + " kilometers from <span class='hoverable' title='" 
         + pingServiceLocation + "'>Ping Service</span> to <span class='hoverable' title='" 
         + pingURLLocation + "'>" 
         + job.getTitleFriendly() + "</span>.";
+    }
+
+    private String formatDistanceInKilometers(long distanceInMeters) {
+        return String.format("%,d", distanceInMeters / 1000);
     }
 
     private IPLocation pingServiceLocation;
