@@ -110,6 +110,10 @@ public abstract class AbstractFilter implements Filter {
                                       globals);
     }
 
+    public void setApplication(Application application) {
+        this.application = application;
+    }
+    
     @Override
     public void destroy() {
         

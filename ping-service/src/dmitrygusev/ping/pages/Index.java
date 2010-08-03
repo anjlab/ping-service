@@ -65,7 +65,7 @@ public class Index {
         Date timestamp = job.getLastPingTimestamp();
         
         return timestamp != null 
-             ? Application.formatDate(timestamp, Application.DATETIME_FORMAT, getTimeZone()) 
+             ? Application.formatDate(Application.DATETIME_FORMAT, getTimeZone(), timestamp) 
              : "N/A";
     }
 

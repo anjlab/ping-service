@@ -22,6 +22,7 @@ import dmitrygusev.ping.entities.JobResult;
 import dmitrygusev.ping.pages.job.EditJob;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.JobResultCSVExporter;
+import dmitrygusev.ping.services.JobResultsAnalyzer;
 import dmitrygusev.ping.services.Mailer;
 import dmitrygusev.ping.services.Utils;
 
@@ -82,42 +83,43 @@ public class BackupJobResultsFilter extends AbstractFilter {
         
         String subject = "Statistics Backup for " + job.getTitleFriendly();
 
-        String timeZoneCity = null;
+        String timeZoneCity = null; //  TODO Use job specific time zone
         TimeZone timeZone = Application.getTimeZone(timeZoneCity);
 
         StringBuilder builder = new StringBuilder();
         builder.append("Job results for period: ");
-        builder.append(Application.formatDate(firstResult.getTimestamp(), timeZoneCity, Application.DATETIME_FORMAT));
+        builder.append(Application.formatDate(Application.DATETIME_FORMAT, timeZone, firstResult.getTimestamp()));
         builder.append(" - ");
-        builder.append(Application.formatDate(lastResult.getTimestamp(), timeZoneCity, Application.DATETIME_FORMAT));
+        builder.append(Application.formatDate(Application.DATETIME_FORMAT, timeZone, lastResult.getTimestamp()));
         builder.append(" (");
         builder.append(Utils.formatMillisecondsToWordsUpToMinutes(lastResult.getTimestamp().getTime() - firstResult.getTimestamp().getTime()));
         builder.append(")");
-        builder.append("\n# of records: ");
+        builder.append("<br/># of records: ");
         builder.append(results.size());
-        builder.append("\nTimeZone: ");
+        builder.append("<br/>Time Zone: ");
         builder.append(timeZone.getDisplayName());
         builder.append(" (");
         builder.append(timeZone.getID());
         builder.append(")");
         
-        builder.append("\n\tAvailability percent for the period: ");
-        builder.append(Utils.formatPercent(Utils.calculateAvailabilityPercent(results)));
+        JobResultsAnalyzer analyzer = new JobResultsAnalyzer(results, true);
+        StringBuilder report = analyzer.buildHtmlReport(timeZone);
+        builder.append(report);
         
-        builder.append("\n\n----"); 
-        builder.append("\nYou can disable receiving statistics backups for the job here: ");
+        builder.append("<br/><br/>----"); 
+        builder.append("<br/>You can disable receiving statistics backups for the job here: ");
         String editJobLink = application.getJobUrl(job, EditJob.class);
         builder.append(editJobLink);
-        builder.append("\n\nNote:");
-        builder.append("\nAutomatic Backups is a beta function, please use our feedback form (http://ping-service.appspot.com/feedback) to provide a feedback on it.");
-        builder.append("\nYou will get approximately one email per week per job depending on job's cron string.");
-        builder.append("\nOnce you received an email with the statistics, this data will be deleted from Ping Service database.");
-        builder.append("\nPing Service will only store ");
+        builder.append("<br/><br/<Note:");
+        builder.append("<br/>Automatic Backups is a beta function, please use our <a href='http://ping-service.appspot.com/feedback'>feedback form</a> to provide a feedback on it.");
+        builder.append("<br/>You will get approximately one email per week per job depending on job's cron string.");
+        builder.append("<br/>Once you received an email with the statistics, this data will be deleted from Ping Service database.");
+        builder.append("<br/>Ping Service will only store ");
         builder.append(Application.DEFAULT_NUMBER_OF_JOB_RESULTS);
         builder.append(" latest ping results per job.");
-        builder.append("\nWe're doing this to keep Ping Service free, since we're running out of free quota limit of Google App Engine infrastructure.");
-        builder.append("\nWe're sorry for any inconvenience you might get from this email.");
-        builder.append("\nThank you for understanding.");
+        builder.append("<br/>We're doing this to keep Ping Service free, since we're running out of free quota limit of Google App Engine infrastructure.");
+        builder.append("<br/>We're sorry for any inconvenience you might get from this email.");
+        builder.append("<br/>Thank you for understanding.");
         
         String message = builder.toString();
         
@@ -129,11 +131,11 @@ public class BackupJobResultsFilter extends AbstractFilter {
                 + Application.formatDateForFileName(firstResult.getTimestamp(), timeZoneCity) + "-" 
                 + Application.formatDateForFileName(lastResult.getTimestamp(), timeZoneCity) + ".txt");
         
-        byte[] export = JobResultCSVExporter.export(timeZone, (List<JobResult>)results);
+        byte[] export = JobResultCSVExporter.export(timeZone, results);
         
         attachment.setContent(new String(export), "text/plain");
         
-        application.getMailer().sendMail(Mailer.PING_SERVICE_NOTIFY_GMAIL_COM, reportRecipient, subject, message, attachment);
+        application.getMailer().sendMail2("text/html", Mailer.PING_SERVICE_NOTIFY_GMAIL_COM, reportRecipient, subject, message, attachment);
     }
     
 }

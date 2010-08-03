@@ -314,27 +314,27 @@ public class Application {
     public String formatDateForFileName(Date date) {
         String timeZoneCity = getUserAccount().getTimeZoneCity();
 
-        return formatDate(date, timeZoneCity, DATETIME_FORMAT_FOR_FILE_NAME);
+        return formatDate(DATETIME_FORMAT_FOR_FILE_NAME, timeZoneCity, date);
     }
     
     public static String formatDateForFileName(Date date, String timeZoneCity) {
-        return formatDate(date, timeZoneCity, DATETIME_FORMAT_FOR_FILE_NAME);
+        return formatDate(DATETIME_FORMAT_FOR_FILE_NAME, timeZoneCity, date);
     }
     
     public String formatDate(Date date) {
         String timeZoneCity = getUserAccount().getTimeZoneCity();
 
-        return formatDate(date, timeZoneCity, DATETIME_FORMAT);
+        return formatDate(DATETIME_FORMAT, timeZoneCity, date);
     }
 
-    public static String formatDate(Date date, String timeZoneCity, DateFormat format) {
+    public static String formatDate(DateFormat format, String timeZoneCity, Date date) {
         TimeZone timezone = getTimeZone(timeZoneCity);
 
-        return formatDate(date, format, timezone);
+        return formatDate(format, timezone, date);
     }
 
-    public static String formatDate(Date date, DateFormat format, TimeZone timezone) {
-        format.setTimeZone(timezone);
+    public static String formatDate(DateFormat format, TimeZone timeZone, Date date) {
+        format.setTimeZone(timeZone);
         
         return format.format(date);
     }
@@ -345,19 +345,10 @@ public class Application {
     
     public static TimeZone getTimeZone(String timeZoneCity) {
         return Utils.isNullOrEmpty(timeZoneCity) 
-                                ? TimeZone.getDefault() 
+                                ? TimeZone.getTimeZone("UTC") 
                                 : TimeZone.getTimeZone(Utils.getTimeZoneId(timeZoneCity));
     }
 
-    public static void checkResult(Job job, StringBuilder sb, int resultCode, String message) {
-        if (job.containsResult(resultCode)) {
-            if (sb.length() > 0) {
-                sb.append(", ");
-            }
-            sb.append(message);
-        }
-    }
-    
     private static Account getSystemAccount() {
         Account account = new Account();
         account.setEmail("system");

@@ -136,15 +136,15 @@ public class Job implements Serializable {
      }
 
      public boolean isLastPingFailed() {
-          return ! (containsResult(PING_RESULT_NOT_AVAILABLE) || containsResult(PING_RESULT_OK));
+          return ! (containsResult(lastPingResult, PING_RESULT_NOT_AVAILABLE) || containsResult(lastPingResult, PING_RESULT_OK));
      }
 
-     public boolean containsResult(int resultCode) {
-          return (lastPingResult & resultCode) == resultCode;
+     public static boolean containsResult(int result, int resultCode) {
+          return (result & resultCode) == resultCode;
      }
      
      public String getValidationSummary() {
-          StringBuffer sb = new StringBuffer();
+          StringBuilder sb = new StringBuilder();
           
           if (usesValidatingHttpCode) {
                sb.append("HTTP Code");
@@ -519,36 +519,29 @@ public class Job implements Serializable {
       * @since 13.05.2010
       */
     @PrePersist
-     @PreUpdate
-     void packJobResults() {
+    @PreUpdate
+    void packJobResults() {
         if (jobResults != null) {
-             ByteArrayOutputStream baos = new ByteArrayOutputStream(jobResults.size() * 14 + 365);
-             ObjectOutputStream oos = null;
-             try {
-                 oos = new ObjectOutputStream(baos);
-                 oos.writeObject(jobResults);
-             } catch (IOException e) {
-                 logger.error("Error packing job results", e);
-             } finally {
-                 if (oos != null) {
-                     try { oos.close(); } catch (IOException e) { logger.error("Error closing oos", e); }
-                 }
-             }
-             packedJobResults = new Blob(baos.toByteArray());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(jobResults.size() * 14 + 365);
+            ObjectOutputStream oos = null;
+            try {
+                oos = new ObjectOutputStream(baos);
+                oos.writeObject(jobResults);
+            } catch (IOException e) {
+                logger.error("Error packing job results", e);
+            } finally {
+                if (oos != null) {
+                    try { oos.close(); } catch (IOException e) { logger.error("Error closing oos", e); }
+                }
+            }
+            packedJobResults = new Blob(baos.toByteArray());
         }
-     }
+    }
+    
     int getPackedJobResultsLength() {
         return packedJobResults == null ? 0 : packedJobResults.getBytes().length;
     }
 
-    /**
-     * For test purposes
-     * 
-     * @param key
-     */
-    public void setKey(Key key) {
-        this.key = key;
-    }
     public Date getCreatedAt() {
         if (createdAt == null) {
             Calendar calendar = Calendar.getInstance();
@@ -560,6 +553,7 @@ public class Job implements Serializable {
         }
         return createdAt;
     }
+    
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
@@ -575,7 +569,7 @@ public class Job implements Serializable {
         if (getLastPingTimestamp() != null) {
             String timeAgo = Utils.getTimeAgoUpToMinutes(getLastPingTimestamp());
             
-            buildLastPingSummary(this, sb);
+            buildPingResultSummary(getLastPingResult(), sb);
             
             sb.append(" / ");
             sb.append(timeAgo);
@@ -586,12 +580,28 @@ public class Job implements Serializable {
         return sb.toString();
     }
 
-    static void buildLastPingSummary(Job job, StringBuilder sb) {
-        Application.checkResult(job, sb, PING_RESULT_NOT_AVAILABLE, "N/A");
-        Application.checkResult(job, sb, PING_RESULT_OK, "Okay");
-        Application.checkResult(job, sb, PING_RESULT_HTTP_ERROR, "HTTP failed");
-        Application.checkResult(job, sb, PING_RESULT_CONNECTIVITY_PROBLEM, "Failed connecting");
-        Application.checkResult(job, sb, PING_RESULT_REGEXP_VALIDATION_FAILED, "Regexp failed");
+    public static void buildPingResultSummary(int pingResult, StringBuilder sb) {
+        checkResult(pingResult, sb, PING_RESULT_NOT_AVAILABLE, "N/A");
+        checkResult(pingResult, sb, PING_RESULT_OK, "Okay");
+        checkResult(pingResult, sb, PING_RESULT_HTTP_ERROR, "HTTP failed");
+        checkResult(pingResult, sb, PING_RESULT_CONNECTIVITY_PROBLEM, "Failed connecting");
+        checkResult(pingResult, sb, PING_RESULT_REGEXP_VALIDATION_FAILED, "Regexp failed");
     }
-    
+
+    private static void checkResult(int pingResult, StringBuilder sb, int resultCode, String message) {
+        if (containsResult(pingResult, resultCode)) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(message);
+        }
+    }
+
+
+    public static String buildPingResultSummary(int resultCode) {
+        StringBuilder sb = new StringBuilder();
+        buildPingResultSummary(resultCode, sb);
+        return sb.toString();
+    }
+
 }

@@ -12,15 +12,15 @@ import dmitrygusev.ping.entities.JobResult;
 
 public class JobResultCSVExporter {
 
-    private static final char SEPARATOR_CHAR = ';';
+    public static final char SEPARATOR_CHAR = ';';
 
-    private static final String[] COLUMN_HEADERS = {
+    public static final String[] COLUMN_HEADERS = {
         "timestamp",
         "duration",
         "resultCode"
     };
 
-    private static final String[] COLUMN_HEADER_PATTERNS = {
+    public static final String[] COLUMN_HEADER_PATTERNS = {
         Application.DATETIME_PATTERN,
         "99999",
         "00"

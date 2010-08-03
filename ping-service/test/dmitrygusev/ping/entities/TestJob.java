@@ -2,15 +2,18 @@ package dmitrygusev.ping.entities;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import dmitrygusev.ping.services.Application;
-
+import dmitrygusev.ping.services.JobResultCSVImporter;
+import dmitrygusev.ping.services.JobResultsAnalyzer;
 
 public class TestJob {
 
@@ -22,8 +25,8 @@ public class TestJob {
         job.setLastPingResult(Job.PING_RESULT_NOT_AVAILABLE);
         
         StringBuilder sb = new StringBuilder();
-        String formattedDate = Application.formatDate(job.getLastPingTimestamp(), "Moscow", Application.DATETIME_FORMAT);
-        Job.buildLastPingSummary(job, sb);
+        String formattedDate = Application.formatDate(Application.DATETIME_FORMAT, "Moscow", job.getLastPingTimestamp());
+        Job.buildPingResultSummary(job.getLastPingResult(), sb);
         
         Assert.assertEquals("1970-01-01 03:00:00", formattedDate);
         Assert.assertEquals("N/A", sb.toString());
@@ -31,8 +34,8 @@ public class TestJob {
         job.setLastPingResult(Job.PING_RESULT_OK);
 
         sb = new StringBuilder();
-        formattedDate = Application.formatDate(job.getLastPingTimestamp(), "Moscow", Application.DATETIME_FORMAT);
-        Job.buildLastPingSummary(job, sb);
+        formattedDate = Application.formatDate(Application.DATETIME_FORMAT, "Moscow", job.getLastPingTimestamp());
+        Job.buildPingResultSummary(job.getLastPingResult(), sb);
         
         Assert.assertEquals("1970-01-01 03:00:00", formattedDate);
         Assert.assertEquals("Okay", sb.toString());
@@ -93,5 +96,52 @@ public class TestJob {
         assertEquals(3, results.size());
         
         job.packJobResults();
+    }
+    
+    @Test
+    public void testJobResultCSVImporter() throws Exception {
+        JobResultCSVImporter importer = new JobResultCSVImporter(null);
+        
+        List<JobResult> results = importer.fromStream(
+                new FileInputStream("test/job-1026-6-results-20100429211642-20100615120457.txt"));
+        
+        assertEquals(1000, results.size());
+        
+        JobResult result = results.get(0);
+        assertEquals(Job.PING_RESULT_OK, result.getPingResult().intValue());
+        assertEquals("2010-04-29 21:16:42", Application.DATETIME_FORMAT.format(result.getTimestamp()));
+        assertEquals(684, result.getResponseTime());
+    }
+    
+    @Test
+    public void testJobResultsAnalyzerPlainTextReport() throws Exception {
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        
+        JobResultCSVImporter importer = new JobResultCSVImporter(timeZone);
+        
+        List<JobResult> results = importer.fromStream(
+                new FileInputStream("test/job-1026-6-results-20100429211642-20100615120457.txt"));
+
+        JobResultsAnalyzer analyzer = new JobResultsAnalyzer(results, true);
+
+        StringBuilder sb = analyzer.buildPlainTextReport(timeZone);
+        
+        System.out.println(sb);
+    }
+    
+    @Test
+    public void testJobResultsAnalyzerHtmlReport() throws Exception {
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        
+        JobResultCSVImporter importer = new JobResultCSVImporter(timeZone);
+        
+        List<JobResult> results = importer.fromStream(
+                new FileInputStream("test/job-1026-6-results-20100429211642-20100615120457.txt"));
+
+        JobResultsAnalyzer analyzer = new JobResultsAnalyzer(results, true);
+
+        StringBuilder sb = analyzer.buildHtmlReport(timeZone);
+        
+        System.out.println(sb);
     }
 }

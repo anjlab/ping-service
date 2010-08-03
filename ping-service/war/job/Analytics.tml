@@ -31,11 +31,15 @@
        <div class="admin-tasks">
            Admin tasks: 
             <t:actionlink t:id="runJob">Run This Job Now</t:actionlink>
+            &#160;
+            <t:actionlink t:id="viewResultsReport" target="_blank">View Results Report</t:actionlink>
        </div>
     </t:if>
     
-       <h2><t:logo/> Analytics Workspace</h2>
+    <h2><t:logo/> Analytics Workspace</h2>
+    
     <div>for "${job.titleFriendly}"<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a> [statistics based on last ${timeDiff} (from ${dateFrom} to ${dateTo})] <a href="/feedback?subject=Request for earlier data">Need earlier data? Send a request!</a></div>
+    
     <font color="red"><p>${message}</p></font>
        
        <table>
@@ -122,9 +126,9 @@
            }
            
            function showOverviewCharts() {
-           for (var key in overviewCharts) {
-               $(overviewCharts[key]).parent().show();
-           } 
+	           for (var key in overviewCharts) {
+	               $(overviewCharts[key]).parent().show();
+	           } 
            }
            
            function plotOverviewCharts() {
@@ -134,7 +138,7 @@
                plotPieChart($($(pies.get(pies.length-1)).children().get(0)), "#chart2", "Total Availability, %");
                var histograms = $(".m-4");
                plotHistogramChart($($(histograms.get(histograms.length-1)).children().get(0)), "#chart4", "Total Response Time, ms");
-            removeHighlights();
+               removeHighlights();
                plotLineChart($($(".m-0").get(0)), "#chart3");
                plotLineChart($($(".m-5").get(0)), "#chart");
            }
@@ -148,7 +152,7 @@
               
               showPrimaryChart();
               removeHighlights();
-            plotLineChart($($(".m-0").filter(".ix-1")), "#chart");
+              plotLineChart($($(".m-0").filter(".ix-1")), "#chart");
           }
           
           $("#charts").scrollFollow( { speed: 'fast' } );

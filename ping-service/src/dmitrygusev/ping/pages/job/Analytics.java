@@ -35,6 +35,7 @@ import dmitrygusev.ping.pages.Index;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.IPUtils;
 import dmitrygusev.ping.services.JobResultCSVExporter;
+import dmitrygusev.ping.services.JobResultsAnalyzer;
 import dmitrygusev.ping.services.Utils;
 import dmitrygusev.ping.services.IPUtils.IPLocation;
 
@@ -279,4 +280,36 @@ public class Analytics {
         return jobLocation;
     }
 
+    public StreamResponse onActionFromViewResultsReport() {
+        return new StreamResponse() {
+            
+            @Override
+            public void prepareResponse(Response response) {
+                response.setHeader(
+                        "Content-Disposition", 
+                        "inline");
+            }
+            
+            @Override
+            public InputStream getStream() throws IOException {
+                JobResultsAnalyzer analyzer = new JobResultsAnalyzer(
+                        job.getRecentJobResults(Application.DEFAULT_NUMBER_OF_JOB_RESULTS), true);
+                
+                TimeZone timeZone = application.getTimeZone();
+                
+                StringBuilder report = analyzer.buildPlainTextReport(timeZone);
+                
+//                report.insert(0, "Time Zone: " + timeZone.getDisplayName() + " (" + timeZone.getID() + ")\n\n");
+                
+                InputStream is = new ByteArrayInputStream(report.toString().getBytes());
+                
+                return is;
+            }
+            
+            @Override
+            public String getContentType() {
+                return "text/plain";
+            }
+        };
+    }
 }

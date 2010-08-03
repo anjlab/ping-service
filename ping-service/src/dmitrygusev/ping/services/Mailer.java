@@ -26,6 +26,10 @@ public class Mailer {
     }
     
     public void sendMail(String from, String to, String subject, String message, MimeBodyPart... attachments) {
+        sendMail2("text/plain", from, to, subject, message, attachments);
+    }
+
+    public void sendMail2(String mimeType, String from, String to, String subject, String message, MimeBodyPart... attachments) {
         if (Utils.isNullOrEmpty(to)) {
             logger.warn("mail can't be delivered to (recipient == null):\n{}", message);
             return;
@@ -44,7 +48,7 @@ public class Mailer {
             Multipart multipart = new MimeMultipart();
 
             MimeBodyPart main = new MimeBodyPart();
-            main.setContent(message, "text/plain");
+            main.setContent(message, mimeType);
             multipart.addBodyPart(main);
             
             if (attachments != null && attachments.length > 0) {
