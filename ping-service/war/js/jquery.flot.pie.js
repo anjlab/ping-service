@@ -7,14 +7,22 @@ NOT need to be passed in as percentage values because it
 internally calculates the total and percentages.
 
 * Created by Brian Medendorp, June 2009
-* Updated by Anthony Aragues, July 2009 http://suddenDevelopment.com
-* Updated by Dee Adesanwo, September 2009
+* Updated November 2009 with contributions from: btburnett3, Anthony Aragues and Xavi Ivars
+
+* Changes:
+	2009-10-22: lineJoin set to round
+	2009-10-23: IE full circle fix, donut
+	2009-11-11: Added basic hover from btburnett3 - does not work in IE, and center is off in Chrome and Opera
+	2009-11-17: Added IE hover capability submitted by Anthony Aragues
+	2009-11-18: Added bug fix submitted by Xavi Ivars (issues with arrays when other JS libraries are included as well)
+		
 
 Available options are:
 series: {
 	pie: {
 		show: true/false
 		radius: 0-1 for percentage of fullsize, or a specified pixel length, or 'auto'
+		innerRadius: 0-1 for percentage of fullsize or a specified pixel length, for creating a donut effect
 		startAngle: 0-2 factor of PI used for starting angle (in radians) i.e 3/2 starts at the top, 0 and 2 have the same result
 		tilt: 0-1 for percentage to tilt the pie, where 1 is no tilt, and 0 is completely flat (nothing will show)
 		offset: {
@@ -40,20 +48,13 @@ series: {
 			color: any hexidecimal color value (other formats may or may not work, so best to stick with something like '#CCC'), if null, the plugin will automatically use the color of the first slice to be combined
 			label: any text value of what the combined slice should be labeled
 		}
+		highlight: {
+			opacity: 0-1
+		}
 	}
 }
 
-Border Layout for labels:
-options.series.pie.label.show: 'border'
-
-Donut hole:
-options.series.pie.innerRadius: > 0
-
-Color Gradient
-options.series.pie.gradient: {show:true, colors:["#hexValue","rgb(r,b,g)"]}
-
-More detail and specific examples can be found in the included HTML 
-file.
+More detail and specific examples can be found in the included HTML file.
 
 */
 
@@ -61,30 +62,26 @@ file.
 {
 	function init(plot) // this is the "body" of the plugin
 	{
-		var canvas = null,
-			ctx = null,
-			target = null,
-			eventHolder = null,
-			options = null,
-			maxRadius = null,
-			centerLeft = null,
-			centerTop = null,
-			total = 0,
-			redraw = true,
-			redrawAttempts = 10,
-			shrink = 0.95,
-			legendWidth = 0,
-			processed = false,
-			raw = false,
+		var canvas = null;
+		var target = null;
+		var maxRadius = null;
+		var centerLeft = null;
+		var centerTop = null;
+		var total = 0;
+		var redraw = true;
+		var redrawAttempts = 10;
+		var shrink = 0.95;
+		var legendWidth = 0;
+		var processed = false;
+		var raw = false;
 		
-			// interactive variables
-		    lastMousePos = { pageX: null, pageY: null },
-            highlights = [];
+		// interactive variables	
+		var highlights = [];	
 	
 		// add hook to determine if pie plugin in enabled, and then perform necessary operations
 		plot.hooks.processOptions.push(checkPieEnabled);
-		plot.hooks.bindEvents.push(bindEvents);
-	
+		plot.hooks.bindEvents.push(bindEvents);	
+
 		// check to see if the pie plugin is enabled
 		function checkPieEnabled(plot, options)
 		{
@@ -115,23 +112,26 @@ file.
 			
 				// add processData hook to do transformations on the data
 				plot.hooks.processDatapoints.push(processDatapoints);
-				plot.hooks.drawOverlay.push(drawOverlay);
+				plot.hooks.drawOverlay.push(drawOverlay);	
 				
 				// add draw hook
 				plot.hooks.draw.push(draw);
 			}
 		}
-		
+	
 		// bind hoverable events
-		function bindEvents(plot, newEventHolder) {
-			eventHolder = newEventHolder;
+		function bindEvents(plot, eventHolder) 		
+		{		
 			var options = plot.getOptions();
 			
-			if (options.series.pie.show && 
-			    options.grid.hoverable)
-                eventHolder.unbind('mousemove').mousemove(onMouseMove);
-		}		
+			if (options.series.pie.show && options.grid.hoverable)
+				eventHolder.unbind('mousemove').mousemove(onMouseMove);
+				
+			if (options.series.pie.show && options.grid.clickable)
+				eventHolder.unbind('click').click(onClick);
+		}	
 		
+
 		// debugging function that prints out an object
 		function alertObject(obj)
 		{
@@ -140,7 +140,7 @@ file.
 			{
 				if (!depth)
 					depth = 0;
-				for(var i in obj)
+				for (var i = 0; i < obj.length; ++i)
 				{
 					for (var j=0; j<depth; j++)
 						msg += '\t';
@@ -162,7 +162,7 @@ file.
 		
 		function calcTotal(data)
 		{
-			for (var i in data)
+			for (var i = 0; i < data.length; ++i)
 			{
 				var item = parseFloat(data[i].data[0][1]);
 				if (item)
@@ -189,7 +189,7 @@ file.
 			legendWidth = target.children().filter('.legend').children().width();
 		
 			// calculate maximum radius and center point
-			maxRadius =  Math.min(canvas.width,canvas.height)/2;
+			maxRadius =  Math.min(canvas.width,(canvas.height/options.series.pie.tilt))/2;
 			centerTop = (canvas.height/2)+options.series.pie.offset.top;
 			centerLeft = (canvas.width/2);
 			
@@ -209,7 +209,7 @@ file.
 		
 		function fixData(data)
 		{
-			for (var i in data)
+			for (var i = 0; i < data.length; ++i)
 			{
 				if (typeof(data[i].data)=='number')
 					data[i].data = [[1,data[i].data]];
@@ -233,7 +233,7 @@ file.
 			var color = options.series.pie.combine.color;
 			
 			var newdata = [];
-			for (var i in data)
+			for (var i = 0; i < data.length; ++i)
 			{
 				// make sure its a number
 				data[i].data[0][1] = parseFloat(data[i].data[0][1]);
@@ -270,11 +270,10 @@ file.
 		}		
 		
 		function draw(plot, newCtx)
-		{			
+		{
 			if (!target) return; // if no series were passed
-			
 			ctx = newCtx;
-						
+		
 			setupPie();
 			var slices = plot.getData();
 		
@@ -365,9 +364,10 @@ file.
 				// draw slices
 				ctx.save();
 				var currentAngle = startAngle;
-				for (var i in slices) {
+				for (var i = 0; i < slices.length; ++i)
+				{
 					slices[i].startAngle = currentAngle;
-					drawSlice(slices[i].angle, slices[i].color, true); 
+					drawSlice(slices[i].angle, slices[i].color, true);
 				}
 				ctx.restore();
 				
@@ -375,9 +375,12 @@ file.
 				ctx.save();
 				ctx.lineWidth = options.series.pie.stroke.width;
 				currentAngle = startAngle;
-				for (var i in slices)
+				for (var i = 0; i < slices.length; ++i)
 					drawSlice(slices[i].angle, options.series.pie.stroke.color, false);
 				ctx.restore();
+					
+				// draw donut hole
+				drawDonutHole(ctx);
 				
 				// draw labels
 				if (options.series.pie.label.show)
@@ -391,6 +394,14 @@ file.
 					if (angle<=0)
 						return;
 				
+					if (fill)
+						ctx.fillStyle = color;
+					else
+					{
+						ctx.strokeStyle = color;
+						ctx.lineJoin = 'round';
+					}
+						
 					ctx.beginPath();
 					if (angle!=Math.PI*2)
 						ctx.moveTo(0,0); // Center of the pie
@@ -400,41 +411,15 @@ file.
 					ctx.arc(0,0,radius,currentAngle,currentAngle+angle,false);
 					ctx.closePath();
 					//ctx.rotate(angle); // This doesn't work properly in Opera
+					currentAngle += angle;
 					
-                    
-					var halfAngle = ((currentAngle+angle) + currentAngle)/2;
-					var x = centerLeft + Math.round(Math.cos(halfAngle) * radius);
-					var y = centerTop + Math.round(Math.sin(halfAngle) * radius) * options.series.pie.tilt;
-                    
-					currentAngle += angle; 
-					if (fill) {
-					if (options.series.pie.gradient.show && options.series.pie.gradient.colors.length > 0) {
-					var gradientColors = [];
-					gradientColors.push(color) //Always start with default fill color
-                            
-					for (i in options.series.pie.gradient.colors) {
-					    gradientColors.push(options.series.pie.gradient.colors[i]);
-					}
-                            
-					var gradient = ctx.createLinearGradient(0, 0,x-centerLeft,y-centerTop); //Create gradient object.
-                            
-					//Add gradient colors                      
-					for (var i = 0, l = gradientColors.length; i < l; ++i) {
-					    gradient.addColorStop(i / (l - 1), gradientColors[i]);
-					}
-					ctx.fillStyle = gradient;
-					ctx.fill();
-					} else {
-					    ctx.fillStyle = color;
-					    ctx.fill();
-					}
-					} else {
-					    ctx.strokeStyle = color;
-					    ctx.stroke();
-					}
+					if (fill)
+						ctx.fill();
+					else
+						ctx.stroke();
 				}
 				
-                function drawLabels()
+				function drawLabels()
 				{
 					var currentAngle = startAngle;
 					
@@ -444,7 +429,7 @@ file.
 					else
 						var radius = maxRadius * options.series.pie.label.radius;
 					
-					for(var i in slices)
+					for (var i = 0; i < slices.length; ++i)
 					{
 						if (slices[i].percent >= options.series.pie.label.threshold*100)
 							drawLabel(slices[i], currentAngle, i);
@@ -453,49 +438,27 @@ file.
 					
 					function drawLabel(slice, startAngle, index)
 					{
-                        
 						if (slice.data[0][1]==0)
 							return;
 							
 						// format label text
 						var lf = options.legend.labelFormatter, text, plf = options.series.pie.label.formatter;
-						if (lf){
-							text = lf(slice.label, slice);}
-						else{
-							text = slice.label;}
-						if (plf){
-							text = plf(text, slice);}
+						if (lf)
+							text = lf(slice.label, slice);
+						else
+							text = slice.label;
+						if (plf)
+							text = plf(text, slice);
 							
 						var halfAngle = ((startAngle+slice.angle) + startAngle)/2;
 						var x = centerLeft + Math.round(Math.cos(halfAngle) * radius);
 						var y = centerTop + Math.round(Math.sin(halfAngle) * radius) * options.series.pie.tilt;
-
+						
 						var html = '<span class="pieLabel" id="pieLabel'+index+'" style="position:absolute;top:' + y + 'px;left:' + x + 'px;">' + text + "</span>";
 						target.append(html);
 						var label = target.children('#pieLabel'+index);
 						var labelTop = (y - label.height()/2);
 						var labelLeft = (x - label.width()/2);
-						
-						/* Border layout for labels */
-						if(options.series.pie.label.show == 'border'){
-							ctx.restore();
-							ctx.beginPath();
-							ctx.strokeStyle = '#000000';
-							ctx.moveTo(x,y);
-							if(x > (canvas.width/2)){
-								var endX = canvas.width - label.width();
-								var endY = y;
-								labelLeft = endX;
-							}else{
-								var endX = label.width();
-								var endY = y;
-								labelLeft = 0;
-							}
-							ctx.lineTo(endX, endY);
-							ctx.stroke();
-							ctx.save();
-						}	
-						
 						label.css('top', labelTop);
 						label.css('left', labelLeft);
 						
@@ -515,60 +478,80 @@ file.
 					} // end individual label function
 				} // end drawLabels function
 			} // end drawPie function
-			
-			if(options.series.pie.innerRadius > 0){
-				/* donut hole */
-				radius = options.series.pie.radius > 1 ? options.series.pie.radius : maxRadius * options.series.pie.radius;
-				ctx.translate(centerLeft,centerTop);
-				ctx.scale(1, options.series.pie.tilt);
-				ctx.save();
-				ctx.beginPath();
-				ctx.strokeStyle = options.series.pie.stroke.color;
-				ctx.fillStyle = options.series.pie.stroke.color;
-				ctx.arc(0,0,radius*options.series.pie.innerRadius,0,Math.PI*2,false);
-				ctx.fill();
-				ctx.closePath();
-			}
-			/* debug */
-
-			/*  end debug  */
 		} // end draw function
-	
-	function isPointInPoly(poly, pt){
-	for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
-		((poly[i][1] <= pt[1] && pt[1] < poly[j][1]) || (poly[j][1] <= pt[1] && pt[1]< poly[i][1]))
-		&& (pt[0] < (poly[j][0] - poly[i][0]) * (pt[1] - poly[i][1]) / (poly[j][1] - poly[i][1]) + poly[i][0])
-		&& (c = !c);
-	return c;
-	}
-		// returns the data item the mouse is over, or null if none is found
-        function findNearbyItem(mouseX, mouseY, seriesFilter) {
-            var item = null, foundPoint = false, i, j,
-				series = plot.getData(),
+		
+		// Placed here because it needs to be accessed from multiple locations 
+		function drawDonutHole(layer)
+		{
+			// draw donut hole
+			if(options.series.pie.innerRadius > 0)
+			{
+				// subtract the center
+				layer.save();
+				innerRadius = options.series.pie.innerRadius > 1 ? options.series.pie.innerRadius : maxRadius * options.series.pie.innerRadius;
+				layer.globalCompositeOperation = 'destination-out'; // this does not work with excanvas, but it will fall back to using the stroke color
+				layer.beginPath();
+				layer.fillStyle = options.series.pie.stroke.color;
+				layer.arc(0,0,innerRadius,0,Math.PI*2,false);
+				layer.fill();
+				layer.closePath();
+				layer.restore();
+				
+				// add inner stroke
+				layer.save();
+				layer.beginPath();
+				layer.strokeStyle = options.series.pie.stroke.color;
+				layer.arc(0,0,innerRadius,0,Math.PI*2,false);
+				layer.stroke();
+				layer.closePath();
+				layer.restore();
+				// TODO: add extra shadow inside hole (with a mask) if the pie is tilted.
+			}
+		}
+		
+		//-- Additional Interactive related functions --
+		
+		function isPointInPoly(poly, pt)
+		{
+			for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
+				((poly[i][1] <= pt[1] && pt[1] < poly[j][1]) || (poly[j][1] <= pt[1] && pt[1]< poly[i][1]))
+				&& (pt[0] < (poly[j][0] - poly[i][0]) * (pt[1] - poly[i][1]) / (poly[j][1] - poly[i][1]) + poly[i][0])
+				&& (c = !c);
+			return c;
+		}
+		
+		function findNearbySlice(mouseX, mouseY)
+		{
+			var slices = plot.getData(),
+				options = plot.getOptions(),
 				radius = options.series.pie.radius > 1 ? options.series.pie.radius : maxRadius * options.series.pie.radius;
-
-            for (var i = 0; i < series.length; ++i) {
-                if (!seriesFilter(series[i]))
-                    continue;
-                
-                var s = series[i];					
-
-                if (s.pie.show) {
+			
+			for (var i = 0; i < slices.length; ++i) 
+			{
+				var s = slices[i];	
+				
+				if(s.pie.show)
+				{
 					ctx.save();
 					ctx.beginPath();
-					ctx.translate(centerLeft,centerTop);
-					ctx.scale(1, options.series.pie.tilt);
 					ctx.moveTo(0,0); // Center of the pie
+					//ctx.scale(1, options.series.pie.tilt);	// this actually seems to break everything when here.
 					ctx.arc(0,0,radius,s.startAngle,s.startAngle+s.angle,false);
 					ctx.closePath();
 					x = mouseX-centerLeft;
 					y = mouseY-centerTop;
-					if(ctx.isPointInPath){
-						if (ctx.isPointInPath(x, y)){
-							item = {datapoint: [series[i].percent, series[i].data], dataIndex: 0, series: series[i], seriesIndex: i}; 
+					if(ctx.isPointInPath)
+					{
+						if (ctx.isPointInPath(mouseX-centerLeft, mouseY-centerTop))
+						{
+							//alert('found slice!');
+							ctx.restore();
+							return {datapoint: [s.percent, s.data], dataIndex: 0, series: s, seriesIndex: i};
 						}
-					}else{
-						/* excanvas for IE doesn;t support isPointInPath, this is a workaround. */
+					}
+					else
+					{
+						// excanvas for IE doesn;t support isPointInPath, this is a workaround. 
 						p1X = (radius * Math.cos(s.startAngle));
 						p1Y = (radius * Math.sin(s.startAngle));
 						p2X = (radius * Math.cos(s.startAngle+(s.angle/4)));
@@ -581,235 +564,143 @@ file.
 						p5Y = (radius * Math.sin(s.startAngle+s.angle));
 						arrPoly = [[0,0],[p1X,p1Y],[p2X,p2Y],[p3X,p3Y],[p4X,p4Y],[p5X,p5Y]];
 						arrPoint = [x,y];
-						if(isPointInPoly(arrPoly, arrPoint)){
-							item = {datapoint: [series[i].percent, series[i].data], dataIndex: 0, series: series[i], seriesIndex: i};
+						// TODO: perhaps do some mathmatical trickery here with the Y-coordinate to compensate for pie tilt?
+						if(isPointInPoly(arrPoly, arrPoint))
+						{
+							ctx.restore();
+							return {datapoint: [s.percent, s.data], dataIndex: 0, series: s, seriesIndex: i};
 						}			
 					}
 					ctx.restore();
-                }
-            }
-            
-            return item;
-        }
-		
-		function onMouseMove(e) {
-			if (!processed) return;
-			
-            lastMousePos.pageX = e.pageX;
-            lastMousePos.pageY = e.pageY;
-            
-            if (options.grid.hoverable){
-                triggerClickHoverEvent("plothover", lastMousePos,
-                                       function (s) { return s["hoverable"] != false;});
+				}
 			}
+			
+			return null;
+		}
+
+		function onMouseMove(e) 
+		{
+			triggerClickHoverEvent('plothover', e);
 		}
 		
-		// trigger click or hover event (they send the same parameters
-        // so we share their code)
-        function triggerClickHoverEvent(eventname, event, seriesFilter) {
-			var plotOffset = plot.getPlotOffset(),
-				offset = eventHolder.offset(),
-                pos = { pageX: event.pageX, pageY: event.pageY },
-                canvasX = event.pageX - offset.left - plotOffset.left,
-                canvasY = event.pageY - offset.top - plotOffset.top;
+        function onClick(e) 
+		{
+			triggerClickHoverEvent('plotclick', e);
+        }
 
-            var item = findNearbyItem(canvasX, canvasY, seriesFilter);
-            if (item) {
-                
-				// fill in mouse pos for any listeners out there
-                item.pageX = event.pageX;
-				item.pageY = event.pageY;
+		// trigger click or hover event (they send the same parameters so we share their code)
+		function triggerClickHoverEvent(eventname, e) 
+		{
+			var offset = plot.offset(),
+				canvasX = parseInt(e.pageX - offset.left),
+				canvasY =  parseInt(e.pageY - offset.top),
+				item = findNearbySlice(canvasX, canvasY);
+			
+			if (options.grid.autoHighlight) 
+			{
+				// clear auto-highlights
+				for (var i = 0; i < highlights.length; ++i) 
+				{
+					var h = highlights[i];
+					if (h.auto == eventname && !(item && h.series == item.series))
+						unhighlight(h.series);
+				}
+			}
+			
+			// if no slice was found, quit
+			if (!item) 
+				return;
 				
-            }
+			// highlight the slice
+			highlight(item.series, eventname);
+				
+			// trigger any hover bind events
+			var pos = { pageX: e.pageX, pageY: e.pageY };
+			target.trigger(eventname, [ pos, item ]);	
+		}
 
-            if (options.grid.autoHighlight) {
-                // clear auto-highlights
-                for (var i = 0; i < highlights.length; ++i) {
-                    var h = highlights[i];
-                    if (h.auto == eventname &&
-                        !(item && h.series == item.series))
-                        unhighlight(h.series);
-                }
-                
-                if (item)
-                    highlight(item.series, eventname);
-            }
-            
-            target.trigger(eventname, [ pos, item ]);
-        }
-		
-		function highlight(s, auto) {
-            if (typeof s == "number")
-                s = series[s];
+		function highlight(s, auto) 
+		{
+			if (typeof s == "number")
+				s = series[s];
 
-            var i = indexOfHighlight(s);
-            if (i == -1) {
-                highlights.push({ series: s, auto: auto });
+			var i = indexOfHighlight(s);
+			if (i == -1) 
+			{
+				highlights.push({ series: s, auto: auto });
+				plot.triggerRedrawOverlay();
+			}
+			else if (!auto)
+				highlights[i].auto = false;
+		}
 
-                plot.triggerRedrawOverlay();
-            }
-            else if (!auto)
-                highlights[i].auto = false;
-        }
-            
-        function unhighlight(s) {
-            if (s == null) {
-                highlights = [];
-                plot.triggerRedrawOverlay();
-            }
-            
-            if (typeof s == "number")
-                s = series[s];
+		function unhighlight(s) 
+		{
+			if (s == null) 
+			{
+				highlights = [];
+				plot.triggerRedrawOverlay();
+			}
+			
+			if (typeof s == "number")
+				s = series[s];
 
-            var i = indexOfHighlight(s);
-            if (i != -1) {
-                highlights.splice(i, 1);
+			var i = indexOfHighlight(s);
+			if (i != -1) 
+			{
+				highlights.splice(i, 1);
+				plot.triggerRedrawOverlay();
+			}
+		}
 
-                plot.triggerRedrawOverlay();
-            }
-        }
-        
-        function indexOfHighlight(s) {
-            for (var i = 0; i < highlights.length; ++i) {
-                var h = highlights[i];
-                if (h.series == s)
-                    return i;
-            }
-            return -1;
-        }
-		
-		function drawOverlay(plot, octx) {
-            var radius = options.series.pie.radius > 1 ? options.series.pie.radius : maxRadius * options.series.pie.radius,
-				i, hi;
+		function indexOfHighlight(s) 
+		{
+			for (var i = 0; i < highlights.length; ++i) 
+			{
+				var h = highlights[i];
+				if (h.series == s)
+					return i;
+			}
+			return -1;
+		}
+
+		function drawOverlay(plot, octx) 
+		{
+			//alert(options.series.pie.radius);
+			var options = plot.getOptions();
+			//alert(options.series.pie.radius);
+			
+			var radius = options.series.pie.radius > 1 ? options.series.pie.radius : maxRadius * options.series.pie.radius;
 
 			octx.save();
-            octx.translate(centerLeft, centerTop);
-            
-            for (i = 0; i < highlights.length; ++i) {
+			octx.translate(centerLeft, centerTop);
+			octx.scale(1, options.series.pie.tilt);
+			
+			for (i = 0; i < highlights.length; ++i) 
 				drawHighlight(highlights[i].series);
-            }
+			
+			drawDonutHole(octx);
 
 			octx.restore();
-		
-			function drawHighlight(series) {
+
+			function drawHighlight(series) 
+			{
 				if (series.angle < 0) return;
 				
-				octx.fillStyle = parseColor(options.series.pie.highlight.color).scale(null, null, null, options.series.pie.highlight.opacity).toString();
-							
+				//octx.fillStyle = parseColor(options.series.pie.highlight.color).scale(null, null, null, options.series.pie.highlight.opacity).toString();
+				octx.fillStyle = "rgba(255, 255, 255, "+options.series.pie.highlight.opacity+")"; // this is temporary until we have access to parseColor
+				
 				octx.beginPath();
 				if (series.angle!=Math.PI*2)
 					octx.moveTo(0,0); // Center of the pie
 				octx.arc(0,0,radius,series.startAngle,series.startAngle+series.angle,false);
 				octx.closePath();
-				
 				octx.fill();
 			}
 			
-		}		
+		}	
 		
 	} // end init (plugin body)
-	
-	function clamp(min, value, max) {
-        if (value < min)
-            return min;
-        else if (value > max)
-            return max;
-        else
-            return value;
-    }
-	
-	// color helpers, inspiration from the jquery color animation
-    // plugin by John Resig
-    function Color (r, g, b, a) {
-       
-        var rgba = ['r','g','b','a'];
-        var x = 4; //rgba.length
-       
-        while (-1<--x) {
-            this[rgba[x]] = arguments[x] || ((x==3) ? 1.0 : 0);
-        }
-       
-        this.toString = function() {
-            if (this.a >= 1.0) {
-                return "rgb("+[this.r,this.g,this.b].join(",")+")";
-            } else {
-                return "rgba("+[this.r,this.g,this.b,this.a].join(",")+")";
-            }
-        };
-
-        this.scale = function(rf, gf, bf, af) {
-            x = 4; //rgba.length
-            while (-1<--x) {
-                if (arguments[x] != null)
-                    this[rgba[x]] *= arguments[x];
-            }
-            return this.normalize();
-        };
-
-        this.adjust = function(rd, gd, bd, ad) {
-            x = 4; //rgba.length
-            while (-1<--x) {
-                if (arguments[x] != null)
-                    this[rgba[x]] += arguments[x];
-            }
-            return this.normalize();
-        };
-
-        this.clone = function() {
-            return new Color(this.r, this.b, this.g, this.a);
-        };
-
-        var limit = function(val,minVal,maxVal) {
-            return Math.max(Math.min(val, maxVal), minVal);
-        };
-
-        this.normalize = function() {
-            this.r = clamp(0, parseInt(this.r), 255);
-            this.g = clamp(0, parseInt(this.g), 255);
-            this.b = clamp(0, parseInt(this.b), 255);
-            this.a = clamp(0, this.a, 1);
-            return this;
-        };
-
-        this.normalize();
-    }
-	
-	function parseColor(str) {
-        var result;
-
-        // Look for rgb(num,num,num)
-        if (result = /rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)/.exec(str))
-            return new Color(parseInt(result[1], 10), parseInt(result[2], 10), parseInt(result[3], 10));
-        
-        // Look for rgba(num,num,num,num)
-        if (result = /rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]+(?:\.[0-9]+)?)\s*\)/.exec(str))
-            return new Color(parseInt(result[1], 10), parseInt(result[2], 10), parseInt(result[3], 10), parseFloat(result[4]));
-            
-        // Look for rgb(num%,num%,num%)
-        if (result = /rgb\(\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*\)/.exec(str))
-            return new Color(parseFloat(result[1])*2.55, parseFloat(result[2])*2.55, parseFloat(result[3])*2.55);
-
-        // Look for rgba(num%,num%,num%,num)
-        if (result = /rgba\(\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\s*\)/.exec(str))
-            return new Color(parseFloat(result[1])*2.55, parseFloat(result[2])*2.55, parseFloat(result[3])*2.55, parseFloat(result[4]));
-        
-        // Look for #a0b1c2
-        if (result = /#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/.exec(str))
-            return new Color(parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16));
-
-        // Look for #fff
-        if (result = /#([a-fA-F0-9])([a-fA-F0-9])([a-fA-F0-9])/.exec(str))
-            return new Color(parseInt(result[1]+result[1], 16), parseInt(result[2]+result[2], 16), parseInt(result[3]+result[3], 16));
-
-        // Otherwise, we're most likely dealing with a named color
-        var name = $.trim(str).toLowerCase();
-        if (name == "transparent")
-            return new Color(255, 255, 255, 0);
-        else {
-            result = lookupColors[name];
-            return new Color(result[0], result[1], result[2]);
-        }
-    }
 	
 	// define pie specific options and their default values
 	var options = {
@@ -818,7 +709,7 @@ file.
 				show: false,
 				radius: 'auto',	// actual radius of the visible pie (based on full calculated radius if <=1, or hard pixel value)
 				innerRadius:0, /* for donut */
-				startAngle: 0,
+				startAngle: 3/2,
 				tilt: 1,
 				offset: {
 					top: 0,
@@ -840,15 +731,14 @@ file.
 					},
 					threshold: 0	// percentage at which to hide the label (i.e. the slice is too narrow)
 				},
-                gradient:{show:false, colors:[]},//Array of colors used as a gradient after base color
 				combine: {
 					threshold: -1,	// percentage at which to combine little slices into one larger slice
 					color: null,	// color to give the new slice (auto-generated if null)
 					label: 'Other'	// label to give the new slice
 				},
 				highlight: {
-					color: '#ffee77',	// color to use for highlights
-					opacity: 0.2		// opacity to use for highlights
+					//color: '#FFF',		// will add this functionality once parseColor is available
+					opacity: 0.5
 				}
 			}
 		}
@@ -858,6 +748,6 @@ file.
 		init: init,
 		options: options,
 		name: "pie",
-		version: "0.4"
+		version: "1.0"
 	});
 })(jQuery);

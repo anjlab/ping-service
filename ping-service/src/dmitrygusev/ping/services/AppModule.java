@@ -167,7 +167,7 @@ public class AppModule
         //    providing entity value encoders
         configuration.add(JPASymbols.PROVIDE_ENTITY_VALUE_ENCODERS, "false");
         
-        configuration.add(SymbolConstants.APPLICATION_VERSION, "beta");
+        configuration.add(SymbolConstants.APPLICATION_VERSION, "beta-20100807");
     }
 
     /**

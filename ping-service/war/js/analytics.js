@@ -55,29 +55,29 @@
 
   }
 
-$(document).ready(function() {
-    $(".c-hb").each(function() {
-        var $this = $(this);
+jQuery(document).ready(function() {
+    jQuery(".c-hb").each(function() {
+        var $this = jQuery(this);
         $this.attr("href", "javascript:void(0)");
         $this.click(function(){
             hideOverviewCharts();
             showPrimaryChart();
             removeHighlights();
-            plotHistogramChart($(this), "#chart");
+            plotHistogramChart(jQuery(this), "#chart");
         });
     });
-    $(".c-pb").each(function() {
-        var $this = $(this);
+    jQuery(".c-pb").each(function() {
+        var $this = jQuery(this);
         $this.attr("href", "javascript:void(0)");
         $this.click(function(){
             hideOverviewCharts();
             showPrimaryChart();
             removeHighlights();
-            plotPieChart($(this), "#chart");
+            plotPieChart(jQuery(this), "#chart");
         });
     });
-    $(".c-m").click(function() {
-        var $this = $(this);
+    jQuery(".c-m").click(function() {
+        var $this = jQuery(this);
         if (!$this.is(".c-n")) {
             return;    //    not a numeric measure
         }
@@ -97,22 +97,17 @@ function plotHistogramChart($this, chartId, chartTitle) {
     var d = [];
     var ticks = [];
     
-    var intIdx;
-    
     ticks.push([0, "0"]);
-    for (var idx in jsonData.keys) {
-        intIdx = parseInt(idx);
-        d.push([intIdx, jsonData.values[intIdx]]);
-        var key = jsonData.keys[intIdx];
-        ticks.push([intIdx + 1, key.substring(key.indexOf(";") + 1, key.lastIndexOf("."))]);
+    for (var idx = 0; idx < jsonData.keys.length; idx++) {
+        d.push([idx, jsonData.values[idx]]);
+        var key = jsonData.keys[idx];
+        ticks.push([idx + 1, key.substring(key.indexOf(";") + 1, key.lastIndexOf("."))]);
     }
     
-    intIdx++;
+    d.push([idx, jsonData.others]);
+    ticks.push([idx + 1, "others"]);
     
-    d.push([intIdx, jsonData.others]);
-    ticks.push([intIdx + 1, "others"]);
-    
-    $.plot($(chartId), [{ 
+    jQuery.plot(jQuery(chartId), [{ 
         data: d, 
         bars: { show: true }
     }], 
@@ -150,15 +145,13 @@ function plotPieChart($this, chartId, chartTitle) {
     var actualColors = [];
     
     var data = [];
-        for (var idx in jsonData.keys)
-    {
-        intIdx = parseInt(idx);
-        key = parseInt(jsonData.keys[intIdx]);
-        data[data.length] = { label: pieLabels[key], data: jsonData.values[intIdx] };
+    for (var idx = 0; idx < jsonData.keys.length; idx++) {
+        key = jsonData.keys[idx];
+        data[data.length] = { label: pieLabels[key], data: jsonData.values[idx] };
         actualColors[actualColors.length] = pieColors[key];
     }
 
-    $.plot($(chartId), data,
+    jQuery.plot(jQuery(chartId), data,
         {
             colors: actualColors,
             series: {
@@ -186,15 +179,15 @@ function plotLineChart($this, chartId, chartTitle) {
     var classes = $this.attr("class").split(' ');
     var columnClass = getColumnClass(classes);
     
-    $dimensions = $(".c-sd");
-    $values = $(".c-sm").filter("." + columnClass);
+    $dimensions = jQuery(".c-sd");
+    $values = jQuery(".c-sm").filter("." + columnClass);
     
     for (var i = 0; i < $dimensions.length; i++) {
-        ticks.push([i, $($dimensions.get(i)).html()]);
-        d.push([i, parseFloat($($values.get(i)).html().replace(',', '.'))]);
+        ticks.push([i, jQuery($dimensions.get(i)).html()]);
+        d.push([i, parseFloat(jQuery($values.get(i)).html().replace(',', '.'))]);
     }
 
-    $.plot($(chartId), [{ 
+    jQuery.plot(jQuery(chartId), [{ 
         data: d,
         lines: { show: true },
         points: { show: true }
@@ -208,9 +201,9 @@ function plotLineChart($this, chartId, chartTitle) {
 }
 
 function removeHighlights() {
-    $(".c-sm").removeClass("c-sm");
-    $(".c-sh").removeClass("c-sh");
-    $(".c-sd").removeClass("c-sd");
+    jQuery(".c-sm").removeClass("c-sm");
+    jQuery(".c-sh").removeClass("c-sh");
+    jQuery(".c-sd").removeClass("c-sd");
 }
 
 function getColumnClass(classes) {
@@ -239,11 +232,11 @@ function highlightHeaders($this, chartId, chartTitle, chartTitleBuilder) {
         offset = 1;
     }
     
-    var $dimensionLabel = $($("." + thisClass).parent().parent().children().children().get(parts.length-2+offset));
+    var $dimensionLabel = jQuery(jQuery("." + thisClass).parent().parent().children().children().get(parts.length-2+offset));
     $dimensionLabel.addClass("c-sh");
 
-    var $aggregateLabel = $(".a" + columnClass);
-    var $measureLabel = $("#" + $aggregateLabel.attr("class").split(' ')[1]);
+    var $aggregateLabel = jQuery(".a" + columnClass);
+    var $measureLabel = jQuery("#" + $aggregateLabel.attr("class").split(' ')[1]);
 
     $aggregateLabel.addClass("c-sh");
     $measureLabel.addClass("c-sh");
@@ -262,7 +255,7 @@ function buildChartTitle($aggregateLabel, $measureLabel, $dimensionLabel, $value
     var classes = $valueCell.attr("class").split(' ');
     var dimensionClass = getDimensionClass(classes);
     
-    var dimensionValue = $("#" + dimensionClass).html();
+    var dimensionValue = jQuery("#" + dimensionClass).html();
 
     return aggregateLabel + " of " + $measureLabel.html() + " for " + $dimensionLabel.html() + " = " + dimensionValue;
 }
@@ -278,12 +271,12 @@ function buildLineChartTitle($aggregateLabel, $measureLabel, $dimensionLabel, $v
 function highlightValuesAndDimensions($valueCell, allValues) {
     var classes = $valueCell.attr("class").split(' ');
     var columnClass = getColumnClass(classes);
-    var colspan = $($valueCell.parent().children().get(0)).attr("colspan");
+    var colspan = jQuery($valueCell.parent().children().get(0)).attr("colspan");
 
     if (allValues == true) {
-        $("." + columnClass).each(function() {
-            var $this = $(this);
-            var _colspan = $($this.parent().children().get(0)).attr("colspan");
+        jQuery("." + columnClass).each(function() {
+            var $this = jQuery(this);
+            var _colspan = jQuery($this.parent().children().get(0)).attr("colspan");
             
             if (colspan == _colspan) {
                 highlightValueWithParentDimension($this);
@@ -297,11 +290,11 @@ function highlightValuesAndDimensions($valueCell, allValues) {
 function highlightValueWithParentDimension($this) {
     var classes = $this.attr("class").split(' ');
     var dimensionClass = getDimensionClass(classes);
-    $("#" + dimensionClass).addClass("c-sd");
+    jQuery("#" + dimensionClass).addClass("c-sd");
     $this.addClass("c-sm");
 }
 
 function setChartTitle(chartId, chartTitle) {
-    var $chartTitle = $(chartId).parent().children().filter(".chartTitle");
+    var $chartTitle = jQuery(chartId).parent().children().filter(".chartTitle");
     $chartTitle.text(chartTitle);
 }

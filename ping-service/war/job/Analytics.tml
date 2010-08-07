@@ -5,10 +5,10 @@
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     <link rel="stylesheet" type="text/css" href="${asset:classpath:/anjlab/cubics/css/cube.css}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/analytics.css}" />
-    <script type="text/javascript" src="${asset:classpath:/anjlab/cubics/js/jquery-1.3.2.js}"></script>
+    <script type="text/javascript" src="${context:/js/jquery-1.4.2.min.js}"></script>
     <script type="text/javascript" src="${asset:classpath:/anjlab/cubics/js/cube.js}"></script>
     <script type="text/javascript" src="${context:/js/excanvas.min.js}"></script> 
-    <script type="text/javascript" src="${context:/js/jquery.flot.js}"></script>
+    <script type="text/javascript" src="${context:/js/jquery.flot.min.js}"></script>
     <script type="text/javascript" src="${context:/js/jquery.flot.pie.js}"></script>
     <t:if test="!jobLocation.empty">
         <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
@@ -72,9 +72,9 @@
                     <p>
                         <t:outputraw value="locationMetrics" />
                     </p>
+                    <div id="map_canvas"></div>
                 </t:if>
                 
-                <div id="map_canvas"></div>
                </td>
                <td align="center" style="padding-left: 20px;">
                    <table id="charts">
@@ -110,52 +110,52 @@
            collapseAll();
            
            function showPrimaryChart() {
-               $("#chart").parent().show();
+               jQuery("#chart").parent().show();
            }
            
            function hidePrimaryChart() {
-               $("#chart").parent().hide();
+               jQuery("#chart").parent().hide();
            }
            
            var overviewCharts = ["#chart2", "#chart3", "#chart4"];
            
            function hideOverviewCharts() {
-              for (var key in overviewCharts) {
-                  $(overviewCharts[key]).parent().hide();
+              for (var idx = 0; idx != overviewCharts.length; idx++) {
+                  jQuery(overviewCharts[idx]).parent().hide();
               } 
            }
            
            function showOverviewCharts() {
-	           for (var key in overviewCharts) {
-	               $(overviewCharts[key]).parent().show();
-	           } 
+              for (var idx = 0; idx != overviewCharts.length; idx++) {
+                  jQuery(overviewCharts[idx]).parent().show();
+              } 
            }
            
            function plotOverviewCharts() {
                showOverviewCharts();
                
-               var pies = $(".m-7");
-               plotPieChart($($(pies.get(pies.length-1)).children().get(0)), "#chart2", "Total Availability, %");
-               var histograms = $(".m-4");
-               plotHistogramChart($($(histograms.get(histograms.length-1)).children().get(0)), "#chart4", "Total Response Time, ms");
+               var pies = jQuery(".m-7");
+               plotPieChart(jQuery(jQuery(pies.get(pies.length-1)).children().get(0)), "#chart2", "Total Availability, %");
+               var histograms = jQuery(".m-4");
+               plotHistogramChart(jQuery(jQuery(histograms.get(histograms.length-1)).children().get(0)), "#chart4", "Total Response Time, ms");
                removeHighlights();
-               plotLineChart($($(".m-0").get(0)), "#chart3");
-               plotLineChart($($(".m-5").get(0)), "#chart");
+               plotLineChart(jQuery(jQuery(".m-0").get(0)), "#chart3");
+               plotLineChart(jQuery(jQuery(".m-5").get(0)), "#chart");
            }
            
-           if ($("#view").val().indexOf("day") != 0) {
+           if (jQuery("#view").val().indexOf("day") != 0) {
                plotOverviewCharts();
           } else {
-              $("#overviewChartsButton").hide();
+              jQuery("#overviewChartsButton").hide();
               hidePrimaryChart();
               hideOverviewCharts();
               
               showPrimaryChart();
               removeHighlights();
-              plotLineChart($($(".m-0").filter(".ix-1")), "#chart");
+              plotLineChart(jQuery(jQuery(".m-0").filter(".ix-1")), "#chart");
           }
           
-          $("#charts").scrollFollow( { speed: 'fast' } );
+          jQuery("#charts").scrollFollow( { speed: 'fast' } );
        </script>
        
     <t:footer/>
