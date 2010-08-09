@@ -198,6 +198,10 @@ function plotLineChart($this, chartId, chartTitle) {
             autoscaleMargin: 0.02
         }
     });
+    
+    jQuery('.tickLabel:nth-child(even)[style*="text-align:center"]').each(function() {
+        jQuery(this).css('margin-top', '10px');
+    });
 }
 
 function removeHighlights() {
