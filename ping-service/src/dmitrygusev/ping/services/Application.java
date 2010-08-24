@@ -503,22 +503,32 @@ public class Application {
     }
 
     private boolean internalUpdateJobAfterDelay(Job job, boolean commitAfter) {
-        try {
-            logger.debug("Waiting for another job to commit");
-            
-            Thread.sleep(1000);
-            
+        final int maxAttempts = 3;
+        int attempt = 1;
+        
+        while (true) {
             try {
-                //  Transaction will be reopened inside DAO if required
-                jobDAO.update(job, commitAfter);
-                logger.debug("Update after delay succeeded");
+                logger.debug("Waiting for another job to commit #{} of {}", attempt, maxAttempts);
                 
-                return true;
-            } catch (RollbackException e2) {
-                logger.error("Update after delay failed", e2);
+                Thread.sleep(1000);
+                
+                try {
+                    //  Transaction will be reopened inside DAO if required
+                    jobDAO.update(job, commitAfter);
+                    logger.debug("Update after delay succeeded");
+                    
+                    return true;
+                } catch (RollbackException e) {
+                    if (attempt >= maxAttempts) {
+                        logger.error("Update after delay failed", e);
+                        break;
+                    }
+                    attempt++;
+                    logger.warn("Update after delay failed, will try again...", e);
+                }
+            } catch (InterruptedException e) {
+                logger.error("Interrupted", e);
             }
-        } catch (InterruptedException e2) {
-            logger.error("Interrupted", e2);
         }
         
         return false;

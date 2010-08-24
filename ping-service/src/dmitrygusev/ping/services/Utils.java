@@ -419,7 +419,7 @@ public class Utils {
     }
 
     private static Object getExportFilenameWithoutExtension(Job job) {
-        return String.format("ping-service-{0}-{1}", 
+        return String.format("ping-service-%s-%s", 
                         String.valueOf(job.getKey().getParent().getId()), 
                         String.valueOf(job.getKey().getId()));
     }

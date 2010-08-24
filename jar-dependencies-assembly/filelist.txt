@@ -1,10 +1,10 @@
  Том в устройстве C имеет метку OS
  Серийный номер тома: 32FD-AD7B
 
- Содержимое папки C:\dev\workspaces\ping-service\ping-service\war\WEB-INF\lib
+ Содержимое папки c:\dev\workspaces\ping-service\ping-service\war\WEB-INF\lib
 
-07.08.2010  13:57    <DIR>          .
-07.08.2010  13:57    <DIR>          ..
+19.08.2010  14:51    <DIR>          .
+19.08.2010  14:51    <DIR>          ..
 28.10.2009  12:09         1 323 005 ant-1.7.1.jar
 28.10.2009  12:11            12 143 ant-launcher-1.7.1.jar
 28.10.2009  12:09           116 205 antlr-runtime-3.1.1.jar
@@ -18,10 +18,8 @@
 24.04.2010  10:36           124 965 commons-io.jar
 24.11.2009  12:28            38 015 commons-logging-1.0.4.jar
 13.11.2008  16:10            60 686 commons-logging-1.1.1.jar
-07.08.2010  13:45            38 875 cubics-core-1.0.1.jar
-07.08.2010  13:56            38 876 cubics-core-1.0.2.jar
-07.08.2010  13:45            16 799 cubics-renders-1.0.1.jar
-07.08.2010  13:56            16 799 cubics-renders-1.0.2.jar
+19.08.2010  14:50            45 489 cubics-core-1.1.0.jar
+19.08.2010  14:50            26 683 cubics-renders-1.1.0.jar
 01.07.2010  23:41           297 800 datanucleus-appengine-1.0.7.final.jar
 01.07.2010  23:41         1 933 065 datanucleus-core-1.1.5.jar
 01.07.2010  23:41           152 768 datanucleus-jpa-1.1.5.jar
@@ -60,5 +58,5 @@
 07.08.2010  12:23            14 810 tapestry-jpa-core-2.0.2-SNAPSHOT.jar
 07.08.2010  12:28            17 110 tapestry5-annotations-5.2.0.jar
 28.10.2009  12:08           843 464 testng-5.8-jdk15.jar
-              55 файлов     33 670 056 байт
-               2 папок     515 653 632 байт свободно
+              53 файлов     33 630 879 байт
+               2 папок   2 731 749 376 байт свободно

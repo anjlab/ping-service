@@ -63,14 +63,14 @@ public class BackupJobResultsFilter extends AbstractFilter {
                     sendResultsByMail(job, resultsBuffer, job.getReportEmail());
                 }
     
-                application.getMailer().sendSystemMessageToDeveloper(
-                            "Debug: Backup Completed for Job", 
-                            "Job: " + job.getTitleFriendly() + " / " + job.getPingURL()
-                            + "\nhttp://ping-service.appspot.com/job/analytics/" 
-                            + job.getKey().getParent().getId() + "/" + job.getKey().getId()
-                            + "\nhttp://ping-service.appspot.com/job/edit/" 
-                            + job.getKey().getParent().getId() + "/" + job.getKey().getId()
-                            + "\nTotal records: " + resultsBuffer.size());
+//                application.getMailer().sendSystemMessageToDeveloper(
+//                            "Debug: Backup Completed for Job", 
+//                            "Job: " + job.getTitleFriendly() + " / " + job.getPingURL()
+//                            + "\nhttp://ping-service.appspot.com/job/analytics/" 
+//                            + job.getKey().getParent().getId() + "/" + job.getKey().getId()
+//                            + "\nhttp://ping-service.appspot.com/job/edit/" 
+//                            + job.getKey().getParent().getId() + "/" + job.getKey().getId()
+//                            + "\nTotal records: " + resultsBuffer.size());
             } else {
                 logger.error("Error saving job. Backup will not be sent to user this time.");
             }
@@ -110,7 +110,7 @@ public class BackupJobResultsFilter extends AbstractFilter {
         builder.append("<br/>You can disable receiving statistics backups for the job here: ");
         String editJobLink = application.getJobUrl(job, EditJob.class);
         builder.append(editJobLink);
-        builder.append("<br/><br/<Note:");
+        builder.append("<br/><br/>Note:");
         builder.append("<br/>Automatic Backups is a beta function, please use our <a href='http://ping-service.appspot.com/feedback'>feedback form</a> to provide a feedback on it.");
         builder.append("<br/>You will get approximately one email per week per job depending on job's cron string.");
         builder.append("<br/>Once you received an email with the statistics, this data will be deleted from Ping Service database.");
@@ -122,18 +122,20 @@ public class BackupJobResultsFilter extends AbstractFilter {
         builder.append("<br/>Thank you for understanding.");
         
         String message = builder.toString();
-        
+
+        byte[] export = JobResultCSVExporter.export(timeZone, results);
+
         MimeBodyPart attachment = new MimeBodyPart();
+        
+        attachment.setContent(new String(export), "text/comma-separated-values");
+        //  Set Content-Type explicitly since GAE ignores type of setContent(...)
+        attachment.setHeader("Content-Type", "text/comma-separated-values");
         attachment.setFileName(
                 "job-" 
                 + job.getKey().getParent().getId() + "-" +
                 + job.getKey().getId() + "-results-" 
                 + Application.formatDateForFileName(firstResult.getTimestamp(), timeZoneCity) + "-" 
-                + Application.formatDateForFileName(lastResult.getTimestamp(), timeZoneCity) + ".txt");
-        
-        byte[] export = JobResultCSVExporter.export(timeZone, results);
-        
-        attachment.setContent(new String(export), "text/plain");
+                + Application.formatDateForFileName(lastResult.getTimestamp(), timeZoneCity) + ".csv");
         
         application.getMailer().sendMail2("text/html", Mailer.PING_SERVICE_NOTIFY_GMAIL_COM, reportRecipient, subject, message, attachment);
     }

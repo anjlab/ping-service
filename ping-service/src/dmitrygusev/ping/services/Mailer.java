@@ -2,6 +2,7 @@ package dmitrygusev.ping.services;
 
 import java.util.Properties;
 
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.Session;
@@ -29,44 +30,44 @@ public class Mailer {
         sendMail2("text/plain", from, to, subject, message, attachments);
     }
 
-    public void sendMail2(String mimeType, String from, String to, String subject, String message, MimeBodyPart... attachments) {
+    public void sendMail2(String mimeType, String from, String to, String subject, String text, MimeBodyPart... attachments) {
         if (Utils.isNullOrEmpty(to)) {
-            logger.warn("mail can't be delivered to (recipient == null):\n{}", message);
+            logger.warn("mail can't be delivered to (recipient == null):\n{}", text);
             return;
         }
         
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
 
-        Message msg = new MimeMessage(session);
+        Message message = new MimeMessage(session);
         
         try {
-            msg.setFrom(new InternetAddress(from, from.equals(PING_SERVICE_NOTIFY_GMAIL_COM) ? "Ping Service Notifier" : null));
-            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            msg.setSubject(subject);
+            Multipart mp = new MimeMultipart("mixed");
 
-            Multipart multipart = new MimeMultipart();
+            BodyPart content = new MimeBodyPart();
+            content.setContent(text, mimeType);
+            mp.addBodyPart(content);
 
-            MimeBodyPart main = new MimeBodyPart();
-            main.setContent(message, mimeType);
-            multipart.addBodyPart(main);
-            
             if (attachments != null && attachments.length > 0) {
-                for (MimeBodyPart part : attachments) {
-                    multipart.addBodyPart(part);
+                for (MimeBodyPart attachment : attachments) {
+                    mp.addBodyPart(attachment);
                 }
             }
+
+            message.setFrom(new InternetAddress(from, from.equals(PING_SERVICE_NOTIFY_GMAIL_COM) ? "Ping Service Notifier" : null));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+            message.setSubject(subject);
+            message.setContent(mp);
+            message.saveChanges();
             
-            msg.setContent(multipart);
-            
-            Transport.send(msg);
+            Transport.send(message);
         } catch (Exception e) {
             logger.error(
                     "Error sending mail:"+
                     "\n\tFrom: " + from + 
                     "\n\tTo: " + to + 
                     "\n\tSubject: " + subject + 
-                    "\n\tMessage:\n\n" + message, 
+                    "\n\tMessage:\n\n" + (Utils.isNullOrEmpty(text) ? "-" : text.substring(0, 100) + "..."), 
                     e);
         }
     }

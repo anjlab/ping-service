@@ -3,6 +3,8 @@ package dmitrygusev.ping.services;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -49,6 +51,8 @@ import org.tynamo.jpa.JPATransactionManager;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
+import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 import com.google.apphosting.api.DeadlineExceededException;
 
 import dmitrygusev.ping.services.dao.AccountDAO;
@@ -59,6 +63,10 @@ import dmitrygusev.ping.services.dao.impl.cache.AccountDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.JobDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.RefDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.ScheduleDAOImplCache;
+import dmitrygusev.ping.services.location.IPResolver;
+import dmitrygusev.ping.services.location.LocationResolver;
+import dmitrygusev.ping.services.location.gae.IPWhoisNetIPResolver;
+import dmitrygusev.ping.services.location.gae.IPWhoisNetLocationResolver;
 import dmitrygusev.ping.services.security.AccessController;
 import dmitrygusev.tapestry5.TimeTranslator;
 import dmitrygusev.tapestry5.gae.LazyJPAEntityManagerSource;
@@ -104,6 +112,14 @@ public class AppModule
                 refDAO, gaeHelper, jobExecutor, mailer, linkSource,
                 globals);
     }
+    
+    public static LocationResolver buildLocationResolver() {
+        return new IPWhoisNetLocationResolver(URLFetchServiceFactory.getURLFetchService());
+    }
+
+    public static IPResolver buildIPResolver() {
+        return new IPWhoisNetIPResolver(URLFetchServiceFactory.getURLFetchService());
+    }
 
     public static Cache buildCache(Logger logger, PerthreadManager perthreadManager) {
         try {
@@ -112,10 +128,8 @@ public class AppModule
             
             LocalMemorySoftCache cache2 = new LocalMemorySoftCache(cache);
 
-            if (perthreadManager != null) {
-                perthreadManager.addThreadCleanupListener(cache2);
-            }
-
+            perthreadManager.addThreadCleanupListener(cache2);
+            
             return cache2;
         } catch (CacheException e) {
             logger.error("Error instantiating cache", e);
@@ -362,6 +376,38 @@ public class AppModule
                 }
             }
         };
+    }
+
+    @SuppressWarnings("unchecked")
+    @Match("IPResolver")
+    public static void adviseCacheIPResolverMethods(final MethodAdviceReceiver receiver, Logger logger, PerthreadManager perthreadManager) {
+        try {
+            Map props = new HashMap();
+
+            //  IP address may change, keep them in cache for one day
+            props.put(GCacheFactory.EXPIRATION_DELTA, 60 * 60 * 24);
+            
+            CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
+            Cache cache = cacheFactory.createCache(props);
+            
+            LocalMemorySoftCache cache2 = new LocalMemorySoftCache(cache);
+            
+            //  We don't want local memory cache live longer than memcache
+            //  Since we don't have any mechanism to set local cache expiration
+            //  we will just reset this cache after each request
+            perthreadManager.addThreadCleanupListener(cache2);
+            
+            receiver.adviseAllMethods(new CacheMethodResultAdvice(IPResolver.class, cache2));
+        } catch (CacheException e) {
+            logger.error("Error instantiating cache", e);
+        }
+    }
+
+    @Match("LocationResolver")
+    public static void adviseCacheLocationResolverMethods(final MethodAdviceReceiver receiver, Cache cache) {
+        //  Assume that location of IP address will never change, 
+        //  so we don't have to set any custom cache expiration parameters
+        receiver.adviseAllMethods(new CacheMethodResultAdvice(LocationResolver.class, cache));
     }
     
 //    @Match("*")

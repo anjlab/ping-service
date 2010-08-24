@@ -18,26 +18,29 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.Response;
 
+import anjlab.cubics.BeanValueProvider;
 import anjlab.cubics.Cube;
 import anjlab.cubics.FactModel;
 import anjlab.cubics.aggregate.histogram.HistogramAggregateFactory;
 import anjlab.cubics.aggregate.histogram.Histogram.HistogramMergeStrategy;
 import anjlab.cubics.aggregate.pie.PieAggregateFactory;
 import anjlab.cubics.coerce.IntegerCoercer;
-import anjlab.cubics.renders.HtmlRender;
+import anjlab.cubics.renders.html.HtmlRender;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
+import dmitrygusev.ping.filters.BackupJobResultsFilter;
 import dmitrygusev.ping.pages.Index;
 import dmitrygusev.ping.services.Application;
-import dmitrygusev.ping.services.IPUtils;
 import dmitrygusev.ping.services.JobResultCSVExporter;
 import dmitrygusev.ping.services.JobResultsAnalyzer;
 import dmitrygusev.ping.services.Utils;
-import dmitrygusev.ping.services.IPUtils.IPLocation;
+import dmitrygusev.ping.services.location.IPResolver;
+import dmitrygusev.ping.services.location.Location;
+import dmitrygusev.ping.services.location.LocationResolver;
 
 public class Analytics {
 
@@ -155,7 +158,7 @@ public class Analytics {
             result.setTimeZone(timeZone);
         }
         
-        FactModel<JobResult> model = new FactModel<JobResult>(JobResult.class);
+        FactModel<JobResult> model = new FactModel<JobResult>(new BeanValueProvider<JobResult>(JobResult.class));
         
         model.setDimensions(view.split(" > "));
         model.setMeasures("responseTime", "pingResult");
@@ -243,13 +246,18 @@ public class Analytics {
         message = job.getLastPingSummary();
     }
     
+    public void onActionFromSendResultsByMail() throws Exception {
+        BackupJobResultsFilter filter = new BackupJobResultsFilter();
+        filter.setApplication(application);
+        filter.sendResultsByMail(
+                job, job.getRecentJobResults(Integer.MAX_VALUE), "gusevdima@mail.ru");
+    }
+    
     public String getLocationMetrics() {
-        IPLocation pingServiceLocation = getPingServiceLocation();
-        IPLocation pingURLLocation = getJobLocation();
+        Location pingServiceLocation = getPingServiceLocation();
+        Location pingURLLocation = getJobLocation();
         
         long distance = pingServiceLocation.distanceInMeters(pingURLLocation);
-        
-        
         
         return "It is " + formatDistanceInKilometers(distance) 
         + " kilometers from <span class='hoverable' title='" 
@@ -262,20 +270,26 @@ public class Analytics {
         return String.format("%,d", distanceInMeters / 1000);
     }
 
-    private IPLocation pingServiceLocation;
+    private Location pingServiceLocation;
     
-    public IPLocation getPingServiceLocation() {
+    @Inject
+    private LocationResolver locationResolver;
+    @Inject
+    private IPResolver ipResolver;
+    
+    public Location getPingServiceLocation() {
         if (pingServiceLocation == null) {
-            pingServiceLocation = IPUtils.resolveLocation(IPUtils.resolveIp("http://ping-service.appspot.com"));
+            pingServiceLocation = locationResolver.resolveLocation(
+                    ipResolver.resolveIp("http://ping-service.appspot.com"));
         }
         return pingServiceLocation;
     }
 
-    private IPLocation jobLocation;
+    private Location jobLocation;
     
-    public IPLocation getJobLocation() {
+    public Location getJobLocation() {
         if (jobLocation == null) {
-            jobLocation = IPUtils.resolveLocation(IPUtils.resolveIp(job.getPingURL()));
+            jobLocation = locationResolver.resolveLocation(ipResolver.resolveIp(job.getPingURL()));
         }
         return jobLocation;
     }
@@ -299,7 +313,7 @@ public class Analytics {
                 
                 StringBuilder report = analyzer.buildPlainTextReport(timeZone);
                 
-//                report.insert(0, "Time Zone: " + timeZone.getDisplayName() + " (" + timeZone.getID() + ")\n\n");
+                report.insert(0, "Time Zone: " + timeZone.getDisplayName() + " (" + timeZone.getID() + ")\n\n");
                 
                 InputStream is = new ByteArrayInputStream(report.toString().getBytes());
                 

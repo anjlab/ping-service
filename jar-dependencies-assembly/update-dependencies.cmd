@@ -21,6 +21,8 @@ CD %PINGSERVICE_WEBINF_LIB%
 
 FOR %%i IN (tapestry*.jar) DO DEL %%i
 
+FOR %%i IN (cubics*.jar) DO DEL %%i
+
 COPY /Y %DEPENDENCIES_DIR%\*.jar %PINGSERVICE_WEBINF_LIB%
 
 ECHO ************************************************************************

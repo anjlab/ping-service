@@ -5,7 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import anjlab.cubics.Aggregate;
-import anjlab.cubics.BeanClass;
+import anjlab.cubics.BeanValueProvider;
+import anjlab.cubics.FactValueProvider;
 
 public class GeneralStats {
     
@@ -57,7 +58,7 @@ public class GeneralStats {
     
     @SuppressWarnings("unchecked")
     public static <T> GeneralStats calculate(Class<T> clazz, final String property, List<T> data) {
-        final BeanClass<T> beanClass = new BeanClass<T>(clazz);
+        final FactValueProvider<T> beanClass = new BeanValueProvider<T>(clazz);
         
         Collections.sort((List)data, new Comparator<T>() {
             @Override

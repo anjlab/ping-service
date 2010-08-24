@@ -3,6 +3,7 @@ package dmitrygusev.ping.services;
 import static dmitrygusev.ping.services.Utils.getHttpCodeDescription;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -19,6 +20,7 @@ import com.google.appengine.api.urlfetch.HTTPRequest;
 import com.google.appengine.api.urlfetch.HTTPResponse;
 import com.google.appengine.api.urlfetch.URLFetchService;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
+import com.google.apphosting.api.ApiProxy.ApiDeadlineExceededException;
 
 import dmitrygusev.ping.entities.Job;
 import dmitrygusev.ping.entities.JobResult;
@@ -98,18 +100,20 @@ public class JobExecutor {
             
             job.setLastPingDetails(sb.toString());
         }
-        catch (Exception e) {
-            logger.warn("Error fetching url " + url, e);
-        
-            job.setLastPingResult(Job.PING_RESULT_CONNECTIVITY_PROBLEM);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            PrintStream out = new PrintStream(baos);
-            e.printStackTrace(out);
-            String trace = new String(baos.toByteArray());
+        catch (IOException e) {
+            logger.debug("Error fetching url " + url, e);
             
-            job.setLastPingDetails("Error fetching url " + url + ": " 
-                    + trace.substring(0, trace.indexOf("at dmitrygusev."))); 
+            processException(job, url, e);
+        }
+        catch (ApiDeadlineExceededException e) {
+            logger.debug("Error fetching url " + url, e);
+            
+            processException(job, url, e);
+        }
+        catch (Exception e) {
+            logger.error("Error fetching url " + url, e);
+            
+            processException(job, url, e);
         }
         finally
         {
@@ -121,6 +125,20 @@ public class JobExecutor {
         jobResult.setPingResult(job.getLastPingResult());
 
         return jobResult;
+    }
+
+    private void processException(Job job, String url, Exception e) {
+        job.setLastPingResult(Job.PING_RESULT_CONNECTIVITY_PROBLEM);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream out = new PrintStream(baos);
+        e.printStackTrace(out);
+        String trace = new String(baos.toByteArray());
+        
+        int endIndex = trace.indexOf("at dmitrygusev.");
+        
+        job.setLastPingDetails("Error fetching url " + url + ": " 
+                + (endIndex < 0 ? trace : trace.substring(0, endIndex)));
     }
 
     private void checkHttpCodeValidation(Job job, HTTPResponse response,
