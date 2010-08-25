@@ -128,7 +128,10 @@ public class AppModule
             
             LocalMemorySoftCache cache2 = new LocalMemorySoftCache(cache);
 
-            perthreadManager.addThreadCleanupListener(cache2);
+            //  perthreadManager may be null if we creating cache from AbstractFilter
+            if (perthreadManager != null) {
+                perthreadManager.addThreadCleanupListener(cache2);
+            }
             
             return cache2;
         } catch (CacheException e) {
