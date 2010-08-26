@@ -118,9 +118,9 @@ public class BackupJobResultsFilter extends AbstractFilter {
 
         MimeBodyPart attachment = new MimeBodyPart();
         
-        attachment.setContent(new String(export), "text/comma-separated-values");
+        attachment.setContent(new String(export), "text/csv");
         //  Set Content-Type explicitly since GAE ignores type passed to setContent(...) method
-        attachment.setHeader("Content-Type", "text/comma-separated-values");
+        attachment.setHeader("Content-Type", "text/csv");
         attachment.setFileName(
                 "job-" 
                 + job.getKey().getParent().getId() + "-" +

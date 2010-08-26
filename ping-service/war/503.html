@@ -1,0 +1,33 @@
+<html>
+<head>
+    <title>Ping Service - Over Capacity</title>
+</head>
+<body>
+    <h1>
+        Over Capacity
+    </h1>
+    
+    <p>
+        We apologize for the inconvenience.
+    </p>
+    
+    <p>
+        Service is temporary unavailable until <span id="deadline">8:00 am UTC time.</span>
+        
+        <script type="text/javascript">
+           var element = document.getElementById("deadline");
+           var now = new Date();
+           var deadline = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8);
+           var timezoneOffset = now.getTimezoneOffset() / 60;
+           deadline.setHours(deadline.getHours() - timezoneOffset);
+           if (deadline <= now) {
+               deadline.setDate(deadline.getDate() + 1);
+           }
+           element.innerHTML = deadline.toLocaleTimeString().replace(/:00$/, "") 
+                             + " your time (" 
+                             + Math.round((deadline - now) / 60 / 60 / 1000) 
+                             + " hours left).";
+        </script>
+    </p>
+</body>
+</html>

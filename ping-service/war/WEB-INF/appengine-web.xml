@@ -13,4 +13,10 @@
     <admin-console>
         <page name="Appstats" url="/appstats/" />
     </admin-console>
+    
+    <static-error-handlers>
+        <handler file="500.html"/>
+        <handler file="503.html" error-code="over_quota"/>
+        <handler file="504.html" error-code="timeout"/>
+    </static-error-handlers>
 </appengine-web-app>

@@ -18,11 +18,11 @@
                 <a target="_blank" href="https://www.google.com/accounts/NewAccount">here</a>.
             </p>
 
-            <p>You also may find helpful our <t:pagelink page="help">Quick Start Guide</t:pagelink>.</p>
-
             <p>
                 <t:pagelink page="job/analytics" context="pingServiceJobContext">Take a tour</t:pagelink> (statistics for Ping Service itself).
             </p>
+
+            <p>You also may find helpful our <t:pagelink page="help">Quick Start Guide</t:pagelink>.</p>
 
             <t:pagelink page="job/analytics" context="pingServiceJobContext">
                 <img src="images/analytics-demo.png" width="500" height="252" alt="Analytics Workspace Demo"
