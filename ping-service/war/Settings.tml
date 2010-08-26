@@ -9,11 +9,10 @@
 
         <h2><t:logo/> Settings</h2>
 
-        <font color="${messageColor}">
-            <p>${message}</p>
-        </font>
-
         <div align="center">
+	        <font color="${messageColor}">
+	            <p>${message}</p>
+	        </font>
             <t:form>
                 <table>
                     <tr>

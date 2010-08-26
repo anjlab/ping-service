@@ -107,7 +107,9 @@ public abstract class AbstractFilter implements Filter {
                                                                   null);
                                           }
                                       }, 
-                                      globals);
+                                      globals,
+                                      null,
+                                      null);
     }
 
     public void setApplication(Application application) {
@@ -153,7 +155,7 @@ public abstract class AbstractFilter implements Filter {
         }
         catch (Exception e)
         {
-            logger.warn("Error enqueueing job", e);
+            logger.warn("Error processing request", e);
         }
         finally
         {

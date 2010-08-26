@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.labs.taskqueue.Queue;
 import com.google.appengine.api.labs.taskqueue.TaskOptions;
+import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
 import dmitrygusev.ping.entities.Account;
@@ -45,6 +46,9 @@ import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.JobDAO;
 import dmitrygusev.ping.services.dao.RefDAO;
 import dmitrygusev.ping.services.dao.ScheduleDAO;
+import dmitrygusev.ping.services.location.Location;
+import dmitrygusev.ping.services.location.LocationResolver;
+import dmitrygusev.ping.services.location.TimeZoneResolver;
 
 public class Application {
 
@@ -60,6 +64,8 @@ public class Application {
     private Mailer mailer;
     private PageRenderLinkSource linkSource;
     private RequestGlobals globals;
+    private TimeZoneResolver timeZoneResolver;
+    private LocationResolver locationResolver;
 
     public static final int DEFAULT_NUMBER_OF_JOB_RESULTS = 1000;
 
@@ -72,6 +78,9 @@ public class Application {
     public static final String MAIL_QUEUE = "mail";
     public static final String DEFAULT_QUEUE = "default";
 
+    public static final String ANONYMOUS_TIME_ZONE_ID_SESSION_ATTRIBUTE_NAME = "anonymous.timeZoneId";
+    public static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
+
     public Application(
             AccountDAO accountDAO, 
             JobDAO jobDAO,
@@ -81,7 +90,9 @@ public class Application {
             JobExecutor jobExecutor,
             Mailer mailer,
             PageRenderLinkSource linkSource,
-            RequestGlobals globals) {
+            RequestGlobals globals,
+            TimeZoneResolver timeZoneResolver,
+            LocationResolver locationResolver) {
         super();
         this.accountDAO = accountDAO;
         this.jobDAO = jobDAO;
@@ -92,7 +103,8 @@ public class Application {
         this.mailer = mailer;
         this.linkSource = linkSource;
         this.globals = globals;
-//        this.memcache = memcache;
+        this.timeZoneResolver = timeZoneResolver;
+        this.locationResolver = locationResolver;
     }
 
     public List<Account> getAccounts(Schedule schedule) {
@@ -312,25 +324,15 @@ public class Application {
     }
 
     public String formatDateForFileName(Date date) {
-        String timeZoneCity = getUserAccount().getTimeZoneCity();
-
-        return formatDate(DATETIME_FORMAT_FOR_FILE_NAME, timeZoneCity, date);
+        return formatDate(DATETIME_FORMAT_FOR_FILE_NAME, getTimeZone(), date);
     }
     
-    public static String formatDateForFileName(Date date, String timeZoneCity) {
-        return formatDate(DATETIME_FORMAT_FOR_FILE_NAME, timeZoneCity, date);
+    public static String formatDateForFileName(Date date, TimeZone timeZone) {
+        return formatDate(DATETIME_FORMAT_FOR_FILE_NAME, timeZone, date);
     }
     
     public String formatDate(Date date) {
-        String timeZoneCity = getUserAccount().getTimeZoneCity();
-
-        return formatDate(DATETIME_FORMAT, timeZoneCity, date);
-    }
-
-    public static String formatDate(DateFormat format, String timeZoneCity, Date date) {
-        TimeZone timezone = getTimeZone(timeZoneCity);
-
-        return formatDate(format, timezone, date);
+        return formatDate(DATETIME_FORMAT, getTimeZone(), date);
     }
 
     public static String formatDate(DateFormat format, TimeZone timeZone, Date date) {
@@ -340,13 +342,44 @@ public class Application {
     }
 
     public TimeZone getTimeZone() {
-        return getTimeZone(getUserAccount().getTimeZoneCity());
+        UserService userService = UserServiceFactory.getUserService();
+        
+        return userService.isUserLoggedIn()
+                ? getTimeZone(getUserAccount().getTimeZoneCity())
+                : getTimeZoneByClientIP();
     }
     
-    public static TimeZone getTimeZone(String timeZoneCity) {
+    private TimeZone getTimeZone(String timeZoneCity) {
         return Utils.isNullOrEmpty(timeZoneCity) 
-                                ? TimeZone.getTimeZone("UTC") 
+                                ? getTimeZoneByClientIP() 
                                 : TimeZone.getTimeZone(Utils.getTimeZoneId(timeZoneCity));
+    }
+    
+    private TimeZone getTimeZoneByClientIP() {
+        TimeZone timeZone = UTC_TIME_ZONE;
+        
+        try {
+            String clientIP = globals.getHTTPServletRequest().getRemoteAddr();
+            
+            if (!Utils.isNullOrEmpty(clientIP)) {
+                Location location = locationResolver.resolveLocation(clientIP);
+                
+                if (!location.isEmpty()) {
+                    timeZone = timeZoneResolver.resolveTimeZone(location.getLatitude(), location.getLongitude());
+                }
+                
+                if (timeZone == null) {
+                    timeZone = UTC_TIME_ZONE;
+                }
+            }
+            
+            logger.debug("Resolved timeZoneId is {}", timeZone.getID());
+        } catch (Exception e) {
+            logger.error("Error resolving client timezone by ip " 
+                    + globals.getHTTPServletRequest().getRemoteAddr(), e);
+        }
+        
+        return timeZone;
     }
 
     private static Account getSystemAccount() {

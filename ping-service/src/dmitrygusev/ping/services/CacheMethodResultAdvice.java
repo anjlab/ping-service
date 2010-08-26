@@ -7,12 +7,16 @@ import net.sf.jsr107cache.Cache;
 
 import org.apache.tapestry5.ioc.Invocation;
 import org.apache.tapestry5.ioc.MethodAdvice;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CacheMethodResultAdvice implements MethodAdvice {
 
-    private Cache cache;
-    private Class<?> advisedClass;
-    private Object nullObject = new Object();
+    private static final Logger logger = LoggerFactory.getLogger(CacheMethodResultAdvice.class);
+    
+    private final Cache cache;
+    private final Class<?> advisedClass;
+    private final Object nullObject = new Object();
     
     public CacheMethodResultAdvice(Class<?> advisedClass, Cache cache) {
         this.advisedClass = advisedClass;
@@ -21,14 +25,18 @@ public class CacheMethodResultAdvice implements MethodAdvice {
     
     @Override
     public void advise(Invocation invocation) {
-        String entityCacheKey = getEntityCacheKey(invocation);
+        String invocationSignature = getInvocationSignature(invocation);
         
+        String entityCacheKey = String.valueOf(invocationSignature.hashCode());
+
         Object result;
         
         if (cache.containsKey(entityCacheKey))
         {
             result = cache.get(entityCacheKey);
-            
+
+            logger.debug("Using invocation result ({}) from cache '{}'", invocationSignature, result);
+
             invocation.overrideResult(result);
         }
         else 
@@ -44,7 +52,7 @@ public class CacheMethodResultAdvice implements MethodAdvice {
         }
     }
 
-    private String getEntityCacheKey(Invocation invocation) {
+    private String getInvocationSignature(Invocation invocation) {
         StringBuilder builder = new StringBuilder(150);
         builder.append(advisedClass.getName());
         builder.append('.');
@@ -63,8 +71,7 @@ public class CacheMethodResultAdvice implements MethodAdvice {
         }
         builder.append(')');
         
-        String entityCacheKey = String.valueOf(builder.toString().hashCode());
-        return entityCacheKey;
+        return builder.toString();
     }
     
 }

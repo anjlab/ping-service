@@ -24,8 +24,10 @@ public class TestJob {
         job.setLastPingTimestamp(new Date(0));
         job.setLastPingResult(Job.PING_RESULT_NOT_AVAILABLE);
         
+        TimeZone timeZone = TimeZone.getTimeZone("Europe/Moscow");
+        
         StringBuilder sb = new StringBuilder();
-        String formattedDate = Application.formatDate(Application.DATETIME_FORMAT, "Moscow", job.getLastPingTimestamp());
+        String formattedDate = Application.formatDate(Application.DATETIME_FORMAT, timeZone, job.getLastPingTimestamp());
         Job.buildPingResultSummary(job.getLastPingResult(), sb);
         
         Assert.assertEquals("1970-01-01 03:00:00", formattedDate);
@@ -34,7 +36,7 @@ public class TestJob {
         job.setLastPingResult(Job.PING_RESULT_OK);
 
         sb = new StringBuilder();
-        formattedDate = Application.formatDate(Application.DATETIME_FORMAT, "Moscow", job.getLastPingTimestamp());
+        formattedDate = Application.formatDate(Application.DATETIME_FORMAT, timeZone, job.getLastPingTimestamp());
         Job.buildPingResultSummary(job.getLastPingResult(), sb);
         
         Assert.assertEquals("1970-01-01 03:00:00", formattedDate);

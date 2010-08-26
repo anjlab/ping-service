@@ -40,7 +40,9 @@
     
     <h2><t:logo/> Analytics Workspace</h2>
     
-    <div>for "${job.titleFriendly}"<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a> [statistics based on last ${timeDiff} (from ${dateFrom} to ${dateTo})] <a href="/feedback?subject=Request for earlier data">Need earlier data? Send a request!</a></div>
+    <div><span style="font-weight: bold; font-size: 120%">${job.titleFriendly}</span><a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a> 
+    <span title="from ${dateFrom} to ${dateTo}; your time is ${clientTime}"> statistics based on ${timeDiff} </span>
+    <a href="/feedback?subject=Request for earlier data">Need earlier data? Send a request!</a></div>
     
     <font color="red"><p>${message}</p></font>
        
@@ -79,30 +81,25 @@
                 
                </td>
                <td align="center" style="padding-left: 20px;">
-                   <table id="charts">
-                   <tr>
-                       <td>
-                           <div>
-                            <h4 class="chartTitle">Chart</h4>
-                            <div style="width: 350px; height: 200px;" id="chart"/>
-                        </div>
-                        <div>
-                            <h4 class="chartTitle">Chart</h4>
-                            <div style="width: 350px; height: 200px; display: hidden;" id="chart3"/>
-                        </div>
-                    </td>
-                       <td>
-                           <div>
-                            <h4 class="chartTitle">Chart</h4>
-                            <div style="width: 350px; height: 200px; display: hidden;" id="chart2"/>
-                        </div>
-                        <div>
-                            <h4 class="chartTitle">Chart</h4>
-                            <div style="width: 350px; height: 200px; display: hidden;" id="chart4"/>
-                        </div>
-                       </td>
-                   </tr>
-                   </table>
+                <div id="charts">
+                    <div style="float: left;">
+                        <h4 class="chartTitle">Chart</h4>
+                        <div style="width: 350px; height: 200px;" id="chart"/>
+                    </div>
+                    <div style="float: left;">
+                        <h4 class="chartTitle">Chart</h4>
+                        <div style="width: 350px; height: 200px; display: hidden;" id="chart2"/>
+                    </div>
+                    <div style="float: left;">
+                        <h4 class="chartTitle">Chart</h4>
+                        <div style="width: 350px; height: 200px; display: hidden;" id="chart3"/>
+                    </div>
+                    <div style="float: left;">
+                        <h4 class="chartTitle">Chart</h4>
+                        <div style="width: 350px; height: 200px; display: hidden;" id="chart4"/>
+                    </div>
+                    <div style="clear: both;"/>
+                </div>
                </td>
            </tr>
        </table>

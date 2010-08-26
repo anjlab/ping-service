@@ -58,15 +58,9 @@
             ${job.titleFriendly}<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a>
         </t:parameter>
 
-        <t:parameter name="analyticsCell">
-            <t:pagelink t:id="analytics" page="job/analytics" context="jobContext">Analyze</t:pagelink>
-        </t:parameter>
-
-        <t:parameter name="detailsCell">
-            <t:pagelink t:id="details" page="job/edit" context="jobContext">Edit</t:pagelink>
-        </t:parameter>
-
-        <t:parameter name="deleteCell">
+        <t:parameter name="actionsCell">
+            <t:pagelink t:id="analytics" page="job/analytics" context="jobContext">Analyze</t:pagelink>,
+            <t:pagelink t:id="details" page="job/edit" context="jobContext">Edit</t:pagelink>,
             <t:actionlink t:id="deleteJob" context="jobContext" 
                 onclick="return confirm('Are you sure you want to delete the job and all its statistics?');">Delete</t:actionlink>
         </t:parameter>

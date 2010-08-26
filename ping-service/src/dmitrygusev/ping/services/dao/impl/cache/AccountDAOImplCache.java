@@ -45,12 +45,17 @@ public class AccountDAOImplCache extends AccountDAOImpl {
         super.delete(id);
         Object entityCacheKey = getEntityCacheKey(Account.class, id);
         cache.remove(entityCacheKey);
+        
+        //  TODO Account with email as a key will remain in cache, remove it also 
     }
     
     @Override
     public void update(Account account) {
         super.update(account);
         Object entityCacheKey = getEntityCacheKey(Account.class, account.getId());
+        cache.put(entityCacheKey, account);
+
+        entityCacheKey = getEntityCacheKey(Account.class, account.getEmail());
         cache.put(entityCacheKey, account);
     }
 }

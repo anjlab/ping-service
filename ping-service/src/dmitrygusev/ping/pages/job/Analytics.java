@@ -37,6 +37,7 @@ import dmitrygusev.ping.pages.Index;
 import dmitrygusev.ping.services.Application;
 import dmitrygusev.ping.services.JobResultCSVExporter;
 import dmitrygusev.ping.services.JobResultsAnalyzer;
+import dmitrygusev.ping.services.Mailer;
 import dmitrygusev.ping.services.Utils;
 import dmitrygusev.ping.services.location.IPResolver;
 import dmitrygusev.ping.services.location.Location;
@@ -63,6 +64,10 @@ public class Analytics {
     
     public String getDateTo() {
         return application.formatDate(dateTo);
+    }
+    
+    public String getClientTime() {
+        return application.formatDate(new Date());
     }
     
     @InjectPage
@@ -250,7 +255,7 @@ public class Analytics {
         BackupJobResultsFilter filter = new BackupJobResultsFilter();
         filter.setApplication(application);
         filter.sendResultsByMail(
-                job, job.getRecentJobResults(Integer.MAX_VALUE), "gusevdima@mail.ru");
+                job, job.getRecentJobResults(Integer.MAX_VALUE), Mailer.DMITRY_GUSEV_GMAIL_COM);
     }
     
     public String getLocationMetrics() {

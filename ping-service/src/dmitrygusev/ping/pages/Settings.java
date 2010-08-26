@@ -50,7 +50,8 @@ public class Settings {
     public void onSuccess() {
         try {
             accountDAO.update(getUserAccount());
-            
+
+            this.message = "Saved";
             this.messageColor = "green";
         } catch (Exception e) {
             this.message = e.getMessage();

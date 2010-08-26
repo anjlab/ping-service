@@ -105,7 +105,7 @@ public class EditJob {
         Date timestamp = job.getLastPingTimestamp();
         
         return timestamp != null 
-             ? Application.formatDate(Application.DATETIME_FORMAT, application.getTimeZone(), timestamp) 
+             ? application.formatDate(timestamp) 
              : "N/A";
     }
     

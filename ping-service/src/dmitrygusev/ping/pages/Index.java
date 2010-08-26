@@ -3,7 +3,6 @@ package dmitrygusev.ping.pages;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import net.sf.jsr107cache.Cache;
 
@@ -53,10 +52,7 @@ public class Index {
         grantedEmail = null;
         job = null;
         messageColor = null;
-        timeZone = null;
     }
-    
-    private TimeZone timeZone;
     
     @Property
     private Job job;
@@ -64,16 +60,7 @@ public class Index {
     public String getLastPingTimestamp() {
         Date timestamp = job.getLastPingTimestamp();
         
-        return timestamp != null 
-             ? Application.formatDate(Application.DATETIME_FORMAT, getTimeZone(), timestamp) 
-             : "N/A";
-    }
-
-    private TimeZone getTimeZone() {
-        if (timeZone == null) {
-            timeZone = application.getTimeZone();
-        }
-        return timeZone;
+        return timestamp != null ? application.formatDate(timestamp) : "N/A";
     }
     
     public String getSummaryStatusCssClass() {
@@ -219,9 +206,7 @@ public class Index {
             }
         }).sortable(false);
 
-        beanModel.add("analytics", null);
-        beanModel.add("details", null);
-        beanModel.add("delete", null);
+        beanModel.add("actions", null);
         
         beanModel.exclude(
                 "receiveNotifications",
@@ -265,7 +250,7 @@ public class Index {
                         "upDownTimeInMinutes", 
                         "recentAvailabilityPercent", 
                         "totalAvailabilityPercent", 
-                        "analytics");
+                        "actions");
         
         return beanModel;
     }

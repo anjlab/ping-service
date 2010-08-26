@@ -65,6 +65,8 @@ import dmitrygusev.ping.services.dao.impl.cache.RefDAOImplCache;
 import dmitrygusev.ping.services.dao.impl.cache.ScheduleDAOImplCache;
 import dmitrygusev.ping.services.location.IPResolver;
 import dmitrygusev.ping.services.location.LocationResolver;
+import dmitrygusev.ping.services.location.TimeZoneResolver;
+import dmitrygusev.ping.services.location.gae.GeonamesTimeZoneResolver;
 import dmitrygusev.ping.services.location.gae.IPWhoisNetIPResolver;
 import dmitrygusev.ping.services.location.gae.IPWhoisNetLocationResolver;
 import dmitrygusev.ping.services.security.AccessController;
@@ -106,11 +108,13 @@ public class AppModule
                                                ApplicationStateManager stateManager,
                                                PageRenderLinkSource linkSource,
                                                RequestGlobals globals,
-                                               MemcacheService memcache)
+                                               MemcacheService memcache,
+                                               TimeZoneResolver timeZoneResolver,
+                                               LocationResolver locationResolver)
     {
         return new Application(accountDAO, jobDAO, scheduleDAO, 
                 refDAO, gaeHelper, jobExecutor, mailer, linkSource,
-                globals);
+                globals, timeZoneResolver, locationResolver);
     }
     
     public static LocationResolver buildLocationResolver() {
@@ -121,6 +125,10 @@ public class AppModule
         return new IPWhoisNetIPResolver(URLFetchServiceFactory.getURLFetchService());
     }
 
+    public static TimeZoneResolver buildTimeZoneResolver() {
+        return new GeonamesTimeZoneResolver(URLFetchServiceFactory.getURLFetchService(), "ping_service");
+    }
+    
     public static Cache buildCache(Logger logger, PerthreadManager perthreadManager) {
         try {
             CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
@@ -387,7 +395,7 @@ public class AppModule
         try {
             Map props = new HashMap();
 
-            //  IP address may change, keep them in cache for one day
+            //  IP address of URL may change, keep it in cache for one day
             props.put(GCacheFactory.EXPIRATION_DELTA, 60 * 60 * 24);
             
             CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
@@ -409,6 +417,13 @@ public class AppModule
     @Match("LocationResolver")
     public static void adviseCacheLocationResolverMethods(final MethodAdviceReceiver receiver, Cache cache) {
         //  Assume that location of IP address will never change, 
+        //  so we don't have to set any custom cache expiration parameters
+        receiver.adviseAllMethods(new CacheMethodResultAdvice(LocationResolver.class, cache));
+    }
+    
+    @Match("TimeZoneResolver")
+    public static void adviseCacheTimeZoneResolverMethods(final MethodAdviceReceiver receiver, Cache cache) {
+        //  Assume that time zone of location will never change, 
         //  so we don't have to set any custom cache expiration parameters
         receiver.adviseAllMethods(new CacheMethodResultAdvice(LocationResolver.class, cache));
     }

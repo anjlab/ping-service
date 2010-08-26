@@ -58,6 +58,10 @@ a.external {
 	vertical-align: text-bottom;
 }
 
+.job:hover, .job:nth-child(even):hover {
+	background-color: #DCE5FF;
+}
+
 .job:nth-child(even) {
     background-color: #E8E8E8;
 }

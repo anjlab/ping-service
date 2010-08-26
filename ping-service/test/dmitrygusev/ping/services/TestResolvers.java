@@ -5,9 +5,10 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import dmitrygusev.ping.services.location.Location;
+import dmitrygusev.ping.services.location.gae.GeonamesTimeZoneResolver;
 
 
-public class TestIPUtils {
+public class TestResolvers {
 
     @Test
     public void testParseIPLocation() {
@@ -41,5 +42,12 @@ public class TestIPUtils {
     @Test
     public void testIsEmpty() {
         assertTrue(Location.empty().isEmpty());
+    }
+    
+    @Test
+    public void formatGeonamesURL() {
+        GeonamesTimeZoneResolver resolver = new GeonamesTimeZoneResolver(null, "user_name");
+        String url = resolver.formatURL(1.341, 3.123);
+        assertEquals("http://ws.geonames.org/timezoneJSON?lat=1.34&lng=3.12&username=user_name", url);
     }
 }

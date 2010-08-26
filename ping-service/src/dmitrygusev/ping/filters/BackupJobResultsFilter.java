@@ -62,15 +62,7 @@ public class BackupJobResultsFilter extends AbstractFilter {
                 if (job.isReceiveBackups() && !Utils.isNullOrEmpty(job.getReportEmail())) {
                     sendResultsByMail(job, resultsBuffer, job.getReportEmail());
                 }
-    
-//                application.getMailer().sendSystemMessageToDeveloper(
-//                            "Debug: Backup Completed for Job", 
-//                            "Job: " + job.getTitleFriendly() + " / " + job.getPingURL()
-//                            + "\nhttp://ping-service.appspot.com/job/analytics/" 
-//                            + job.getKey().getParent().getId() + "/" + job.getKey().getId()
-//                            + "\nhttp://ping-service.appspot.com/job/edit/" 
-//                            + job.getKey().getParent().getId() + "/" + job.getKey().getId()
-//                            + "\nTotal records: " + resultsBuffer.size());
+
             } else {
                 logger.error("Error saving job. Backup will not be sent to user this time.");
             }
@@ -83,8 +75,7 @@ public class BackupJobResultsFilter extends AbstractFilter {
         
         String subject = "Statistics Backup for " + job.getTitleFriendly();
 
-        String timeZoneCity = null; //  TODO Use job specific time zone
-        TimeZone timeZone = Application.getTimeZone(timeZoneCity);
+        TimeZone timeZone = Application.UTC_TIME_ZONE; //  TODO Use job specific time zone
 
         StringBuilder builder = new StringBuilder();
         builder.append("Job results for period: ");
@@ -128,14 +119,14 @@ public class BackupJobResultsFilter extends AbstractFilter {
         MimeBodyPart attachment = new MimeBodyPart();
         
         attachment.setContent(new String(export), "text/comma-separated-values");
-        //  Set Content-Type explicitly since GAE ignores type of setContent(...)
+        //  Set Content-Type explicitly since GAE ignores type passed to setContent(...) method
         attachment.setHeader("Content-Type", "text/comma-separated-values");
         attachment.setFileName(
                 "job-" 
                 + job.getKey().getParent().getId() + "-" +
                 + job.getKey().getId() + "-results-" 
-                + Application.formatDateForFileName(firstResult.getTimestamp(), timeZoneCity) + "-" 
-                + Application.formatDateForFileName(lastResult.getTimestamp(), timeZoneCity) + ".csv");
+                + Application.formatDateForFileName(firstResult.getTimestamp(), timeZone) + "-" 
+                + Application.formatDateForFileName(lastResult.getTimestamp(), timeZone) + ".csv");
         
         application.getMailer().sendMail2("text/html", Mailer.PING_SERVICE_NOTIFY_GMAIL_COM, reportRecipient, subject, message, attachment);
     }
