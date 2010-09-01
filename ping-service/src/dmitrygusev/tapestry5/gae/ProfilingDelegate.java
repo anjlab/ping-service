@@ -14,10 +14,12 @@ public class ProfilingDelegate implements Delegate<Environment> {
 
     private static final Logger logger = LoggerFactory.getLogger(ProfilingDelegate.class);
     
-    private Delegate<Environment> parent;
+    private final Delegate<Environment> parent;
+    private final String appPackage;
     
-    public ProfilingDelegate(Delegate<Environment> parent) {
+    public ProfilingDelegate(Delegate<Environment> parent, String appPackage) {
       this.parent = parent;
+      this.appPackage = appPackage;
     }
     
     public void log(Environment env, LogRecord logRec) {
@@ -28,12 +30,18 @@ public class ProfilingDelegate implements Delegate<Environment> {
     public byte[] makeSyncCall(Environment env, String pkg, String method, byte[] request) throws ApiProxyException {
         long start = System.currentTimeMillis();
         byte[] result = parent.makeSyncCall(env, pkg, method, request);
-        StringBuilder builder = buildStackTrace();
-        logger.info("GAE/S {}.{}: ->{}<-\n{}", new Object[] { pkg, method, System.currentTimeMillis() - start, builder });
+        StringBuilder builder = buildStackTrace(appPackage);
+        logger.info("GAE/S {}.{}: ->{} ms<-\n{}", new Object[] { pkg, method, System.currentTimeMillis() - start, builder });
         return result;
     }
 
-    public static StringBuilder buildStackTrace() {
+    /**
+     * 
+     * @param appPackage
+     *        Only classes from this package would be included in trace.
+     * @return
+     */
+    public static StringBuilder buildStackTrace(String appPackage) {
         StackTraceElement[] traces = Thread.currentThread().getStackTrace();
         StringBuilder builder = new StringBuilder();
         int length = traces.length;
@@ -42,7 +50,7 @@ public class ProfilingDelegate implements Delegate<Environment> {
         for (int i = 3; i < length; i++) {
             traceElement = traces[i];
             className = traceElement.getClassName();
-            if (className.startsWith("dmitrygusev")) {
+            if (className.startsWith(appPackage)) {
                 if (builder.length() > 0) {
                     builder.append('\n');
                 }
@@ -75,8 +83,8 @@ public class ProfilingDelegate implements Delegate<Environment> {
     public Future<byte[]> makeAsyncCall(Environment env, String pkg, String method, byte[] request, ApiConfig config) {
         long start = System.currentTimeMillis();
         Future<byte[]> result = parent.makeAsyncCall(env, pkg, method, request, config);
-        StringBuilder builder = buildStackTrace();
-        logger.info("GAE/A {}.{}: ->{}<-\n{}", new Object[] { pkg, method, System.currentTimeMillis() - start, builder });
+        StringBuilder builder = buildStackTrace(appPackage);
+        logger.info("GAE/A {}.{}: ->{} ms<-\n{}", new Object[] { pkg, method, System.currentTimeMillis() - start, builder });
         return result;
     }
 }

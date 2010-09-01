@@ -16,6 +16,7 @@ import net.sf.jsr107cache.CacheManager;
 import org.apache.tapestry5.MarkupWriter;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.Translator;
+import org.apache.tapestry5.internal.InternalConstants;
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.MethodAdviceReceiver;
@@ -53,7 +54,6 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
-import com.google.apphosting.api.DeadlineExceededException;
 
 import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.JobDAO;
@@ -304,9 +304,12 @@ public class AppModule
         return source;
     }
     
-    public JPATransactionManager buildLazyJPATransactionManager(final JPAEntityManagerSource source)
+    public JPATransactionManager buildLazyJPATransactionManager(
+            final JPAEntityManagerSource source,
+            @Inject @Symbol(InternalConstants.TAPESTRY_APP_PACKAGE_PARAM) 
+            String appPackage)
     {
-        return new LazyJPATransactionManager(source);
+        return new LazyJPATransactionManager(source, appPackage);
     }
 
     @SuppressWarnings("unchecked")
@@ -378,13 +381,9 @@ public class AppModule
         {
             public void handleRequestException(Throwable exception) throws IOException
             {
-                logger.error("Unexpected runtime exception: " + exception.getMessage(), exception);
+                logger.error("Unexpected runtime exception", exception);
                 
-                if (exception instanceof DeadlineExceededException) {
-                    response.sendError(HttpServletResponse.SC_GATEWAY_TIMEOUT, null);
-                } else {
-                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
-                }
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
             }
         };
     }

@@ -31,7 +31,7 @@ public class LazyTapestryFilter implements Filter {
         FILTER_CONFIG = config;
         this.config = config;
         //  Note: Comment this off to profile Google API requests
-//        ApiProxy.setDelegate(new ProfilingDelegate(ApiProxy.getDelegate()));
+//        ApiProxy.setDelegate(new ProfilingDelegate(ApiProxy.getDelegate(), "dmitrygusev"));
     }
     
     @Override

@@ -38,12 +38,14 @@ public class LocalMemorySoftCache implements Cache, ThreadCleanupListener {
 
     @Override
     public boolean containsKey(Object key) {
-        return cache.containsKey(key);
+        return map.containsKey(key)
+            || cache.containsKey(key);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return cache.containsValue(value);
+        return map.containsValue(value)
+            || cache.containsValue(value);
     }
 
     @SuppressWarnings("unchecked")

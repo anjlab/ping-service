@@ -155,7 +155,7 @@ public abstract class AbstractFilter implements Filter {
         }
         catch (Exception e)
         {
-            logger.warn("Error processing request", e);
+            logger.error("Error processing request", e);
         }
         finally
         {
