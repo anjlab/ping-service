@@ -1,16 +1,16 @@
  Том в устройстве C имеет метку OS
  Серийный номер тома: 32FD-AD7B
 
- Содержимое папки c:\dev\workspaces\ping-service\ping-service\war\WEB-INF\lib
+ Содержимое папки C:\dev\workspaces\ping-service\ping-service\war\WEB-INF\lib
 
-19.08.2010  14:51    <DIR>          .
-19.08.2010  14:51    <DIR>          ..
+04.09.2010  01:13    <DIR>          .
+04.09.2010  01:13    <DIR>          ..
 28.10.2009  12:09         1 323 005 ant-1.7.1.jar
 28.10.2009  12:11            12 143 ant-launcher-1.7.1.jar
 28.10.2009  12:09           116 205 antlr-runtime-3.1.1.jar
-01.07.2010  23:41        10 199 133 appengine-api-1.0-sdk-1.3.5.jar
-01.07.2010  23:41         1 305 403 appengine-api-labs-1.3.5.jar
-01.07.2010  23:41            15 404 appengine-jsr107cache-1.3.5.jar
+24.08.2010  20:09        10 494 022 appengine-api-1.0-sdk-1.3.6.jar
+24.08.2010  20:09         1 336 918 appengine-api-labs-1.3.6.jar
+24.08.2010  20:09            15 404 appengine-jsr107cache-1.3.6.jar
 24.04.2010  10:36             5 142 auth.jar
 28.10.2009  12:09         1 269 446 bcprov-jdk15-135.jar
 24.11.2009  12:27            46 725 commons-codec-1.3.jar
@@ -20,11 +20,11 @@
 13.11.2008  16:10            60 686 commons-logging-1.1.1.jar
 19.08.2010  14:50            45 489 cubics-core-1.1.0.jar
 19.08.2010  14:50            26 683 cubics-renders-1.1.0.jar
-01.07.2010  23:41           297 800 datanucleus-appengine-1.0.7.final.jar
-01.07.2010  23:41         1 933 065 datanucleus-core-1.1.5.jar
-01.07.2010  23:41           152 768 datanucleus-jpa-1.1.5.jar
-01.07.2010  23:41            52 877 geronimo-jpa_3.0_spec-1.1.1.jar
-01.07.2010  23:41            16 030 geronimo-jta_1.1_spec-1.1.1.jar
+24.08.2010  20:09           297 800 datanucleus-appengine-1.0.7.final.jar
+24.08.2010  20:09         1 933 065 datanucleus-core-1.1.5.jar
+24.08.2010  20:09           152 768 datanucleus-jpa-1.1.5.jar
+24.08.2010  20:09            52 877 geronimo-jpa_3.0_spec-1.1.1.jar
+24.08.2010  20:09            16 030 geronimo-jta_1.1_spec-1.1.1.jar
 28.10.2009  12:05            15 172 gmaven-common-1.0-rc-3.jar
 28.10.2009  12:05            17 457 gmaven-feature-api-1.0-rc-3.jar
 28.10.2009  12:10            16 103 gmaven-feature-support-1.0-rc-3.jar
@@ -35,9 +35,9 @@
 28.10.2009  12:08         2 810 333 groovy-all-minimal-1.5.6.jar
 07.08.2010  12:28           644 148 javassist-3.12.1.GA.jar
 21.02.2010  11:49           121 807 javax.persistence-2.0.0.jar
-01.07.2010  23:41           192 820 jdo2-api-2.3-eb.jar
+24.08.2010  20:09           192 820 jdo2-api-2.3-eb.jar
 28.10.2009  12:11            87 325 jline-0.9.94.jar
-01.07.2010  23:41             8 082 jsr107cache-1.1.jar
+24.08.2010  20:09             8 082 jsr107cache-1.1.jar
 24.11.2009  12:27           121 070 junit-3.8.1.jar
 19.06.2007  16:12           676 858 org.mortbay.jetty-5.1.10.jar
 28.10.2009  12:09           251 275 plexus-utils-1.5.5.jar
@@ -58,5 +58,5 @@
 07.08.2010  12:23            14 810 tapestry-jpa-core-2.0.2-SNAPSHOT.jar
 07.08.2010  12:28            17 110 tapestry5-annotations-5.2.0.jar
 28.10.2009  12:08           843 464 testng-5.8-jdk15.jar
-              53 файлов     33 630 879 байт
-               2 папок   2 731 749 376 байт свободно
+              53 файлов     33 957 283 байт
+               2 папок     911 855 616 байт свободно

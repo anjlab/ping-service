@@ -1,0 +1,100 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<head>
+    <title>Job Analytics - Ping Service</title>
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" />
+    <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript">
+        var ips = ${ips};
+        
+        function initializeMap() {
+            var mapCanvas = document.getElementById("map_canvas")
+            
+            if (mapCanvas == undefined) {
+                return;
+            }
+            
+            if (ips.length == 0) {
+                return;
+            }
+            
+            var center;
+            
+            for (var ip in ips) {
+                center = ips[ip];
+            }
+            
+            var myOptions = {
+              zoom: 1,
+              center: new google.maps.LatLng(center.lat, center.lng),
+              mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+        
+            var map = new google.maps.Map(mapCanvas, myOptions);
+        
+            var points = [];
+            
+            for (var ip in ips) {
+                var marker = new google.maps.Marker({
+                              position: new google.maps.LatLng(parseFloat(ips[ip].lat), parseFloat(ips[ip].lng)), 
+                              map: map, 
+                              title: ip
+                            });
+                points.push(marker.position);
+            }
+            
+            var path = new google.maps.Polyline({
+              path: points,
+              strokeColor: "#FF0000",
+              strokeOpacity: 0.5,
+              strokeWeight: 2
+            });
+        
+            path.setMap(map);
+
+            if (points.length != 1) {
+                // Fit to markers:
+                //     http://blog.shamess.info/2009/09/29/zoom-to-fit-all-markers-on-google-maps-api-v3/
+            
+                //  Create a new viewpoint bound
+                var bounds = new google.maps.LatLngBounds ();
+                //  Go through each...
+                for (var i = 0, LtLgLen = points.length; i != LtLgLen; i++) {
+                  //  And increase the bounds to take this point
+                  bounds.extend (points[i]);
+                }
+                //  Fit these bounds to the map
+                map.fitBounds (bounds);
+            }
+      }
+    </script>
+</head>
+<body>
+    <t:topbar/>
+    
+    <h2><t:logo/> Visualize Trace Route Output</h2>
+
+    <div style="float:left; margin-right: 10px;">
+        <t:form>
+            <p>
+                Paste trace route output here, or type in IP address(es) to see their locations:
+            </p>
+            <t:textarea value="traceRoute" cols="50" rows="13" style="font-family: Courier" wrap="off"/>
+            <br/>
+            <t:submit value="Show On Map"/>
+        </t:form>
+        <ol>
+        <t:loop source="ipList" value="ip">
+            <li>${ip} - ${location}</li>
+        </t:loop>
+        </ol>
+    </div>
+    <div id="map_canvas" style="width: 480px; height: 320px; float:left;"></div>
+    <div style="clear: both;"></div>
+    <script>
+        initializeMap();
+    </script>
+
+    <t:footer/>
+</body>
+</html>

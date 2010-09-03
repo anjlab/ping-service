@@ -33,6 +33,7 @@ public class AccessController implements Dispatcher {
                 || thisURL.startsWith("/job/analytics/1026/5002")   //  Share PingService analytics with everyone
                 || thisURL.startsWith("/job/analytics.form")        //  and allow anonymous form submission for analytics page 
                                                                     //  (i.e., for changing analytics view)
+                || thisURL.startsWith("/traceroute")
                 || thisURL.startsWith("/assets")
                 || thisURL.startsWith("/job/run/")
                 || thisURL.startsWith("/task/")

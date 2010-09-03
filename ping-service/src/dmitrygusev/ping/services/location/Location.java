@@ -79,4 +79,8 @@ public class Location implements Serializable {
     public static double parseDouble(String value) {
         return Utils.isNullOrEmpty(value) ? 0 : Double.parseDouble(value);
     }
+
+    public String toJSON() {
+        return "{address:\"" + address + "\",lat:" + latitude + ",lng:" + longitude + "}";
+    }
 }
