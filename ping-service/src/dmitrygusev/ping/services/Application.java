@@ -648,7 +648,7 @@ public class Application {
         
         logger.debug("Found {} job(s) to enqueue", jobKeys.size());
 
-        Queue queue = getQueue(cronString.replace(" ", ""));
+        Queue queue = getQueue(cronString.replace(" ", "").replace(":", ""));
 
         List<TaskOptions> tasks = new ArrayList<TaskOptions>(jobKeys.size());
         

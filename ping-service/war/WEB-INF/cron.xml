@@ -20,4 +20,9 @@
     <description>Ping every 1 hours</description>
     <schedule>every 1 hours</schedule>
   </cron>
+  <cron>
+    <url>/filters/enqueueJobs/?schedule=every%20day%2000:00</url>
+    <description>Ping every day 00:00</description>
+    <schedule>every day 00:00</schedule>
+  </cron>
 </cronentries>

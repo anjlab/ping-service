@@ -303,6 +303,7 @@ public class Utils {
      */
     private static Map<String, Integer> buildCronModel() {
         Map<String, Integer> result = new TreeMap<String, Integer>();
+        result.put("every day 00:00", 1440);
         result.put("every 1 hours", 60);
         result.put("every 30 minutes", 30);
         result.put("every 15 minutes", 15);

@@ -25,6 +25,11 @@
     <bucket-size>5</bucket-size>
   </queue>
   <queue>
+    <name>everyday0000</name>
+    <rate>6/m</rate>
+    <bucket-size>5</bucket-size>
+  </queue>
+  <queue>
     <name>mail</name>
     <rate>1/m</rate>
     <bucket-size>1</bucket-size>
