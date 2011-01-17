@@ -1,7 +1,7 @@
 package dmitrygusev.ping.pages.task;
 
-import static com.google.appengine.api.labs.taskqueue.QueueFactory.getDefaultQueue;
-import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
+import static com.google.appengine.api.taskqueue.QueueFactory.getDefaultQueue;
+import static com.google.appengine.api.taskqueue.QueueFactory.getQueue;
 import static dmitrygusev.ping.services.GAEHelper.addTaskNonTransactional;
 
 import java.util.List;
@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.labs.taskqueue.Queue;
-import com.google.appengine.api.labs.taskqueue.TaskOptions;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableMultimap;
 import com.google.appengine.repackaged.com.google.common.collect.Multimap;
 

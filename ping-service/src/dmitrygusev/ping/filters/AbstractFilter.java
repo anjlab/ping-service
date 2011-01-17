@@ -20,6 +20,7 @@ import net.sf.jsr107cache.Cache;
 import org.apache.tapestry5.EventContext;
 import org.apache.tapestry5.Link;
 import org.apache.tapestry5.internal.services.LinkImpl;
+import org.apache.tapestry5.internal.services.LinkSecurity;
 import org.apache.tapestry5.internal.services.RequestGlobalsImpl;
 import org.apache.tapestry5.internal.services.ResponseImpl;
 import org.apache.tapestry5.services.PageRenderLinkSource;
@@ -57,7 +58,7 @@ public abstract class AbstractFilter implements Filter {
     public void init(FilterConfig config) throws ServletException {
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     protected void lazyInit() {
         //  One instance might already be created by tapestry-jpa
         System.setProperty("appengine.orm.disable.duplicate.emf.exception", "");
@@ -86,10 +87,11 @@ public abstract class AbstractFilter implements Filter {
                                               String pageAddress = pageClass.getName().substring("dmitrygusev.ping.pages".length()).replaceAll("\\.", "/");
                                               
                                               return new LinkImpl(pageAddress, 
-                                                                  false, 
-                                                                  false, 
-                                                                  new ResponseImpl(globals.getHTTPServletResponse()), 
-                                                                  null);
+                                                      false, 
+                                                      LinkSecurity.INSECURE, 
+                                                      new ResponseImpl(globals.getHTTPServletRequest(), globals.getHTTPServletResponse()), 
+                                                      null,
+                                                      null);
                                           }
                                           @Override public Link createPageRenderLinkWithContext(Class pageClass, Object... context)
                                           {
@@ -102,8 +104,9 @@ public abstract class AbstractFilter implements Filter {
                                               
                                               return new LinkImpl(pageAddress.toString(), 
                                                                   false, 
-                                                                  false, 
-                                                                  new ResponseImpl(globals.getHTTPServletResponse()), 
+                                                                  LinkSecurity.INSECURE, 
+                                                                  new ResponseImpl(globals.getHTTPServletRequest(), globals.getHTTPServletResponse()), 
+                                                                  null,
                                                                   null);
                                           }
                                       }, 

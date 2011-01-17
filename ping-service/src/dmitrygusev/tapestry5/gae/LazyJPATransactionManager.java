@@ -144,7 +144,7 @@ public class LazyJPATransactionManager implements JPATransactionManager
                 return getEM().createNativeQuery(sqlString, resultSetMapping);
             }
             
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("rawtypes")
             @Override
             public Query createNativeQuery(String sqlString, Class resultClass) {
                 assureTxBegin();

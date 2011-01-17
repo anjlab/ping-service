@@ -312,7 +312,7 @@ public class AppModule
         return new LazyJPATransactionManager(source, appPackage);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public void contributeServiceOverride(
             MappedConfiguration<Class, Object> configuration,
             @Local JPAEntityManagerSource source,
@@ -388,7 +388,7 @@ public class AppModule
         };
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Match("IPResolver")
     public static void adviseCacheIPResolverMethods(final MethodAdviceReceiver receiver, Logger logger, PerthreadManager perthreadManager) {
         try {

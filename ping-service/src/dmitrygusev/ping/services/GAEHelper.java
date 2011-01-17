@@ -1,6 +1,6 @@
 package dmitrygusev.ping.services;
 
-import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
+import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
 
 import java.security.Principal;
 import java.util.Arrays;
@@ -11,10 +11,10 @@ import org.apache.tapestry5.services.RequestGlobals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.appengine.api.labs.taskqueue.Queue;
-import com.google.appengine.api.labs.taskqueue.TaskOptions;
-import com.google.appengine.api.labs.taskqueue.TransientFailureException;
-import com.google.appengine.api.labs.taskqueue.TaskOptions.Method;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.appengine.api.taskqueue.TransientFailureException;
+import com.google.appengine.api.taskqueue.TaskOptions.Method;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
@@ -63,7 +63,7 @@ public class GAEHelper {
     }
 
     public static TaskOptions buildTaskUrl(String path) {
-        return url(path.endsWith("/") ? path : path + "/").method(Method.GET);
+        return withUrl(path.endsWith("/") ? path : path + "/").method(Method.GET);
     }
     
     public static void addTaskNonTransactional(Queue queue, TaskOptions options) {

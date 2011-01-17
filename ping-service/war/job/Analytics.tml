@@ -35,12 +35,16 @@
             <t:actionlink t:id="viewResultsReport" target="_blank">View Results Report</t:actionlink>
             &#160;
             <t:actionlink t:id="sendResultsByMail">Send Results By Mail</t:actionlink>
+            &#160;
+            <t:actionlink t:id="deleteJob"
+                onclick="return confirm('Are you sure you want to delete the job and all its statistics?');">Delete This Job</t:actionlink>
        </div>
     </t:if>
     
     <h2><t:logo/> Analytics Workspace</h2>
     
-    <div><span style="font-weight: bold; font-size: 120%">${job.titleFriendly}</span><a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a> 
+    <div><span style="font-weight: bold; font-size: 120%">${job.titleFriendly}</span><a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a>
+    (<t:pagelink page="job/edit" context="jobContext">edit</t:pagelink>) 
     <span title="from ${dateFrom} to ${dateTo}; your time is ${clientTime}"> statistics based on ${timeDiff} </span>
     <a href="/feedback?subject=Request for earlier data">Need earlier data? Send a request!</a></div>
     

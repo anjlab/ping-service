@@ -48,7 +48,7 @@ public class LocalMemorySoftCache implements Cache, ThreadCleanupListener {
             || cache.containsValue(value);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     @Override
     public Set entrySet() {
         return cache.entrySet();
@@ -70,7 +70,7 @@ public class LocalMemorySoftCache implements Cache, ThreadCleanupListener {
         return value;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     @Override
     public Map getAll(Collection keys) throws CacheException {
         return cache.getAll(keys);
@@ -91,7 +91,7 @@ public class LocalMemorySoftCache implements Cache, ThreadCleanupListener {
         return cache.isEmpty();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     @Override
     public Set keySet() {
         return cache.keySet();
@@ -102,7 +102,7 @@ public class LocalMemorySoftCache implements Cache, ThreadCleanupListener {
         cache.load(key);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     @Override
     public void loadAll(Collection keys) throws CacheException {
         cache.loadAll(keys);
@@ -119,7 +119,7 @@ public class LocalMemorySoftCache implements Cache, ThreadCleanupListener {
         return cache.put(key, value);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void putAll(Map t) {
         map.putAll(t);
@@ -142,7 +142,7 @@ public class LocalMemorySoftCache implements Cache, ThreadCleanupListener {
         return cache.size();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     @Override
     public Collection values() {
         return cache.values();

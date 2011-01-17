@@ -82,7 +82,7 @@ public class Index {
 
     public void onActionFromDeleteJob(Long scheduleId, Long jobId) {
         try {
-            application.deleteJob(scheduleId, jobId);
+            application.deleteJob(scheduleId, jobId, true);
         } catch (Exception e) {
             logger.error("Error deleting job", e);
             message = "Error deleting job";

@@ -22,6 +22,15 @@
                 add="totalAvailabilityPercent, recentAvailabilityPercent, statusCounter, lastPingSummary"
                 submitLabel="Apply Edit">
                 
+                <t:parameter name="title">
+                    <t:label for="title"/>
+                    <t:textfield t:id="title" value="job.title"/>
+                    <t:if test="job.key">
+	                    &#8194;
+	                    <t:pagelink page="job/analytics" context="jobContext">Analyze Performance</t:pagelink>
+                    </t:if>
+                </t:parameter>
+                
                 <t:parameter name="cronString">
                     <t:label for="cronString"/>
                     <t:select t:id="cronString" model="cronStringModel" value="job.cronString"/>

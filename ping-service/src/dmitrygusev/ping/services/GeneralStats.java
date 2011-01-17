@@ -60,8 +60,9 @@ public class GeneralStats {
     public static <T> GeneralStats calculate(Class<T> clazz, final String property, List<T> data) {
         final FactValueProvider<T> beanClass = new BeanValueProvider<T>(clazz);
         
-        Collections.sort((List)data, new Comparator<T>() {
+        Collections.sort((List<T>)data, new Comparator<T>() {
             @Override
+            @SuppressWarnings("rawtypes")
             public int compare(T o1, T o2) {
                 Comparable v1 = (Comparable<?>) beanClass.getValue(property, o1);
                 Comparable v2 = (Comparable<?>) beanClass.getValue(property, o2);

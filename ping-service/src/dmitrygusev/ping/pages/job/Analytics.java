@@ -17,6 +17,8 @@ import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import anjlab.cubics.BeanValueProvider;
 import anjlab.cubics.Cube;
@@ -44,6 +46,8 @@ import dmitrygusev.ping.services.location.Location;
 import dmitrygusev.ping.services.location.LocationResolver;
 
 public class Analytics {
+
+    private static final Logger logger = LoggerFactory.getLogger(Analytics.class);
 
     private static final String CSV = "csv";
 
@@ -330,5 +334,21 @@ public class Analytics {
                 return "text/plain";
             }
         };
+    }
+    
+    public Long[] getJobContext() {
+        return Utils.createJobContext(job);
+    }
+    
+    public void onActionFromDeleteJob() {
+        try {
+            //  This is admin action
+            if (isAdmin()) {
+                application.deleteJob(job.getKey().getParent().getId(), job.getKey().getId(), false);
+            }
+        } catch (Exception e) {
+            logger.error("Error deleting job", e);
+            message = "Error deleting job";
+        }
     }
 }

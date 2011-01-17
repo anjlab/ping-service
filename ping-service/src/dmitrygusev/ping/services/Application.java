@@ -1,7 +1,7 @@
 package dmitrygusev.ping.services;
 
 import static com.google.appengine.api.datastore.KeyFactory.keyToString;
-import static com.google.appengine.api.labs.taskqueue.QueueFactory.getQueue;
+import static com.google.appengine.api.taskqueue.QueueFactory.getQueue;
 import static dmitrygusev.ping.services.GAEHelper.addTaskNonTransactional;
 
 import java.net.URI;
@@ -27,8 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.labs.taskqueue.Queue;
-import com.google.appengine.api.labs.taskqueue.TaskOptions;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
@@ -307,14 +307,16 @@ public class Application {
                 "If you think this message was sent to you by mistake, just ignore it.");
     }
 
-    public void deleteJob(Long scheduleId, Long jobId) {
+    public void deleteJob(Long scheduleId, Long jobId, boolean checkPermission) {
         Job job = jobDAO.find(scheduleId, jobId);
         
         if (job == null) {
             throw new RuntimeException("Job not found");
         }
         
-        assertCanDeleteJob(job);
+        if (checkPermission) {
+            assertCanDeleteJob(job);
+        }
         
         jobDAO.delete(scheduleId, jobId);
     }

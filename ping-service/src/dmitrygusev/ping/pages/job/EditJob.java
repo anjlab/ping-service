@@ -112,4 +112,9 @@ public class EditJob {
     public String getCreatedAtFormatted() {
         return application.formatDate(job.getCreatedAt());
     }
+    
+    public Long[] getJobContext() {
+        return Utils.createJobContext(job);
+    }
+
 }
