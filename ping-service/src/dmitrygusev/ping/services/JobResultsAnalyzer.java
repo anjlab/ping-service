@@ -68,6 +68,7 @@ public class JobResultsAnalyzer {
     private List<JobResultsInterval> intervals;
     private Map<Integer, Long> resultCodeCounters;
     private Map<Integer, Long> resultsCountCounters;
+    private long totalDurationMillis;
 
     public JobResultsAnalyzer(List<JobResult> jobResults, boolean resultsSorted) {
         if (!resultsSorted) {
@@ -117,6 +118,11 @@ public class JobResultsAnalyzer {
         }
 
         countInterval(interval);
+        
+        totalDurationMillis = 0;
+        for (Long duration : resultCodeCounters.values()) {
+            totalDurationMillis += duration; 
+        }
     }
 
     private void countInterval(JobResultsInterval interval) {
@@ -147,14 +153,9 @@ public class JobResultsAnalyzer {
 
         sb.append("<p>Totals:</p>\n");
         
-        long totalDurationMillis = 0;
-        for (Long duration : resultCodeCounters.values()) {
-            totalDurationMillis += duration; 
-        }
-
         sb.append("<table>");
         
-        for (Integer resultCode : resultCodeCounters.keySet()) {
+        for (Integer resultCode : getSortedResultCodes()) {
             String status = Job.buildPingResultSummary(resultCode);
             Long durationMillis = resultCodeCounters.get(resultCode);
             String duration = Utils.formatMillisecondsToWordsUpToMinutes(durationMillis);
@@ -162,13 +163,7 @@ public class JobResultsAnalyzer {
             sb.append("<tr><td style='text-align: right;'>");
             sb.append(status);
             sb.append(" :</td><td style='padding-left: 10px;'>");
-            sb.append(duration);
-            sb.append(" (");
-            sb.append(String.format(Locale.ENGLISH, "%.5f", 100d * durationMillis / totalDurationMillis));
-            sb.append(" %) verified by ");
-            String resultsCount = resultsCountCounters.get(resultCode).toString();
-            sb.append(resultsCount);
-            sb.append(" ping(s)");
+            buildResultCodeLine(sb, resultCode, durationMillis, duration);
             sb.append("</td></tr>\n");
         }
 
@@ -205,18 +200,44 @@ public class JobResultsAnalyzer {
         
         return sb;
     }
+
+    private Integer[] getSortedResultCodes() {
+        Integer[] result = new Integer[resultCodeCounters.size()];
+        resultCodeCounters.keySet().toArray(result);
+        Arrays.sort(result);
+        return result;
+    }
+    
+    public String getResultOkaySummary()
+    {
+        StringBuilder builder = new StringBuilder();
+        int resultCode = Job.PING_RESULT_OK;
+        Long durationMillis = resultCodeCounters.get(resultCode);
+        if (durationMillis == null)
+        {
+            durationMillis = 0L;
+        }
+        String duration = Utils.formatMillisecondsToWordsUpToMinutes(durationMillis);
+        buildResultCodeLine(builder, resultCode, durationMillis, duration);
+        return builder.toString();
+    }
+    
+    private void buildResultCodeLine(StringBuilder sb, Integer resultCode, Long durationMillis, String duration) {
+        sb.append(String.format(Locale.ENGLISH, "%.5f", 100d * durationMillis / totalDurationMillis));
+        sb.append(" % (");
+        sb.append(duration);
+        sb.append(") verified by ");
+        String resultsCount = resultsCountCounters.get(resultCode).toString();
+        sb.append(resultsCount);
+        sb.append(" ping(s)");
+    }
     
     public StringBuilder buildPlainTextReport(TimeZone timeZone) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Totals:\n");
         
-        long totalDurationMillis = 0;
-        for (Long duration : resultCodeCounters.values()) {
-            totalDurationMillis += duration; 
-        }
-        
-        for (Integer resultCode : resultCodeCounters.keySet()) {
+        for (Integer resultCode : getSortedResultCodes()) {
             String status = Job.buildPingResultSummary(resultCode);
             Long durationMillis = resultCodeCounters.get(resultCode);
             String duration = Utils.formatMillisecondsToWordsUpToMinutes(durationMillis);
@@ -224,13 +245,8 @@ public class JobResultsAnalyzer {
             sb.append(spaces.substring(0, 19 - status.length()));
             sb.append(status);
             sb.append(" : ");
-            sb.append(duration);
-            sb.append(" (");
-            sb.append(String.format(Locale.ENGLISH, "%.5f", 100d * durationMillis / totalDurationMillis));
-            sb.append(" %) verified by ");
-            String resultsCount = resultsCountCounters.get(resultCode).toString();
-            sb.append(resultsCount);
-            sb.append(" ping(s)\n");
+            buildResultCodeLine(sb, resultCode, durationMillis, duration);
+            sb.append('\n');
         }
 
         sb.append("\nDetailed report:\n\n");

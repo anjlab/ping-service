@@ -19,9 +19,12 @@ import net.sf.jsr107cache.Cache;
 
 import org.apache.tapestry5.EventContext;
 import org.apache.tapestry5.Link;
+import org.apache.tapestry5.internal.services.BaseURLSourceImpl;
+import org.apache.tapestry5.internal.services.DefaultSessionPersistedObjectAnalyzer;
 import org.apache.tapestry5.internal.services.LinkImpl;
 import org.apache.tapestry5.internal.services.LinkSecurity;
 import org.apache.tapestry5.internal.services.RequestGlobalsImpl;
+import org.apache.tapestry5.internal.services.RequestImpl;
 import org.apache.tapestry5.internal.services.ResponseImpl;
 import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.RequestGlobals;
@@ -91,7 +94,7 @@ public abstract class AbstractFilter implements Filter {
                                                       LinkSecurity.INSECURE, 
                                                       new ResponseImpl(globals.getHTTPServletRequest(), globals.getHTTPServletResponse()), 
                                                       null,
-                                                      null);
+                                                      new BaseURLSourceImpl(globals.getRequest()));
                                           }
                                           @Override public Link createPageRenderLinkWithContext(Class pageClass, Object... context)
                                           {
@@ -107,7 +110,7 @@ public abstract class AbstractFilter implements Filter {
                                                                   LinkSecurity.INSECURE, 
                                                                   new ResponseImpl(globals.getHTTPServletRequest(), globals.getHTTPServletResponse()), 
                                                                   null,
-                                                                  null);
+                                                                  new BaseURLSourceImpl(globals.getRequest()));
                                           }
                                       }, 
                                       globals,
@@ -148,8 +151,14 @@ public abstract class AbstractFilter implements Filter {
             
             jobDAO.setEntityManager(em);
             
-            globals.storeServletRequestResponse((HttpServletRequest)request, (HttpServletResponse)response);
-
+            HttpServletRequest httpServletRequest = (HttpServletRequest)request;
+            HttpServletResponse httpServletResponse = (HttpServletResponse)response;
+            globals.storeServletRequestResponse(httpServletRequest, httpServletResponse);
+            globals.storeRequestResponse(new RequestImpl(httpServletRequest, 
+                                                         httpServletRequest.getCharacterEncoding(), 
+                                                         new DefaultSessionPersistedObjectAnalyzer()), 
+                                         new ResponseImpl(httpServletRequest, httpServletResponse));
+            
             processRequest();
             
             if (tx.isActive()) {

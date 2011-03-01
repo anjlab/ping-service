@@ -12,8 +12,14 @@ import net.sf.jsr107cache.CacheStatistics;
 
 import org.apache.tapestry5.ioc.services.ThreadCleanupListener;
 import org.datanucleus.util.SoftValueMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.appengine.api.memcache.MemcacheServiceException;
 
 public class LocalMemorySoftCache implements Cache, ThreadCleanupListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(LocalMemorySoftCache.class);
 
     private final Cache cache;
     
@@ -116,7 +122,19 @@ public class LocalMemorySoftCache implements Cache, ThreadCleanupListener {
     @Override
     public Object put(Object key, Object value) {
         map.put(key, value);
-        return cache.put(key, value);
+        try
+        {
+            return cache.put(key, value);
+        } catch (MemcacheServiceException e) {
+            //  TODO Split the value into smaller pieces and store them separately?
+            logger.warn("Error putting value into cache", e);
+            
+            //  A value may be already in cache. We should remove it to avoid
+            //  not synchronous duplicates there and here in local map.
+            cache.remove(key);
+            
+            return null;
+        }
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

@@ -19,6 +19,7 @@ import org.apache.tapestry5.services.BeanModelSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
 import dmitrygusev.ping.entities.Account;
@@ -167,7 +168,10 @@ public class Index {
     }
 
     public boolean isAdmin() {
-        return UserServiceFactory.getUserService().isUserAdmin();
+        UserService userService = UserServiceFactory.getUserService();
+        
+        return userService.isUserLoggedIn() 
+            && userService.isUserAdmin();
     }
 
     @Inject

@@ -58,6 +58,12 @@ public class JobResultCSVImporter {
                 instance.setPingResult(Integer.parseInt(value));
             }
         });
+        valueSetters.put("httpResponseCode", new ValueSetter<JobResult, String>() {
+            @Override
+            public void setValue(JobResult instance, String value) {
+                instance.setHTTPResponseCode(Integer.parseInt(value));
+            }
+        });
     }
 
     

@@ -58,6 +58,8 @@ public class JobExecutor {
             
             HTTPResponse response = urlFetchService.fetch(request);
             
+            jobResult.setHTTPResponseCode(response.getResponseCode());
+            
             job.setLastPingResult(0);
 
             StringBuffer sb = new StringBuffer();
@@ -69,15 +71,15 @@ public class JobExecutor {
                     sb.append(hcvb);
                 } catch (Exception e) {
                     logger.warn("Error checking http code validation for url " + url, e);
-                    sb.append("Error checking http code validation for url " + url + ": " + e.getMessage());
+                    sb.append("Error checking http code validation for url " + url + ": " + e.getMessage() + "\n");
                     job.setLastPingResult(job.getLastPingResult() | Job.PING_RESULT_HTTP_ERROR);
                 }
             } else {
-                sb.append("HTTP code validator wasn't configured for the job");
+                sb.append("HTTP code validator wasn't configured for the job\n");
             }
 
             if (sb.length() > 0) {
-                sb.append("\n\n");
+                sb.append("\n");
             }
 
             if (job.isUsesValidatingRegexp()) {
@@ -152,7 +154,7 @@ public class JobExecutor {
         }
         
         sb.append("HTTP response code validation ");
-
+        
         if (responseCode != validatingCode) {
             job.setLastPingResult(job.getLastPingResult() | Job.PING_RESULT_HTTP_ERROR);
             
@@ -165,6 +167,15 @@ public class JobExecutor {
         sb.append(getHttpCodeDescription(job.getValidatingHttpCode()));
         sb.append(", was ");
         sb.append(response.getResponseCode());
+        
+        sb.append("\n\nHTTP headers:\n\n");
+        for (int i = 0; i < response.getHeaders().size(); i++) {
+            HTTPHeader httpHeader = response.getHeaders().get(i);
+            sb.append(httpHeader.getName());
+            sb.append('=');
+            sb.append(httpHeader.getValue());
+            sb.append('\n');
+        }
     }
 
     private void checkRegexpValidation(Job job, HTTPResponse response,

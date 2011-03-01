@@ -1,4 +1,5 @@
 package dmitrygusev.tapestry5.gae;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ public class ProfilingDelegate implements Delegate<Environment> {
       this.appPackage = appPackage;
     }
     
+    @Override
     public void log(Environment env, LogRecord logRec) {
         parent.log(env, logRec);
     }
@@ -86,5 +88,15 @@ public class ProfilingDelegate implements Delegate<Environment> {
         StringBuilder builder = buildStackTrace(appPackage);
         logger.info("GAE/A {}.{}: ->{} ms<-\n{}", new Object[] { pkg, method, System.currentTimeMillis() - start, builder });
         return result;
+    }
+
+    @Override
+    public void flushLogs(Environment env) {
+        parent.flushLogs(env);
+    }
+
+    @Override
+    public List<Thread> getRequestThreads(Environment env) {
+        return parent.getRequestThreads(env);
     }
 }

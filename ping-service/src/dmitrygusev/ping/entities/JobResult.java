@@ -21,6 +21,8 @@ public class JobResult implements Serializable {
     private Date timestamp;
     //    Since November 01 2009
     private Integer pingResult;
+    //  Since February 28 2011
+    private int httpResponseCode;
     
     public int getResponseTime() {
         return responseTime;
@@ -105,5 +107,11 @@ public class JobResult implements Serializable {
                  : Job.PING_RESULT_OK;
         }
         return pingResult;
+    }
+    public int getHTTPResponseCode() {
+        return httpResponseCode;
+    }
+    public void setHTTPResponseCode(int code) {
+        this.httpResponseCode = code;
     }
 }

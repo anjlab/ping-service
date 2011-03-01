@@ -29,8 +29,8 @@ public class CacheHelper {
     private static Map<Class<?>, String> getPrefixMap() {
         Map<Class<?>, String> result = new HashMap<Class<?>, String>();
         
-        result.put(Account.class,    "A");
         result.put(Job.class,        "J");
+        result.put(Account.class,    "A");
         result.put(Ref.class,        "R");
         result.put(Schedule.class,   "S");
         

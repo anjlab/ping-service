@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.appengine.repackaged.org.json.JSONArray;
@@ -17,6 +18,7 @@ import dmitrygusev.ping.services.location.Location;
 
 public class TestTimezoneIds {
 
+    @Ignore
     @Test
     public void testGetTimezoneIdByCityName() throws Exception {
         List<String> timezones = new ArrayList<String>();

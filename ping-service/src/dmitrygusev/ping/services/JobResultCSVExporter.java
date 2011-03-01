@@ -17,13 +17,15 @@ public class JobResultCSVExporter {
     public static final String[] COLUMN_HEADERS = {
         "timestamp",
         "duration",
-        "resultCode"
+        "resultCode",
+        "httpResponseCode"
     };
 
     public static final String[] COLUMN_HEADER_PATTERNS = {
         Application.DATETIME_PATTERN,
         "99999",
-        "00"
+        "00",
+        "000"
     };
 
     private static final String HEADER_TEXT = getHeaderText();
@@ -76,6 +78,7 @@ public class JobResultCSVExporter {
             write(baos, result.getResponseTime());
             write(baos, SEPARATOR_CHAR);
             write(baos, result.getPingResult());
+            write(baos, result.getHTTPResponseCode());
             write(baos, '\n');
         }
         

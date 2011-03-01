@@ -73,10 +73,13 @@ public class BackupJobResultsFilter extends AbstractFilter {
         JobResult firstResult = (JobResult) results.get(0);
         JobResult lastResult = (JobResult) results.get(results.size() - 1);
         
-        String subject = "Statistics Backup for " + job.getTitleFriendly();
-
         TimeZone timeZone = Application.UTC_TIME_ZONE; //  TODO Use job specific time zone
-
+        
+        JobResultsAnalyzer analyzer = new JobResultsAnalyzer(results, true);
+        StringBuilder report = analyzer.buildHtmlReport(timeZone);
+        
+        String subject = "Statistics Backup for " + job.getTitleFriendly() + ": availability " + analyzer.getResultOkaySummary();
+        
         StringBuilder builder = new StringBuilder();
         builder.append("Job results for period: ");
         builder.append(Application.formatDate(Application.DATETIME_FORMAT, timeZone, firstResult.getTimestamp()));
@@ -93,8 +96,6 @@ public class BackupJobResultsFilter extends AbstractFilter {
         builder.append(timeZone.getID());
         builder.append(")");
         
-        JobResultsAnalyzer analyzer = new JobResultsAnalyzer(results, true);
-        StringBuilder report = analyzer.buildHtmlReport(timeZone);
         builder.append(report);
         
         builder.append("<br/><br/>----"); 

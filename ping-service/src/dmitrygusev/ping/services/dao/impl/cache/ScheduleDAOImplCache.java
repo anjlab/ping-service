@@ -50,8 +50,7 @@ public class ScheduleDAOImplCache extends ScheduleDAOImpl {
         return result;
     }
     
-    @Inject
-    public EntityManager em;
+    @Inject private EntityManager em;
     
     @Override
     public void update(Schedule schedule) {

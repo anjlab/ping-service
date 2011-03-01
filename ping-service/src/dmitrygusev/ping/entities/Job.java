@@ -581,9 +581,14 @@ public class Job implements Serializable {
     }
 
     public static void buildPingResultSummary(int pingResult, StringBuilder sb) {
+        buildPingResultSummary(pingResult, sb, null);
+    }
+    
+    public static void buildPingResultSummary(int pingResult, StringBuilder sb, JobResult jobResult) {
         checkResult(pingResult, sb, PING_RESULT_NOT_AVAILABLE, "N/A");
         checkResult(pingResult, sb, PING_RESULT_OK, "Okay");
-        checkResult(pingResult, sb, PING_RESULT_HTTP_ERROR, "HTTP failed");
+        checkResult(pingResult, sb, PING_RESULT_HTTP_ERROR, 
+                "HTTP failed" + (jobResult != null ? " (" + jobResult.getHTTPResponseCode() + ")" : ""));
         checkResult(pingResult, sb, PING_RESULT_CONNECTIVITY_PROBLEM, "Failed connecting");
         checkResult(pingResult, sb, PING_RESULT_REGEXP_VALIDATION_FAILED, "Regexp failed");
     }

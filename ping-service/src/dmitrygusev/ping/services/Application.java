@@ -41,6 +41,7 @@ import dmitrygusev.ping.filters.AbstractFilter;
 import dmitrygusev.ping.filters.BackupJobResultsFilter;
 import dmitrygusev.ping.filters.RunJobFilter;
 import dmitrygusev.ping.pages.job.Analytics;
+import dmitrygusev.ping.pages.job.EditJob;
 import dmitrygusev.ping.pages.task.LongRunningQueryTask;
 import dmitrygusev.ping.services.dao.AccountDAO;
 import dmitrygusev.ping.services.dao.JobDAO;
@@ -473,10 +474,10 @@ public class Application {
                                 /* No need to notify earlier since user haven't received fail report yet */
                                 || job.getPreviousStatusCounter() >= GOOGLE_IO_FAIL_LIMIT)) {
                     //    The job is up again
-                    sendReport(job);
+                    sendReport(job, jobResult);
                 } else if (job.isLastPingFailed() && !job.isGoogleIOException()) {
                     //    Non-Google IO failure
-                    sendReport(job);
+                    sendReport(job, jobResult);
                 }
             } else {
                 job.incrementStatusCounter();
@@ -484,7 +485,7 @@ public class Application {
             
             //  Register job failure on third fail (see GOOGLE_IO_FAIL_LIMIT)
             if (job.getStatusCounter() == GOOGLE_IO_FAIL_LIMIT && job.isGoogleIOException()) {
-                sendReport(job);
+                sendReport(job, jobResult);
             }
             
             job.addJobResult(jobResult);
@@ -569,7 +570,7 @@ public class Application {
         return false;
     }
 
-    public void sendReport(Job job) throws URISyntaxException {
+    public void sendReport(Job job, JobResult jobResult) throws URISyntaxException {
         if (!job.isReceiveNotifications() || Utils.isNullOrEmpty(job.getReportEmail())) {
             logger.debug("Job is not configured to recieve reports or no report recepient specified");
             return;
@@ -578,23 +579,30 @@ public class Application {
         String from = Mailer.PING_SERVICE_NOTIFY_GMAIL_COM;
         String to = job.getReportEmail();
         
-        String subject = job.isLastPingFailed() ? job.getTitleFriendly() + " is down" : job.getTitleFriendly() + " is up again";
-    
+        StringBuilder sb = new StringBuilder();
+        Job.buildPingResultSummary(job.getLastPingResult(), sb, jobResult);
+        
+        String subject = (job.isLastPingFailed() 
+                           ? job.getTitleFriendly() + " is down (" + sb + ")"
+                           : job.getTitleFriendly() + " is up again");
+        
         StringBuffer body = new StringBuffer();
         
         body.append("Job results for URL: ");
         body.append(job.getPingURL());
-        body.append("\n\nYou can analyze URL performance at: ");
         
-        body.append(getJobUrl(job, Analytics.class));
-    
-        body.append("\n\nYour ");
-        body.append(job.isLastPingFailed() ? "up" : "down");
+        body.append("\n\n");
+        body.append(job.isLastPingFailed() ? "Up" : "Down");
         body.append("time status counter was: ");
         body.append(job.getPreviousStatusCounterFriendly());
         
+        body.append("\n\nOn-line analysis of URL performance: ");
+        body.append(getJobUrl(job, Analytics.class));
+        body.append("\nEdit job settings: ");
+        body.append(getJobUrl(job, EditJob.class));
+        
         body.append("\n\nDetailed report:\n\n");
-    
+        
         if (job.isGoogleIOException()) {
             body.append("Your server didn't respond in 10 seconds." +
                        "\nWe can't wait longer: http://code.google.com/intl/en/appengine/docs/java/urlfetch/overview.html#Requests\n\n");
