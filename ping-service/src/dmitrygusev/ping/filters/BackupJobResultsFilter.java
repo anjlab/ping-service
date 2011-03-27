@@ -78,16 +78,19 @@ public class BackupJobResultsFilter extends AbstractFilter {
         JobResultsAnalyzer analyzer = new JobResultsAnalyzer(results, true);
         StringBuilder report = analyzer.buildHtmlReport(timeZone);
         
-        String subject = "Statistics Backup for " + job.getTitleFriendly() + ": availability " + analyzer.getResultOkaySummary();
+        String subject = "Data Backup for " + job.getTitleFriendly() + ": " + analyzer.getAvailabilitySummary();
         
         StringBuilder builder = new StringBuilder();
-        builder.append("Job results for period: ");
+        builder.append("For period: ");
         builder.append(Application.formatDate(Application.DATETIME_FORMAT, timeZone, firstResult.getTimestamp()));
-        builder.append(" - ");
+        builder.append(" (");
+        builder.append(Utils.getTimeAgoUpToDays(firstResult.getTimestamp()));
+        builder.append(") &ndash; ");
         builder.append(Application.formatDate(Application.DATETIME_FORMAT, timeZone, lastResult.getTimestamp()));
         builder.append(" (");
+        builder.append(Utils.getTimeAgoUpToDays(lastResult.getTimestamp()));
+        builder.append(") = ");
         builder.append(Utils.formatMillisecondsToWordsUpToMinutes(lastResult.getTimestamp().getTime() - firstResult.getTimestamp().getTime()));
-        builder.append(")");
         builder.append("<br/># of records: ");
         builder.append(results.size());
         builder.append("<br/>Time Zone: ");

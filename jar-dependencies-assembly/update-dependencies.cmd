@@ -14,6 +14,13 @@ CALL mvn clean package -Dmaven.test.skip=true
 
 ECHO ************************************************************************
 ECHO *
+ECHO * Updating eclipse project files...
+ECHO *
+
+CALL mvn eclipse:eclipse
+
+ECHO ************************************************************************
+ECHO *
 ECHO * Updating jars in web app...
 ECHO *
 

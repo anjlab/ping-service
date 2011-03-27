@@ -434,11 +434,15 @@ public class Application {
     }
 
     public List<Job> getAvailableJobs() {
+        List<Job> result = new ArrayList<Job>();
+        
         Account account = getUserAccount();
         
-        List<Ref> refs = refDAO.getRefs(account);
+        if (account == null) {
+            return result;
+        }
         
-        List<Job> result = new ArrayList<Job>();
+        List<Ref> refs = refDAO.getRefs(account);
         
         for (Ref ref : refs) {
             Schedule schedule = scheduleDAO.find(ref.getScheduleKey());

@@ -69,8 +69,10 @@ public class JobResultsAnalyzer {
     private Map<Integer, Long> resultCodeCounters;
     private Map<Integer, Long> resultsCountCounters;
     private long totalDurationMillis;
+    private int totalResultsCount;
 
     public JobResultsAnalyzer(List<JobResult> jobResults, boolean resultsSorted) {
+        totalResultsCount = jobResults.size();
         if (!resultsSorted) {
             sort(jobResults);
         }
@@ -181,7 +183,7 @@ public class JobResultsAnalyzer {
         for (JobResultsInterval interval : intervals) {
             sb.append("<tr><td>");
             sb.append(dateFormat.format(interval.getStartTime()));
-            sb.append(" - ");
+            sb.append(" &ndash; ");
             sb.append(dateFormat.format(interval.getEndTime()));
             sb.append("</td><td style='padding-left: 10px;'>");
             String resultSummary = Job.buildPingResultSummary(interval.getResultCode());
@@ -208,7 +210,7 @@ public class JobResultsAnalyzer {
         return result;
     }
     
-    public String getResultOkaySummary()
+    public String getAvailabilitySummary()
     {
         StringBuilder builder = new StringBuilder();
         int resultCode = Job.PING_RESULT_OK;
@@ -217,8 +219,20 @@ public class JobResultsAnalyzer {
         {
             durationMillis = 0L;
         }
-        String duration = Utils.formatMillisecondsToWordsUpToMinutes(durationMillis);
-        buildResultCodeLine(builder, resultCode, durationMillis, duration);
+        builder.append("availability ");
+        builder.append(String.format(Locale.ENGLISH, "%.1f", 100d * durationMillis / totalDurationMillis));
+        builder.append("%");
+        if (durationMillis != totalDurationMillis) {
+            builder.append(" (downtime ");
+            builder.append(Utils.formatMillisecondsToWordsUpToMinutes(totalDurationMillis - durationMillis));
+            builder.append(" / ");
+            Long count = resultsCountCounters.get(resultCode);
+            if (count == null) {
+                count = 0L;
+            }
+            builder.append(totalResultsCount - count);
+            builder.append(" ping(s))");
+        }
         return builder.toString();
     }
     
@@ -227,7 +241,11 @@ public class JobResultsAnalyzer {
         sb.append(" % (");
         sb.append(duration);
         sb.append(") verified by ");
-        String resultsCount = resultsCountCounters.get(resultCode).toString();
+        Long count = resultsCountCounters.get(resultCode);
+        if (count == null) {
+            count = 0L;
+        }
+        String resultsCount = count.toString();
         sb.append(resultsCount);
         sb.append(" ping(s)");
     }
@@ -235,6 +253,11 @@ public class JobResultsAnalyzer {
     public StringBuilder buildPlainTextReport(TimeZone timeZone) {
         StringBuilder sb = new StringBuilder();
 
+        int maxStatusLength = Job.buildPingResultSummary(Job.PING_RESULT_HTTP_ERROR
+                                                         | Job.PING_RESULT_REGEXP_VALIDATION_FAILED).length();
+        int maxTimeInWords = "10 years 12 months 30 days 60 minutes".length();
+        int maxResultsCount = "99999".length();
+        
         sb.append("Totals:\n");
         
         for (Integer resultCode : getSortedResultCodes()) {
@@ -242,7 +265,7 @@ public class JobResultsAnalyzer {
             Long durationMillis = resultCodeCounters.get(resultCode);
             String duration = Utils.formatMillisecondsToWordsUpToMinutes(durationMillis);
             
-            sb.append(spaces.substring(0, 19 - status.length()));
+            sb.append(spaces.substring(0, maxStatusLength - status.length()));
             sb.append(status);
             sb.append(" : ");
             buildResultCodeLine(sb, resultCode, durationMillis, duration);
@@ -263,13 +286,13 @@ public class JobResultsAnalyzer {
             sb.append("  ");
             String resultSummary = Job.buildPingResultSummary(interval.getResultCode());
             sb.append(resultSummary);
-            sb.append(spaces.substring(0, 19 - resultSummary.length()));
+            sb.append(spaces.substring(0, maxStatusLength - resultSummary.length()));
             String timeDiffInWords = interval.getTimeDiffInWords();
-            sb.append(spaces.substring(0, 37 - timeDiffInWords.length()));
+            sb.append(spaces.substring(0, maxTimeInWords - timeDiffInWords.length()));
             sb.append(timeDiffInWords);
             sb.append(" ");
             String resultsCount = String.valueOf(interval.getResultsCount());
-            sb.append(spaces.substring(0, 5 - resultsCount.length()));
+            sb.append(spaces.substring(0, maxResultsCount - resultsCount.length()));
             sb.append(resultsCount);
             sb.append(" ping(s)\n");
         }

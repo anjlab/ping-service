@@ -320,9 +320,9 @@ public class Analytics {
                 
                 TimeZone timeZone = application.getTimeZone();
                 
-                StringBuilder report = analyzer.buildPlainTextReport(timeZone);
+                StringBuilder report = analyzer.buildHtmlReport(timeZone);
                 
-                report.insert(0, "Time Zone: " + timeZone.getDisplayName() + " (" + timeZone.getID() + ")\n\n");
+                report.insert(0, "<p>Time Zone: " + timeZone.getDisplayName() + " (" + timeZone.getID() + ")</p>");
                 
                 InputStream is = new ByteArrayInputStream(report.toString().getBytes());
                 
@@ -331,7 +331,7 @@ public class Analytics {
             
             @Override
             public String getContentType() {
-                return "text/plain";
+                return "text/html";
             }
         };
     }

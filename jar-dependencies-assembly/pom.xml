@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>org.apache.tapestry</groupId>
 			<artifactId>tapestry-ioc</artifactId>
-			<version>5.2.4</version>
+			<version>5.2.5</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -45,12 +45,12 @@
 		<dependency>
 			<groupId>org.apache.tapestry</groupId>
 			<artifactId>tapestry5-annotations</artifactId>
-			<version>5.2.4</version>
+			<version>5.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tapestry</groupId>
 			<artifactId>tapestry-core</artifactId>
-			<version>5.2.4</version>
+			<version>5.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>anjlab</groupId>
@@ -88,14 +88,14 @@
 			</releases>
 		</repository>
 		<repository>
-		  <id>Tapestry 5.2.0 Alpha</id>
-		  <url>https://repository.apache.org/content/repositories/orgapachetapestry-063/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
+			<id>Tapestry 5 Pre-Releases</id>
+			<url>https://repository.apache.org/content/repositories/orgapachetapestry-025/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 		</repository>
 	</repositories>
 </project>

@@ -78,6 +78,7 @@ public class JobResultCSVExporter {
             write(baos, result.getResponseTime());
             write(baos, SEPARATOR_CHAR);
             write(baos, result.getPingResult());
+            write(baos, SEPARATOR_CHAR);
             write(baos, result.getHTTPResponseCode());
             write(baos, '\n');
         }

@@ -146,4 +146,19 @@ public class TestJob {
         
         System.out.println(sb);
     }
-}
+    
+    @Test
+    public void testJobResultsAnalyzerAvailabilitySummary() throws Exception {
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        
+        JobResultCSVImporter importer = new JobResultCSVImporter(timeZone);
+        
+        List<JobResult> results = importer.fromStream(
+                new FileInputStream("test/job-1026-6-results-20100429211642-20100615120457.txt"));
+
+        JobResultsAnalyzer analyzer = new JobResultsAnalyzer(results, true);
+
+        String summary = analyzer.getAvailabilitySummary();
+        
+        System.out.println(summary);
+    }}

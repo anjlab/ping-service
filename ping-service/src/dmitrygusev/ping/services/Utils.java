@@ -317,14 +317,20 @@ public class Utils {
 
     private static class Pair {
         public final long number;
+        public final double decimals;
         public final String name;
         public Pair(long number, String name) {
+            this(number, 0, name);
+        }
+        public Pair(long number, double decimals, String name) {
             this.number = number;
             this.name = name;
+            this.decimals = decimals;
         }
     }
     
     public enum TimeGranularity {
+        MAJOR_UNIT,
         MINUTE,
         DAY
     }
@@ -338,6 +344,8 @@ public class Utils {
         long numberOfMinutesInMonth = 30 * 24 * 60;
         long numberOfMinutesInDay = 24 * 60;
         long numberOfMinutesInHour = 60;
+        
+        long numberOfMinutesCopy = numberOfMinutes;
         
         long years = numberOfMinutes / numberOfMinutesInYear;
         numberOfMinutes -= years * numberOfMinutesInYear;
@@ -354,13 +362,28 @@ public class Utils {
         long minutes = numberOfMinutes > 0 ? numberOfMinutes : 0;
 
         List<Pair> pairs = new ArrayList<Pair>();
-        pairs.add(new Pair(years, " year"));
-        pairs.add(new Pair(months, " month"));
-        pairs.add(new Pair(days, " day"));
-        
-        if (!(timeGranularity == TimeGranularity.DAY)) {
-            pairs.add(new Pair(hours, " hour"));
-            pairs.add(new Pair(minutes, " minute"));
+        if (timeGranularity == TimeGranularity.MAJOR_UNIT) {
+            if (years != 0) {
+                pairs.add(new Pair(years, 1.0 * (numberOfMinutesCopy - years * numberOfMinutesInYear) / numberOfMinutesInYear, " year"));
+            } else if (months != 0) {
+                pairs.add(new Pair(months, 1.0 * (numberOfMinutesCopy - months * numberOfMinutesInMonth) / numberOfMinutesInMonth, " month"));
+            } else if (days != 0) {
+                pairs.add(new Pair(days, 1.0 * (numberOfMinutesCopy - days * numberOfMinutesInDay) / numberOfMinutesInDay, " day"));
+            } else if (hours != 0) {
+                pairs.add(new Pair(hours, 1.0 * (numberOfMinutesCopy - hours * numberOfMinutesInHour) / numberOfMinutesInHour, " hour"));
+            } else if (minutes != 0) {
+                pairs.add(new Pair(minutes, " minute"));
+            }
+        }
+        else {
+            pairs.add(new Pair(years, " year"));
+            pairs.add(new Pair(months, " month"));
+            pairs.add(new Pair(days, " day"));
+            
+            if (timeGranularity == TimeGranularity.MINUTE) {
+                pairs.add(new Pair(hours, " hour"));
+                pairs.add(new Pair(minutes, " minute"));
+            }
         }
         
         StringBuilder sb = new StringBuilder();
@@ -371,6 +394,9 @@ public class Utils {
                     sb.append(" ");
                 }
                 sb.append(pair.number);
+                if (pair.decimals > 0) {
+                    sb.append(String.format("%.1f", pair.decimals));
+                }
                 sb.append(pair.name);
                 appendIfPlural(sb, "s", pair.number);
             }
@@ -483,6 +509,10 @@ public class Utils {
         String timeAgo = formatMillisecondsToWordsUpToDays(milliseconds) + " ago";
         
         return timeAgo;
+    }
+
+    public static String formatMillisecondsToWordsUpToMajorUnits(long totalTimeMillis) {
+        return formatMillisecondsToWords(totalTimeMillis, TimeGranularity.MAJOR_UNIT);
     }
 
     public static String formatMillisecondsToWordsUpToMinutes(long totalTimeMillis) {
