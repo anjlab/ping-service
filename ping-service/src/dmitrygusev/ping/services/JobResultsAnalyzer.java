@@ -178,7 +178,7 @@ public class JobResultsAnalyzer {
             dateFormat.setTimeZone(timeZone);
         }
         
-        sb.append("<table>");
+        sb.append("<table class='detailed-output-table'>");
         
         for (JobResultsInterval interval : intervals) {
             sb.append("<tr><td>");

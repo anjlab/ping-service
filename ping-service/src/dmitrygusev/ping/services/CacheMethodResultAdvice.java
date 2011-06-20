@@ -3,7 +3,7 @@
  */
 package dmitrygusev.ping.services;
 
-import net.sf.jsr107cache.Cache;
+import javax.cache.Cache;
 
 import org.apache.tapestry5.ioc.Invocation;
 import org.apache.tapestry5.ioc.MethodAdvice;
@@ -23,6 +23,7 @@ public class CacheMethodResultAdvice implements MethodAdvice {
         this.cache = cache;
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public void advise(Invocation invocation) {
         String invocationSignature = getInvocationSignature(invocation);

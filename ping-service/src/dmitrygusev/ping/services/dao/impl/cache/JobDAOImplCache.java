@@ -5,7 +5,7 @@ import static dmitrygusev.ping.services.dao.impl.cache.CacheHelper.getEntityCach
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jsr107cache.Cache;
+import javax.cache.Cache;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 
@@ -35,6 +35,7 @@ public class JobDAOImplCache extends JobDAOImpl {
         abandonScheduleCache(scheduleId);
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public Job find(Key jobKey) {
         Object entityCacheKey = getEntityCacheKey(Job.class, getJobWideUniqueData(jobKey));
@@ -57,6 +58,7 @@ public class JobDAOImplCache extends JobDAOImpl {
         return scheduleId + "/" + id;
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public Job find(Long scheduleId, Long id) {
         Object entityCacheKey = getEntityCacheKey(Job.class, getJobWideUniqueData(scheduleId, id));
@@ -71,6 +73,7 @@ public class JobDAOImplCache extends JobDAOImpl {
         return result;
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public void update(Job job, boolean commitAfter) {
         super.update(job, commitAfter);
@@ -93,6 +96,7 @@ public class JobDAOImplCache extends JobDAOImpl {
         updateJobInScheduleCache(job);
     }
 
+    @SuppressWarnings("unchecked")
     private void updateJobInScheduleCache(Job job) {
         Long scheduleId = job.getKey().getParent().getId();
         

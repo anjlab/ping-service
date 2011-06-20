@@ -4,11 +4,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.jsr107cache.Cache;
-import net.sf.jsr107cache.CacheEntry;
-import net.sf.jsr107cache.CacheException;
-import net.sf.jsr107cache.CacheListener;
-import net.sf.jsr107cache.CacheStatistics;
+import javax.cache.Cache;
+import javax.cache.CacheEntry;
+import javax.cache.CacheListener;
+import javax.cache.CacheStatistics;
 
 import org.apache.tapestry5.ioc.services.ThreadCleanupListener;
 import org.datanucleus.util.SoftValueMap;
@@ -78,7 +77,7 @@ public class LocalMemorySoftCache implements Cache, ThreadCleanupListener {
 
     @SuppressWarnings("rawtypes")
     @Override
-    public Map getAll(Collection keys) throws CacheException {
+    public Map getAll(Collection keys) {
         return cache.getAll(keys);
     }
 
@@ -104,13 +103,13 @@ public class LocalMemorySoftCache implements Cache, ThreadCleanupListener {
     }
 
     @Override
-    public void load(Object key) throws CacheException {
+    public void load(Object key) {
         cache.load(key);
     }
 
     @SuppressWarnings("rawtypes")
     @Override
-    public void loadAll(Collection keys) throws CacheException {
+    public void loadAll(Collection keys) {
         cache.loadAll(keys);
     }
 
@@ -119,6 +118,7 @@ public class LocalMemorySoftCache implements Cache, ThreadCleanupListener {
         return cache.peek(key);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object put(Object key, Object value) {
         map.put(key, value);

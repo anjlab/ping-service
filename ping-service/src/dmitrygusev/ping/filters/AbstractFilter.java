@@ -15,7 +15,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.jsr107cache.Cache;
+import javax.cache.Cache;
 
 import org.apache.tapestry5.EventContext;
 import org.apache.tapestry5.Link;
@@ -130,7 +130,7 @@ public abstract class AbstractFilter implements Filter {
     protected abstract void processRequest() throws Exception;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    public synchronized void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException
     {
         long startTime = System.currentTimeMillis();

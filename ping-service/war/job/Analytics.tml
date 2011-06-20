@@ -32,8 +32,6 @@
            Admin tasks: 
             <t:actionlink t:id="runJob">Run This Job Now</t:actionlink>
             &#160;
-            <t:actionlink t:id="viewResultsReport" target="_blank">View Results Report</t:actionlink>
-            &#160;
             <t:actionlink t:id="sendResultsByMail">Send Results By Mail</t:actionlink>
             &#160;
             <t:actionlink t:id="deleteJob"
@@ -83,6 +81,10 @@
                     <div id="map_canvas"></div>
                 </t:if>
                 
+                <h3>Detailed Report</h3>
+                <div class="detailed-output">
+                <t:outputraw value="detailedReport"/>
+                </div>
                </td>
                <td align="center" style="padding-left: 20px;">
                 <div id="charts">
@@ -107,7 +109,6 @@
                </td>
            </tr>
        </table>
-       
        
        <script type="text/javascript">
            collapseAll();

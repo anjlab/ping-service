@@ -309,6 +309,7 @@ public class Job implements Serializable {
               && getLastPingDetails() != null 
               && getLastPingDetails().contains("google")
               && (getLastPingDetails().contains("java.io.IOException: Timeout")
+                        || getLastPingDetails().contains("java.net.SocketTimeoutException: Timeout")
                         || getLastPingDetails().contains("java.io.IOException: Could not fetch URL")
                         || getLastPingDetails().contains("DeadlineExceededException"));
      }

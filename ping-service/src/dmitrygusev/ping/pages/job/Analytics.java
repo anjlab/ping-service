@@ -1,7 +1,5 @@
 package dmitrygusev.ping.pages.job;
 
-
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -303,37 +301,16 @@ public class Analytics {
         return jobLocation;
     }
 
-    public StreamResponse onActionFromViewResultsReport() {
-        return new StreamResponse() {
-            
-            @Override
-            public void prepareResponse(Response response) {
-                response.setHeader(
-                        "Content-Disposition", 
-                        "inline");
-            }
-            
-            @Override
-            public InputStream getStream() throws IOException {
-                JobResultsAnalyzer analyzer = new JobResultsAnalyzer(
-                        job.getRecentJobResults(Application.DEFAULT_NUMBER_OF_JOB_RESULTS), true);
-                
-                TimeZone timeZone = application.getTimeZone();
-                
-                StringBuilder report = analyzer.buildHtmlReport(timeZone);
-                
-                report.insert(0, "<p>Time Zone: " + timeZone.getDisplayName() + " (" + timeZone.getID() + ")</p>");
-                
-                InputStream is = new ByteArrayInputStream(report.toString().getBytes());
-                
-                return is;
-            }
-            
-            @Override
-            public String getContentType() {
-                return "text/html";
-            }
-        };
+    public String getDetailedReport() {
+        JobResultsAnalyzer analyzer = new JobResultsAnalyzer(results, true);
+        
+        TimeZone timeZone = application.getTimeZone();
+        
+        StringBuilder report = analyzer.buildHtmlReport(timeZone);
+        
+        report.insert(0, "<p>Time Zone: " + timeZone.getDisplayName() + " (" + timeZone.getID() + ")</p>");
+        
+        return report.toString();
     }
     
     public Long[] getJobContext() {

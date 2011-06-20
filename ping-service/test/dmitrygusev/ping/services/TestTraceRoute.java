@@ -29,5 +29,4 @@ public class TestTraceRoute {
        
        Assert.assertEquals(11, ips.size());
    }
-    
 }

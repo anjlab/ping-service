@@ -4,7 +4,7 @@ import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
-import net.sf.jsr107cache.Cache;
+import javax.cache.Cache;
 
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.BeforeRenderTemplate;

@@ -1,6 +1,6 @@
 package dmitrygusev.ping.pages.task;
 
-import net.sf.jsr107cache.Cache;
+import javax.cache.Cache;
 
 import org.apache.tapestry5.annotations.Meta;
 import org.apache.tapestry5.ioc.annotations.Inject;

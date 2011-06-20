@@ -18,4 +18,6 @@
         <handler file="503.html" error-code="over_quota"/>
         <handler file="504.html" error-code="timeout"/>
     </static-error-handlers>
+    
+    <threadsafe>true</threadsafe>
 </appengine-web-app>

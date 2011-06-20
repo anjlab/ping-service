@@ -5,7 +5,7 @@ import static dmitrygusev.ping.services.dao.impl.cache.CacheHelper.getEntityCach
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jsr107cache.Cache;
+import javax.cache.Cache;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 
@@ -18,6 +18,7 @@ public class RefDAOImplCache extends RefDAOImpl {
 
     @Inject private Cache cache;
 
+    @SuppressWarnings("unchecked")
     @Override
     public Ref addRef(Account account, Schedule schedule, int accessType) {
         Ref result = super.addRef(account, schedule, accessType);
@@ -34,6 +35,7 @@ public class RefDAOImplCache extends RefDAOImpl {
         return accountId + "+" + scheduleId;
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public Ref find(Account account, Schedule schedule) {
         Object entityCacheKey = getEntityCacheKey(Ref.class, getRefWideUniqueData(account.getId(), schedule.getId()));
@@ -48,6 +50,7 @@ public class RefDAOImplCache extends RefDAOImpl {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Ref find(Long id) {
         Object entityCacheKey = getEntityCacheKey(Ref.class, id);

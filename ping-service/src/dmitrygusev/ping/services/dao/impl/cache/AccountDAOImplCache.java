@@ -1,7 +1,7 @@
 package dmitrygusev.ping.services.dao.impl.cache;
 
 import static dmitrygusev.ping.services.dao.impl.cache.CacheHelper.getEntityCacheKey;
-import net.sf.jsr107cache.Cache;
+import javax.cache.Cache;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 
@@ -12,6 +12,7 @@ public class AccountDAOImplCache extends AccountDAOImpl {
 
     @Inject private Cache cache;
     
+    @SuppressWarnings("unchecked")
     @Override
     public Account find(Long id) {
         Object entityCacheKey = getEntityCacheKey(Account.class, id);
@@ -26,6 +27,7 @@ public class AccountDAOImplCache extends AccountDAOImpl {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Account getAccount(String email) {
         Object entityCacheKey = getEntityCacheKey(Account.class, email);
@@ -49,6 +51,7 @@ public class AccountDAOImplCache extends AccountDAOImpl {
         //  TODO Account with email as a key will remain in cache, remove it also 
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public void update(Account account) {
         super.update(account);

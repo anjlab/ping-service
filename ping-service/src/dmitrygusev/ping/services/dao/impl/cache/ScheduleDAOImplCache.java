@@ -4,7 +4,7 @@ import static dmitrygusev.ping.services.dao.impl.cache.CacheHelper.getEntityCach
 
 import javax.persistence.EntityManager;
 
-import net.sf.jsr107cache.Cache;
+import javax.cache.Cache;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 
@@ -18,6 +18,7 @@ public class ScheduleDAOImplCache extends ScheduleDAOImpl {
 
     @Inject private Cache cache;
 
+    @SuppressWarnings("unchecked")
     @Override
     public Schedule createSchedule(String name) {
         Schedule result = super.createSchedule(name);
@@ -36,6 +37,7 @@ public class ScheduleDAOImplCache extends ScheduleDAOImpl {
         cache.remove(entityCacheKey);
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public Schedule find(Key scheduleKey) {
         Object entityCacheKey = getEntityCacheKey(Schedule.class, scheduleKey.getId());
@@ -52,6 +54,7 @@ public class ScheduleDAOImplCache extends ScheduleDAOImpl {
     
     @Inject private EntityManager em;
     
+    @SuppressWarnings("unchecked")
     @Override
     public void update(Schedule schedule) {
         for (Job job : schedule.getJobs()) {
