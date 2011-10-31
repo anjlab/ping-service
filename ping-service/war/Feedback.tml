@@ -1,7 +1,7 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
     <title>Feedback - Ping Service</title>
-    <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/feedback.css}" />
 </head>
@@ -15,7 +15,7 @@
     <t:form>
         <table>
         <tr>
-            <td valign="top"><t:label for="message">Message:</t:label></td> 
+            <td valign="top"><t:label for="message">Message:</t:label></td>
             <td><t:textarea t:id="message" value="message" />
             <br/><font color="Gray">${note}</font></td>
         </tr>
@@ -24,7 +24,7 @@
         </tr>
         </table>
     </t:form>
-    </div> 
+    </div>
 
     <t:footer/>
 </body>

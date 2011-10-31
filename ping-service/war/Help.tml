@@ -1,7 +1,7 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
     <title>Help - Ping Service</title>
-    <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/help.css}" />
 </head>
@@ -15,12 +15,12 @@
     <p>Ping Service can ping your sites to check whether they healthy or not.</p>
 
     <p>In Ping Service you create jobs in order to do this.</p>
-    
-    <p>You can create job on <t:pagelink page="index">jobs</t:pagelink> page by 
+
+    <p>You can create job on <t:pagelink page="index">jobs</t:pagelink> page by
         clicking <t:pagelink page="job/create">Create Job...</t:pagelink>.</p>
-        
+
     <p><em>Create Job</em> page allows you to specify the details of your job, like what is your site's address and how to validate its healthy state.</p>
-    
+
         <p>Job parameters with brief descriptions are listed below.</p>
 
     <table class="params" cellpadding="0" cellspacing="0">
@@ -43,8 +43,8 @@
             <td>
                 Ping URL is your site's URL, e.g.:
                 <a href="http://anjlab.com" target="_blank">http://anjlab.com</a>
-                
-                <p>Note that your site will have to respond in less than 10 seconds. 
+
+                <p>Note that your site will have to respond in less than 10 seconds.
                 We can't wait longer, sorry.</p>
             </td>
         </tr>
@@ -154,7 +154,7 @@
             </td>
         </tr>
     </table>
-    
+
     <t:footer/>
 </body>
 </html>

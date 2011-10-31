@@ -1,16 +1,16 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
     <title>Ping Service</title>
-    <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
 </head>
 <body>
     <t:topbar />
-    
+
     <t:if test="admin">
        <div class="admin-tasks">
-           Admin tasks: 
-           
+           Admin tasks:
+
            <t:actionlink t:id="clearCache">Clear Application Cache</t:actionlink>
            &#160;
            <t:pagelink page="report/schedules">Schedules Report</t:pagelink>
@@ -23,7 +23,7 @@
         <tr>
             <td width="370">
                    <h2><t:logo/> Scheduled Jobs</h2>
-                   
+
                    <p>
                        <t:pagelink page="job/create">Create new job...</t:pagelink>
                    </p>
@@ -33,7 +33,7 @@
             </td>
         </tr>
     </table>
-    
+
     <t:grid empty="No jobs" source="jobs" row="job"
             model="model" t:id="grid"
             rowClass="literal:job">
@@ -41,19 +41,19 @@
         <t:parameter name="lastPingSummaryCell">
             <div class="${summaryStatusCssClass}" title="${lastPingTimestamp}">${job.lastPingSummary}</div>
         </t:parameter>
-        
+
         <t:parameter name="upDownTimeInMinutesCell">
             <div align="left">${job.statusCounterFriendlyShort}</div>
         </t:parameter>
-        
+
         <t:parameter name="recentAvailabilityPercentCell">
             <div align="right">${job.recentAvailabilityPercentFriendly}</div>
         </t:parameter>
-        
+
         <t:parameter name="totalAvailabilityPercentCell">
             <div align="right">${job.totalAvailabilityPercentFriendly}</div>
         </t:parameter>
-        
+
         <t:parameter name="titleFriendlyCell">
             ${job.titleFriendly}<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a>
         </t:parameter>
@@ -61,7 +61,7 @@
         <t:parameter name="actionsCell">
             <t:pagelink t:id="analytics" page="job/analytics" context="jobContext">Analyze</t:pagelink>,
             <t:pagelink t:id="details" page="job/edit" context="jobContext">Edit</t:pagelink>,
-            <t:actionlink t:id="deleteJob" context="jobContext" 
+            <t:actionlink t:id="deleteJob" context="jobContext"
                 onclick="return confirm('Are you sure you want to delete the job and all its statistics?');">Delete</t:actionlink>
         </t:parameter>
 
@@ -71,7 +71,7 @@
 
     <p>
         <t:form t:id="grantAccessTo" autofocus="false">
-            <t:label for="email">Share your schedule with (email):</t:label> 
+            <t:label for="email">Share your schedule with (email):</t:label>
             <t:textfield t:id="email" value="grantedEmail" validate="email, required" size="35" />
             <t:checkbox t:id="readOnly" value="readonly"/><t:label for="readOnly"/>&#160;
             <t:submit value="Share"/>
@@ -79,15 +79,15 @@
     </p>
 
     <t:grid empty="ACL is empty" source="accounts" row="account"
-            reorder="email, refAccessType" 
+            reorder="email, refAccessType"
             exclude="id, creationDate, lastVisitDate" add="delete">
-        
+
         <t:parameter name="deleteCell">
             <t:if test="deleteAccountLinkEnabled">
                 <t:actionlink t:id="removeAccount" context="account.id">Delete</t:actionlink>
             </t:if>
         </t:parameter>
-        
+
     </t:grid>
 
     <t:footer/>

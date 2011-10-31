@@ -1,18 +1,18 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
     <title>Schedules Report - Ping Service</title>
-    <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
 </head>
 <body>
     <t:topbar />
-    
+
     <h2><t:logo/> Schedules Report</h2>
-    
+
     <p><t:actionlink t:id="markDuplicates">Mark Duplicates</t:actionlink>
         &#160;
        <t:actionlink t:id="clearMarked">Clear Marks</t:actionlink></p>
-    
+
     <t:grid t:id="grid" source="schedules" row="schedule"
         model="model" rowsperpage="1000" rowClass="literal:job">
 

@@ -1,16 +1,16 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
 <head>
     <title>Jobs Report - Ping Service</title>
-    <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
+    <link rel="icon" type="image/png" href="${context:/favicon.png}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
 </head>
 <body>
     <t:topbar />
-    
+
     <h2><t:logo/> Jobs Report</h2>
-    
-    <t:grid t:id="grid" source="jobs" row="job" 
-        model="model" 
+
+    <t:grid t:id="grid" source="jobs" row="job"
+        model="model"
         rowsperpage="1000"
         rowClass="literal:job">
 
@@ -29,7 +29,7 @@
         <t:parameter name="lastPingSummaryCell">
             <div class="${summaryStatusCssClass}" title="${lastPingTimestamp}">${job.lastPingSummary}</div>
         </t:parameter>
-    
+
         <t:parameter name="titleFriendlyCell">
             ${job.titleFriendly}<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a>
         </t:parameter>
@@ -44,9 +44,9 @@
     </t:grid>
 
     <h2>Unbinded Jobs</h2>
-    
-    <t:grid t:id="grid2" source="unbindedJobs" row="job" 
-        model="model" 
+
+    <t:grid t:id="grid2" source="unbindedJobs" row="job"
+        model="model"
         rowsperpage="1000"
         rowClass="literal:job"
         add="delete">
@@ -66,7 +66,7 @@
         <t:parameter name="lastPingSummaryCell">
             <div class="${summaryStatusCssClass}" title="${lastPingTimestamp}">${job.lastPingSummary}</div>
         </t:parameter>
-    
+
         <t:parameter name="titleFriendlyCell">
             ${job.titleFriendly}<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a>
         </t:parameter>
