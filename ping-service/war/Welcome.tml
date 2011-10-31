@@ -1,7 +1,7 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
     <head>
         <title>Welcome to Ping Service</title>
-        <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
+        <link rel="icon" type="image/png" href="${context:/favicon.png}" />
         <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     </head>
     <body>
@@ -9,12 +9,12 @@
         <div align="center">
             <h2>Welcome to Ping Service!</h2>
 
-            <p><big>You can <a href="${startURL}">start using the service</a> right now.</big></p> 
+            <p><big>You can <a href="${startURL}">start using the service</a> right now.</big></p>
 
             <p>
-                Use your Google Account to login. 
+                Use your Google Account to login.
                 <br/>
-                If you don't have Google Account yet, you can easily create one 
+                If you don't have Google Account yet, you can easily create one
                 <a target="_blank" href="https://www.google.com/accounts/NewAccount">here</a>.
             </p>
 

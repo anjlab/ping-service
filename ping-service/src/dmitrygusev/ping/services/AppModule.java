@@ -97,13 +97,13 @@ public class AppModule
         //  GAE Appstats
         configuration.add("/appstats/.*");
     }
-    
-    public static Application buildApplication(ScheduleDAO scheduleDAO, 
-                                               AccountDAO accountDAO, 
-                                               JobDAO jobDAO, 
-                                               RefDAO refDAO, 
-                                               GAEHelper gaeHelper, 
-                                               JobExecutor jobExecutor, 
+
+    public static Application buildApplication(ScheduleDAO scheduleDAO,
+                                               AccountDAO accountDAO,
+                                               JobDAO jobDAO,
+                                               RefDAO refDAO,
+                                               GAEHelper gaeHelper,
+                                               JobExecutor jobExecutor,
                                                Mailer mailer,
                                                ApplicationStateManager stateManager,
                                                PageRenderLinkSource linkSource,
@@ -112,11 +112,11 @@ public class AppModule
                                                TimeZoneResolver timeZoneResolver,
                                                LocationResolver locationResolver)
     {
-        return new Application(accountDAO, jobDAO, scheduleDAO, 
+        return new Application(accountDAO, jobDAO, scheduleDAO,
                 refDAO, gaeHelper, jobExecutor, mailer, linkSource,
                 globals, timeZoneResolver, locationResolver);
     }
-    
+
     public static LocationResolver buildLocationResolver() {
         return new IPWhoisNetLocationResolver(URLFetchServiceFactory.getURLFetchService());
     }
@@ -128,19 +128,19 @@ public class AppModule
     public static TimeZoneResolver buildTimeZoneResolver() {
         return new GeonamesTimeZoneResolver(URLFetchServiceFactory.getURLFetchService(), "ping_service");
     }
-    
+
     public static Cache buildCache(Logger logger, PerthreadManager perthreadManager) {
         try {
             CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
             Cache cache = cacheFactory.createCache(Collections.emptyMap());
-            
+
             LocalMemorySoftCache cache2 = new LocalMemorySoftCache(cache);
 
             //  perthreadManager may be null if we creating cache from AbstractFilter
             if (perthreadManager != null) {
                 perthreadManager.addThreadCleanupListener(cache2);
             }
-            
+
             return cache2;
         } catch (CacheException e) {
             logger.error("Error instantiating cache", e);
@@ -150,26 +150,26 @@ public class AppModule
 
     public static MemcacheService buildMemcacheService(Logger logger) {
         MemcacheService memcacheService = MemcacheServiceFactory.getMemcacheService();
-        
+
         if (memcacheService == null) {
             logger.error("MemcacheService is null.");
         }
-        
+
         return memcacheService;
     }
-    
+
     public static GAEHelper buildGAEHelper(RequestGlobals requestGlobals) {
         return new GAEHelper(requestGlobals);
     }
-    
+
     public static AccessController buildAccessController(GAEHelper helper, RequestGlobals globals) {
         return new AccessController(helper, globals);
     }
-    
+
     public static Logger buildLogger() {
         return LoggerFactory.getLogger(AppModule.class);
     }
-    
+
     public static void contributeApplicationDefaults(
             MappedConfiguration<String, String> configuration)
     {
@@ -178,7 +178,7 @@ public class AppModule
         // locales to just "en" (English). As you add localised message catalogs and other assets,
         // you can extend this list of locales (it's a comma separated series of locale names;
         // the first locale name is the default when there's no reasonable match).
-        
+
         configuration.add(SymbolConstants.SUPPORTED_LOCALES, "en");
 
         // The factory default is true but during the early stages of an application
@@ -191,7 +191,7 @@ public class AppModule
         //    DataNucleus' GAE implementation doesn't provide EMF.getMetamodel() which is required for
         //    providing entity value encoders
         configuration.add(JPASymbols.PROVIDE_ENTITY_VALUE_ENCODERS, "false");
-        
+
         configuration.add(SymbolConstants.APPLICATION_VERSION, "beta-20100807");
     }
 
@@ -201,18 +201,18 @@ public class AppModule
      * RequestHandler service configuration. Tapestry IoC is responsible for passing in an
      * appropriate Logger instance. Requests for static resources are handled at a higher level, so
      * this filter will only be invoked for Tapestry related requests.
-     * 
+     *
      * <p>
      * Service builder methods are useful when the implementation is inline as an inner class
      * (as here) or require some other kind of special initialization. In most cases,
-     * use the static bind() method instead. 
-     * 
+     * use the static bind() method instead.
+     *
      * <p>
-     * If this method was named "build", then the service id would be taken from the 
+     * If this method was named "build", then the service id would be taken from the
      * service interface and would be "RequestFilter".  Since Tapestry already defines
      * a service named "RequestFilter" we use an explicit service id that we can reference
      * inside the contribution method.
-     */    
+     */
     public RequestFilter buildTimingFilter(final Logger log, final Application application)
     {
         return new RequestFilter()
@@ -224,15 +224,15 @@ public class AppModule
 
                 try
                 {
-                    if (!request.getPath().startsWith("/assets/") 
+                    if (!request.getPath().startsWith("/assets/")
                             && !request.getPath().startsWith("/favicon.ico")) {
                         application.trackUserActivity();
                     }
-                    
+
                     // The responsibility of a filter is to invoke the corresponding method
                     // in the handler. When you chain multiple filters together, each filter
                     // received a handler that is a bridge to the next filter.
-                    
+
                     return handler.service(request, response);
                 }
                 finally
@@ -244,12 +244,12 @@ public class AppModule
             }
         };
     }
-    
+
     public void contributeMasterDispatcher(OrderedConfiguration<Dispatcher> configuration,
             @InjectService("AccessController") Dispatcher accessController) {
-        
+
             //  TODO Investigate performance issue here
-        
+
             configuration.add("AccessController", accessController, "before:PageRender");
     }
 
@@ -267,7 +267,7 @@ public class AppModule
         // Each contribution to an ordered configuration has a name, When necessary, you may
         // set constraints to precisely control the invocation order of the contributed filter
         // within the pipeline.
-        
+
         configuration.add("Utf8Filter", utf8Filter); // handle UTF-8
         configuration.add("Timing", timingFilter);
     }
@@ -276,7 +276,7 @@ public class AppModule
     {
         configuration.add(Date.class, new TimeTranslator());
     }
-    
+
     public void contributeValidationMessagesSource(OrderedConfiguration<String> configuration) {
         String messagesSource = TimeTranslator.class.getName().replace(".", "/");
         configuration.add("time-translator", messagesSource);
@@ -285,28 +285,28 @@ public class AppModule
     public RequestFilter buildUtf8Filter(
             @InjectService("RequestGlobals") final RequestGlobals requestGlobals) {
         return new RequestFilter() {
-            public boolean service(Request request, Response response, 
+            public boolean service(Request request, Response response,
                     RequestHandler handler) throws IOException {
                 requestGlobals.getHTTPServletRequest().setCharacterEncoding("UTF-8");
                 return handler.service(request, response);
             }
         };
     }
-    
+
     public JPAEntityManagerSource buildLazyJPAEntityManagerSource(
-            @Inject @Symbol(JPASymbols.PERSISTENCE_UNIT) String persistenceUnit, 
+            @Inject @Symbol(JPASymbols.PERSISTENCE_UNIT) String persistenceUnit,
             RegistryShutdownHub hub)
     {
         LazyJPAEntityManagerSource source = new LazyJPAEntityManagerSource(persistenceUnit);
-        
+
         hub.addRegistryShutdownListener(source);
-        
+
         return source;
     }
-    
+
     public JPATransactionManager buildLazyJPATransactionManager(
             final JPAEntityManagerSource source,
-            @Inject @Symbol(InternalConstants.TAPESTRY_APP_PACKAGE_PARAM) 
+            @Inject @Symbol(InternalConstants.TAPESTRY_APP_PACKAGE_PARAM)
             String appPackage)
     {
         return new LazyJPATransactionManager(source, appPackage);
@@ -321,7 +321,7 @@ public class AppModule
         configuration.add(JPAEntityManagerSource.class, source);
         configuration.add(JPATransactionManager.class, manager);
     }
-    
+
     @Match("*DAO")
     public static void adviseTransactions(JPATransactionAdvisor advisor, MethodAdviceReceiver receiver)
     {
@@ -338,22 +338,22 @@ public class AppModule
     {
         configuration.add(NO_MARKUP_SYMBOL, "");
     }
-        
-    public void contributeMarkupRenderer(OrderedConfiguration<MarkupRendererFilter> configuration, 
-                                         final MetaDataLocator metaDataLocator, 
-                                         final ComponentEventLinkEncoder linkEncoder, 
+
+    public void contributeMarkupRenderer(OrderedConfiguration<MarkupRendererFilter> configuration,
+                                         final MetaDataLocator metaDataLocator,
+                                         final ComponentEventLinkEncoder linkEncoder,
                                          final RequestGlobals globals)
     {
-        configuration.add(NO_MARKUP_SYMBOL, 
+        configuration.add(NO_MARKUP_SYMBOL,
             new MarkupRendererFilter()
             {
                 @Override
                 public void renderMarkup(MarkupWriter writer, MarkupRenderer renderer) {
                     PageRenderRequestParameters parameters = linkEncoder.decodePageRenderRequest(globals.getRequest());
-    
-                    boolean noMarkup = metaDataLocator.findMeta(NO_MARKUP_SYMBOL, parameters.getLogicalPageName(), 
+
+                    boolean noMarkup = metaDataLocator.findMeta(NO_MARKUP_SYMBOL, parameters.getLogicalPageName(),
                                                                 Boolean.class);
-                    
+
                     if (noMarkup) {
                         //  Provide default (empty) markup
                         writer.element("html");
@@ -363,12 +363,12 @@ public class AppModule
                 }
             }, "before:*");
     }
-    
+
     public static void contributeClasspathAssetAliasManager(MappedConfiguration<String, String> configuration)
     {
         configuration.add("cubics", "anjlab/cubics");
     }
-    
+
     public RequestExceptionHandler decorateRequestExceptionHandler(
             final Logger logger,
             final Response response,
@@ -382,7 +382,7 @@ public class AppModule
             public void handleRequestException(Throwable exception) throws IOException
             {
                 logger.error("Unexpected runtime exception", exception);
-                
+
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null);
             }
         };
@@ -396,17 +396,17 @@ public class AppModule
 
             //  IP address of URL may change, keep it in cache for one day
             props.put(GCacheFactory.EXPIRATION_DELTA, 60 * 60 * 24);
-            
+
             CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
             Cache cache = cacheFactory.createCache(props);
-            
+
             LocalMemorySoftCache cache2 = new LocalMemorySoftCache(cache);
-            
+
             //  We don't want local memory cache live longer than memcache
             //  Since we don't have any mechanism to set local cache expiration
             //  we will just reset this cache after each request
             perthreadManager.addThreadCleanupListener(cache2);
-            
+
             receiver.adviseAllMethods(new CacheMethodResultAdvice(IPResolver.class, cache2));
         } catch (CacheException e) {
             logger.error("Error instantiating cache", e);
@@ -415,18 +415,18 @@ public class AppModule
 
     @Match("LocationResolver")
     public static void adviseCacheLocationResolverMethods(final MethodAdviceReceiver receiver, Cache cache) {
-        //  Assume that location of IP address will never change, 
+        //  Assume that location of IP address will never change,
         //  so we don't have to set any custom cache expiration parameters
         receiver.adviseAllMethods(new CacheMethodResultAdvice(LocationResolver.class, cache));
     }
-    
+
     @Match("TimeZoneResolver")
     public static void adviseCacheTimeZoneResolverMethods(final MethodAdviceReceiver receiver, Cache cache) {
-        //  Assume that time zone of location will never change, 
+        //  Assume that time zone of location will never change,
         //  so we don't have to set any custom cache expiration parameters
         receiver.adviseAllMethods(new CacheMethodResultAdvice(LocationResolver.class, cache));
     }
-    
+
 //    @Match("*")
 //    public static void adviseProfiler(final MethodAdviceReceiver receiver)
 //    {
@@ -436,7 +436,7 @@ public class AppModule
 //            receiver.adviseMethod(m, advice);
 //        };
 //    }
-//    
+//
 //    public static void contributeComponentClassTransformWorker(
 //            OrderedConfiguration<ComponentClassTransformWorker> configuration,
 //            ObjectLocator locator,
@@ -444,7 +444,7 @@ public class AppModule
 //            ComponentClassResolver resolver)
 //    {
 //        configuration.add("ProfilerWorker", new ComponentClassTransformWorker() {
-//            
+//
 //            @Override
 //            public void transform(ClassTransformation transformation, final MutableComponentModel model) {
 //                final MethodAdvice profilingAdvice = new ProfilingAdvice(transformation.getClassName());
@@ -465,7 +465,7 @@ public class AppModule
 //                        {
 //                            profilingAdvice.advise(invocation);
 //                        }
-//                    }; 
+//                    };
 //                    method.addAdvice(advice);
 //                }
 //            }

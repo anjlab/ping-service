@@ -1,7 +1,7 @@
 <html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
     <head>
         <title>Profiler</title>
-        <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
+        <link rel="icon" type="image/png" href="${context:/favicon.png}" />
         <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     </head>
     <body>
@@ -21,7 +21,7 @@
                 <li style="margin-left: ${itemPaddingLeft};">
                     ${itemLeaf.methodName}
                     &#160;
-                    <t:pagelink page="profiler" context="itemContext">View</t:pagelink> 
+                    <t:pagelink page="profiler" context="itemContext">View</t:pagelink>
                 </li>
             </t:loop>
         </ol>
@@ -34,6 +34,6 @@
               <t:pagelink page="profiler" context="${traceIntoContext}">View</t:pagelink>
           </t:parameter>
         </t:grid>
-        
+
     </body>
 </html>
