@@ -1,6 +1,6 @@
 <projectDescription>
   <name>
-    ping-service
+    sources
   </name>
   <comment/>
   <projects/>
@@ -33,13 +33,13 @@
     </buildCommand>
     <buildCommand>
       <name>
-        com.google.appengine.eclipse.core.enhancerbuilder
+        com.google.appengine.eclipse.core.projectValidator
       </name>
       <arguments/>
     </buildCommand>
     <buildCommand>
       <name>
-        com.google.appengine.eclipse.core.projectValidator
+        com.google.appengine.eclipse.core.enhancerbuilder
       </name>
       <arguments/>
     </buildCommand>

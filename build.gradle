@@ -24,7 +24,7 @@ file("$gaeSdkHome/$gaeSdkBundlePath/lib/tools/orm/").eachFileRecurse (groovy.io.
   }
 }
 
-webAppDirName = file('war')
+webAppDirName = 'war'
 webInfLib = file("$webAppDirName/WEB-INF/lib")
 
 repositories {
@@ -47,69 +47,61 @@ dependencies {
   compile 'org.json:json:20090211'
 }
 
-eclipseProject << {
-  def projectFile = file('.project')
-  def projectDescription = new XmlParser().parse(projectFile)
-
-  def buildCommands = projectDescription.buildSpec.get(0)
-  
-  if (!buildCommands.find { it.name.text() == 'com.google.gdt.eclipse.core.webAppProjectValidator' }) {
-    def command = buildCommands.appendNode('buildCommand')
-    command.appendNode('name', 'com.google.gdt.eclipse.core.webAppProjectValidator')
-    command.appendNode('arguments', null)
-  }
-  if (!buildCommands.find { it.name.text() == 'com.google.appengine.eclipse.core.enhancerbuilder' }) {
-    def command = buildCommands.appendNode('buildCommand')
-    command.appendNode('name', 'com.google.appengine.eclipse.core.enhancerbuilder')
-    command.appendNode('arguments', null)
-  }
-  if (!buildCommands.find { it.name.text() == 'com.google.gdt.eclipse.core.webAppProjectValidator' }) {
-    def command = buildCommands.appendNode('buildCommand')
-    command.appendNode('name', 'com.google.appengine.eclipse.core.projectValidator')
-    command.appendNode('arguments', null)
-  }
-
-  def natures = projectDescription.natures.get(0) 
-  if (!natures.find { it.text() == 'com.google.gdt.eclipse.core.webAppNature' }) {
-    natures.appendNode('nature', 'com.google.gdt.eclipse.core.webAppNature')
-  }
-
-  if (!natures.find { it.text() == 'com.google.appengine.eclipse.core.gaeNature' }) {
-    natures.appendNode('nature', 'com.google.appengine.eclipse.core.gaeNature')
-  }
-
-  new XmlNodePrinter(new PrintWriter(new FileWriter(projectFile))).print(projectDescription)
+eclipse.project.file {
+    whenMerged { project ->
+        def commands = [
+            "com.google.gdt.eclipse.core.webAppProjectValidator",
+            "com.google.appengine.eclipse.core.enhancerbuilder",
+            "com.google.appengine.eclipse.core.projectValidator"
+        ]
+        commands.each { command ->
+            if (!project.buildCommands.find { it.name.equals( command ) }) {
+                project.buildCommands.add(
+                    new org.gradle.plugins.ide.eclipse.model.BuildCommand(command, [:]))
+            }
+        }
+        def natures = [
+            "org.eclipse.jdt.core.javanature",
+            "com.google.gdt.eclipse.core.webAppNature",
+            "com.google.appengine.eclipse.core.gaeNature",
+            "org.eclipse.jdt.groovy.core.groovyNature"
+        ]
+        natures.each { nature ->
+            if (!project.natures.find { it.equals( nature ) }) {
+                project.natures.add( nature );
+            }
+        }
+    }
 }
 
-def getFilename(path) {
-    path.substring(path.lastIndexOf('/') + 1)
-}
-
-eclipseClasspath << {
-
-  def classpathFile = file('.classpath')
-  
-  def classpath = new XmlParser().parse(classpathFile)
-  if (!classpath.find { it.@path == 'com.google.appengine.eclipse.core.GAE_CONTAINER' }) {
-    classpath.appendNode('classpathentry', ['kind':'con', 'path':'com.google.appengine.eclipse.core.GAE_CONTAINER'])
-  }
-  
-  if (!classpath.find { it.@path.endsWith(getFilename(gaeEnhancerJar)) }) {
-    classpath.appendNode('classpathentry', ['kind':'lib', 'path':gaeEnhancerJar])
-  }
-  
-  classpath.findAll { it.@kind == 'output' && it.@path == 'bin' }.each {
-    it.@path = 'war/WEB-INF/classes'
-  }
-  
-  classpath.findAll { it.@kind == 'lib' && it.@path.endsWith('.jar') }.each {
-    it.@path = "$webAppDirName/WEB-INF/lib/" + getFilename(it.@path)
-  }
-  
-  println "Don't forget to execute 'gradle :updateWebInfLib'"
-  
-  new XmlNodePrinter(new PrintWriter(new FileWriter(classpathFile))).print(classpath)
-  
+eclipse.classpath.file {
+    withXml {
+        def classpath = it.asNode()
+        
+        if (!classpath.find { it.@path == 'com.google.appengine.eclipse.core.GAE_CONTAINER' }) {
+            classpath.appendNode('classpathentry', ['kind':'con', 'path':'com.google.appengine.eclipse.core.GAE_CONTAINER'])
+        }
+        
+        if (!classpath.find { it.@path.endsWith(file(gaeEnhancerJar).name) }) {
+            classpath.appendNode('classpathentry', ['kind':'lib', 'path':gaeEnhancerJar])
+        }
+        
+        classpath.findAll { it.@kind == 'output' && it.@path == 'bin' }.each {
+            it.@path = 'war/WEB-INF/classes'
+        }
+        
+        classpath.findAll { it.@kind == 'lib' && it.@path.endsWith('.jar') }.each {
+            it.@path = "$webAppDirName/WEB-INF/lib/" + file(it.@path).name
+        }
+        
+        classpath.findAll { it.@sourcepath != null }.each {
+            it.@path = "WORKSPACE_HOME/sources/${it.@path}"
+            it.@sourcepath = it.@sourcepath.replaceAll(System.getProperty('user.home'), 'USER_HOME')
+            it.@kind = 'var'
+        }
+        
+        println "Don't forget to execute 'gradle :updateWebInfLib'"
+    }
 }
 
 task copyJars(type: Copy) {
@@ -136,7 +128,7 @@ updateWebInfLib << {
         gaeLibs.each { jars << it }
     }
     
-    jars << getFilename(gaeEnhancerJar)
+    jars << file(gaeEnhancerJar).name
     
     configurations.compile.files.each {
         if (it.name.endsWith('.jar')) {
