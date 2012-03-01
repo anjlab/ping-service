@@ -1,0 +1,171 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceSets.main.java.srcDirs = ['src']
+sourceSets.test.java.srcDirs = ['test']
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+def gaeSdkHome = System.getenv()['APPENGINE_HOME']
+
+def gaeSdkProps = new Properties()
+file(gaeSdkHome + '/SdkBundleRegistrant.properties').withInputStream { 
+    stream -> gaeSdkProps.load(stream) 
+}
+
+gaeSdkBundlePath = gaeSdkProps.getProperty('sdkBundlePath')
+
+def gaeEnhancerJar = ""
+
+file("$gaeSdkHome/$gaeSdkBundlePath/lib/tools/orm/").eachFileRecurse (groovy.io.FileType.FILES) { 
+  file ->
+  if (file.name.contains('enhancer')) {
+    gaeEnhancerJar = file.path
+  }
+}
+
+webAppDirName = file('war')
+webInfLib = file("$webAppDirName/WEB-INF/lib")
+
+repositories {
+  mavenCentral()
+  mavenLocal()
+}
+
+configurations {
+  compile.exclude group: 'log4j'
+  compile.exclude module: 'slf4j-log4j12'
+}
+
+dependencies {
+  compile 'org.apache.tapestry:tapestry-core:5.3.2'
+  compile 'org.apache.tapestry:tapestry-jpa:5.3.2'
+  compile 'com.anjlab.cubics:cubics-core:1.1.0'
+  compile 'com.anjlab.cubics:cubics-renders:1.1.0'
+  compile 'org.slf4j:slf4j-jdk14:1.6.1'
+  compile 'junit:junit:4.10'
+  compile 'org.json:json:20090211'
+}
+
+eclipseProject << {
+  def projectFile = file('.project')
+  def projectDescription = new XmlParser().parse(projectFile)
+
+  def buildCommands = projectDescription.buildSpec.get(0)
+  
+  if (!buildCommands.find { it.name.text() == 'com.google.gdt.eclipse.core.webAppProjectValidator' }) {
+    def command = buildCommands.appendNode('buildCommand')
+    command.appendNode('name', 'com.google.gdt.eclipse.core.webAppProjectValidator')
+    command.appendNode('arguments', null)
+  }
+  if (!buildCommands.find { it.name.text() == 'com.google.appengine.eclipse.core.enhancerbuilder' }) {
+    def command = buildCommands.appendNode('buildCommand')
+    command.appendNode('name', 'com.google.appengine.eclipse.core.enhancerbuilder')
+    command.appendNode('arguments', null)
+  }
+  if (!buildCommands.find { it.name.text() == 'com.google.gdt.eclipse.core.webAppProjectValidator' }) {
+    def command = buildCommands.appendNode('buildCommand')
+    command.appendNode('name', 'com.google.appengine.eclipse.core.projectValidator')
+    command.appendNode('arguments', null)
+  }
+
+  def natures = projectDescription.natures.get(0) 
+  if (!natures.find { it.text() == 'com.google.gdt.eclipse.core.webAppNature' }) {
+    natures.appendNode('nature', 'com.google.gdt.eclipse.core.webAppNature')
+  }
+
+  if (!natures.find { it.text() == 'com.google.appengine.eclipse.core.gaeNature' }) {
+    natures.appendNode('nature', 'com.google.appengine.eclipse.core.gaeNature')
+  }
+
+  new XmlNodePrinter(new PrintWriter(new FileWriter(projectFile))).print(projectDescription)
+}
+
+def getFilename(path) {
+    path.substring(path.lastIndexOf('/') + 1)
+}
+
+eclipseClasspath << {
+
+  def classpathFile = file('.classpath')
+  
+  def classpath = new XmlParser().parse(classpathFile)
+  if (!classpath.find { it.@path == 'com.google.appengine.eclipse.core.GAE_CONTAINER' }) {
+    classpath.appendNode('classpathentry', ['kind':'con', 'path':'com.google.appengine.eclipse.core.GAE_CONTAINER'])
+  }
+  
+  if (!classpath.find { it.@path.endsWith(getFilename(gaeEnhancerJar)) }) {
+    classpath.appendNode('classpathentry', ['kind':'lib', 'path':gaeEnhancerJar])
+  }
+  
+  classpath.findAll { it.@kind == 'output' && it.@path == 'bin' }.each {
+    it.@path = 'war/WEB-INF/classes'
+  }
+  
+  classpath.findAll { it.@kind == 'lib' && it.@path.endsWith('.jar') }.each {
+    it.@path = "$webAppDirName/WEB-INF/lib/" + getFilename(it.@path)
+  }
+  
+  println "Don't forget to execute 'gradle :updateWebInfLib'"
+  
+  new XmlNodePrinter(new PrintWriter(new FileWriter(classpathFile))).print(classpath)
+  
+}
+
+task copyJars(type: Copy) {
+   from configurations.compile.files
+   from gaeEnhancerJar
+   into webInfLib
+}
+
+task updateWebInfLib {
+    dependsOn copyJars
+}
+
+updateWebInfLib << {
+    def jars = []
+    
+    def settingsAppengineFile = file('.settings/com.google.appengine.eclipse.core.prefs')
+    if (settingsAppengineFile.exists()) {
+        def props = new Properties()
+        
+        settingsAppengineFile.withInputStream { stream -> props.load(stream) }
+        
+        def gaeLibs = props.getProperty('filesCopiedToWebInfLib').split('\\|')
+        
+        gaeLibs.each { jars << it }
+    }
+    
+    jars << getFilename(gaeEnhancerJar)
+    
+    configurations.compile.files.each {
+        if (it.name.endsWith('.jar')) {
+            jars << it.name
+        }
+    }
+    
+    logger.debug("=== Application Classpath: $jars")
+    
+    def libs = []
+    webInfLib.eachFileRecurse (groovy.io.FileType.FILES) { file ->
+      if (file.name.endsWith('.jar')) {
+        libs << file.name
+      }
+    }
+    
+    logger.debug("=== Contents of $webInfLib.path: $libs")
+    
+    def toBeDeleted = libs - jars
+    
+    logger.debug("=== JARs to be deleted: $toBeDeleted")
+    
+    toBeDeleted.each { file("$webInfLib/$it").delete() }
+    
+    def filelist = file("$webInfLib/filelist.txt")
+    
+    if (filelist.exists()) filelist.delete()
+    
+    webInfLib.eachFileRecurse (groovy.io.FileType.FILES) { file ->
+        filelist << "$file.name\n"
+    }
+}

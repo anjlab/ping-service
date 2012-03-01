@@ -11,9 +11,11 @@
        <div class="admin-tasks">
            Admin tasks: 
            
-           <t:actionlink t:id="clearCache">Clear Application Cache</t:actionlink>
+           <t:actionlink t:id="udpateQuotas">Update Quotas</t:actionlink>
            &#160;
-           <t:pagelink page="report/schedules">Schedules Report</t:pagelink>
+           <t:actionlink t:id="quotaLimited">Set Quota Limited</t:actionlink>
+           &#160;
+           <t:actionlink t:id="clearCache">Clear Application Cache</t:actionlink>
            &#160;
            <t:pagelink page="report/jobs">Jobs Report</t:pagelink>
        </div>
@@ -29,7 +31,8 @@
                    </p>
             </td>
             <td align="center" valign="middle">
-                   <font color="${messageColor}"><p>${message}</p></font>
+                   <div class="${systemMessageClass}"><t:outputRaw value="systemMessage" /></div>
+                   <p style="color: ${messageColor};">${message}</p>
             </td>
         </tr>
     </table>
@@ -38,12 +41,16 @@
             model="model" t:id="grid"
             rowClass="literal:job">
 
+        <t:parameter name="cronStringCell">
+            ${cronString}
+        </t:parameter>
+
         <t:parameter name="lastPingSummaryCell">
             <div class="${summaryStatusCssClass}" title="${lastPingTimestamp}">${job.lastPingSummary}</div>
         </t:parameter>
         
         <t:parameter name="upDownTimeInMinutesCell">
-            <div align="left">${job.statusCounterFriendlyShort}</div>
+            <div class="${summaryStatusCssClass}-no-image" align="left">${job.statusCounterFriendlyShort}</div>
         </t:parameter>
         
         <t:parameter name="recentAvailabilityPercentCell">
@@ -57,7 +64,7 @@
         <t:parameter name="titleFriendlyCell">
             ${job.titleFriendly}<a href="${job.pingURL}" class="external" title="${job.pingURL}" target="_blank"></a>
         </t:parameter>
-
+        
         <t:parameter name="actionsCell">
             <t:pagelink t:id="analytics" page="job/analytics" context="jobContext">Analyze</t:pagelink>,
             <t:pagelink t:id="details" page="job/edit" context="jobContext">Edit</t:pagelink>,
@@ -80,7 +87,7 @@
 
     <t:grid empty="ACL is empty" source="accounts" row="account"
             reorder="email, refAccessType" 
-            exclude="id, creationDate, lastVisitDate" add="delete">
+            exclude="id, creationDate, lastVisitDate, system" add="delete">
         
         <t:parameter name="deleteCell">
             <t:if test="deleteAccountLinkEnabled">

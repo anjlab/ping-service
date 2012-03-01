@@ -1,7 +1,7 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
     <context-param>
         <param-name>tapestry.app-package</param-name>
-        <param-value>dmitrygusev.ping</param-value>
+        <param-value>com.anjlab.ping</param-value>
     </context-param>
     <!-- filter>
         <filter-name>appstats</filter-name>
@@ -17,7 +17,7 @@
     </filter-mapping -->
     <filter>
         <filter-name>runJob</filter-name>
-        <filter-class>dmitrygusev.ping.filters.RunJobFilter</filter-class>
+        <filter-class>com.anjlab.ping.filters.RunJobFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>runJob</filter-name>
@@ -25,7 +25,7 @@
     </filter-mapping>
     <filter>
         <filter-name>enqueueJobs</filter-name>
-        <filter-class>dmitrygusev.ping.filters.EnqueueJobsFilter</filter-class>
+        <filter-class>com.anjlab.ping.filters.EnqueueJobsFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>enqueueJobs</filter-name>
@@ -33,7 +33,7 @@
     </filter-mapping>
     <filter>
         <filter-name>backupJobResults</filter-name>
-        <filter-class>dmitrygusev.ping.filters.BackupJobResultsFilter</filter-class>
+        <filter-class>com.anjlab.ping.filters.BackupJobResultsFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>backupJobResults</filter-name>
@@ -41,7 +41,7 @@
     </filter-mapping>
     <filter>
         <filter-name>app</filter-name>
-        <filter-class>dmitrygusev.tapestry5.gae.LazyTapestryFilter</filter-class>
+        <filter-class>com.anjlab.tapestry5.LazyTapestryFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>app</filter-name>
@@ -96,5 +96,13 @@
     <error-page>
         <error-code>500</error-code>
         <location>/500.html</location>
+    </error-page>
+    <error-page>
+        <error-code>503</error-code>
+        <location>/503.html</location>
+    </error-page>
+    <error-page>
+        <error-code>504</error-code>
+        <location>/504.html</location>
     </error-page>
  </web-app>

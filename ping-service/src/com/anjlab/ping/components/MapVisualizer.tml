@@ -1,0 +1,5 @@
+<div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+    <t:grid empty="No records" source="entries" row="entry"
+            model="model" rowsperpage="100" t:id="grid">
+    </t:grid>
+</div>

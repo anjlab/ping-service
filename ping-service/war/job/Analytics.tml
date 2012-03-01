@@ -3,10 +3,10 @@
     <title>Job Analytics - Ping Service</title>
     <link rel="icon" type="image/png" href="${context:/favicon.png}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
-    <link rel="stylesheet" type="text/css" href="${asset:classpath:/anjlab/cubics/css/cube.css}" />
+    <link rel="stylesheet" type="text/css" href="${asset:classpath:/com/anjlab/cubics/css/cube.css}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/analytics.css}" />
     <script type="text/javascript" src="${context:/js/jquery-1.4.2.min.js}"></script>
-    <script type="text/javascript" src="${asset:classpath:/anjlab/cubics/js/cube.js}"></script>
+    <script type="text/javascript" src="${asset:classpath:/com/anjlab/cubics/js/cube.js}"></script>
     <script type="text/javascript" src="${context:/js/excanvas.min.js}"></script> 
     <script type="text/javascript" src="${context:/js/jquery.flot.min.js}"></script>
     <script type="text/javascript" src="${context:/js/jquery.flot.pie.js}"></script>

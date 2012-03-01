@@ -6,10 +6,9 @@
 
     <persistence-unit name="transactions-optional">
         <provider>org.datanucleus.store.appengine.jpa.DatastorePersistenceProvider</provider>
-        <class>dmitrygusev.ping.entities.Account</class>
-        <class>dmitrygusev.ping.entities.Job</class>
-        <class>dmitrygusev.ping.entities.Ref</class>
-        <class>dmitrygusev.ping.entities.Schedule</class>
+        <class>com.anjlab.ping.entities.Account</class>
+        <class>com.anjlab.ping.entities.Job</class>
+        <class>com.anjlab.ping.entities.Ref</class>
         <exclude-unlisted-classes/>
         <properties>
             <property name="datanucleus.NontransactionalRead" value="true"/>

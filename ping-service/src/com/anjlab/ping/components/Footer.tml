@@ -1,0 +1,24 @@
+<div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<div align="center">
+<p>
+    <t:pagelink page="welcome">Welcome</t:pagelink> &#160;
+    <t:pagelink page="index">Home</t:pagelink> &#160;
+    <t:pagelink page="feedback">Feedback</t:pagelink> &#160;
+    <t:pagelink page="settings">Settings</t:pagelink> &#160;
+    <t:pagelink page="help">Help</t:pagelink> &#160;
+    <a href="http://groups.google.com/group/ping-service" target="_blank">Discuss</a>
+</p>
+<p>
+    &#xA9; 2009 - 2012 <a href="http://anjlab.com" target="_blank">AnjLab</a>
+</p>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-10357458-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</div>

@@ -12,19 +12,21 @@
        
        <font color="red"><p>${message}</p></font>
        
-       <t:form>
+       <t:form t:id="jobForm">
         <t:errors/>
     
         <div class="t-beaneditor">
             <t:beaneditor object="job" 
                 reorder="title, pingURL, cronString, usesValidatingHttpCode, validatingHttpCode, usesValidatingRegexp, validatingRegexp, responseEncoding, reportEmail"
-                exclude="createdAt, titleFriendly, shortenURL, id, lastPingTimestamp, lastPingResult, lastPingDetails, lastBackupTimestamp">
+                exclude="scheduleName, createdAt, titleFriendly, shortenURL, id, lastPingTimestamp, lastPingResult, lastPingDetails, lastBackupTimestamp">
     
                 <t:parameter name="cronString">
                     <t:label for="cronString"/>
                     <t:select t:id="cronString" model="cronStringModel" value="job.cronString"/>
                     &#8194;
-                    <a href="/feedback?subject=Request for custom Cron string">Need more? Send a request!</a>
+                    <a href="/feedback?subject=Request for custom Cron string">Need custom string? Send a request!</a>
+                    &#8194;
+                    <a href="/settings">See Quota Limits</a>
                 </t:parameter>
                 
                 <t:parameter name="validatingHttpCode">
@@ -47,7 +49,7 @@
                     &#8194;
                     <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html" target="_blank">Java Regexp Reference</a>
                     &#160;
-                    <a href="/feedback?subject=Need help on regexp">Need help? Ask an expert (it's free)</a>
+                    <a href="/feedback?subject=Need help on regexp">Need help? Ask an expert! (it's free!)</a>
                 </t:parameter>
                                     
             </t:beaneditor>

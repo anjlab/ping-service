@@ -4,6 +4,7 @@
     <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
     <link rel="stylesheet" type="text/css" href="${context:/css/all.css}" />
     <link rel="stylesheet" type="text/css" href="${context:/css/feedback.css}" />
+    <script type="text/javascript" src="${context:/js/jquery-1.4.2.min.js}"></script>
 </head>
 <body>
     <t:topbar />
@@ -13,18 +14,22 @@
     <div align="center">
     <font color="green" weight="bold"><p>${thanks}</p></font>
     <t:form>
+        <div class="note-container">
+        <p>
+            <span class="note">${note}</span>
+        </p>
+        </div>
         <table>
         <tr>
             <td valign="top"><t:label for="message">Message:</t:label></td> 
-            <td><t:textarea t:id="message" value="message" />
-            <br/><font color="Gray">${note}</font></td>
+            <td><t:textarea t:id="message" value="message" /></td>
         </tr>
         <tr>
             <td colspan="2" align="right"><t:submit value="Send Feedback"/></td>
         </tr>
         </table>
     </t:form>
-    </div> 
+    </div>
 
     <t:footer/>
 </body>

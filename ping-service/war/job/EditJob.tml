@@ -12,15 +12,20 @@
        
        <font color="red"><p>${message}</p></font>
        
-       <t:form>
+       <t:form t:id="jobForm">
         <t:errors/>
     
         <div class="t-beaneditor">
             <t:beaneditor t:id="jobEditor" object="job" 
-                reorder="title, pingURL, createdAt, cronString, usesValidatingHttpCode, validatingHttpCode, usesValidatingRegexp, validatingRegexp, responseEncoding, reportEmail, receiveNotifications, receiveBackups, recentAvailabilityPercent, totalAvailabilityPercent, statusCounter, lastPingSummary, lastPingDetails"
+                reorder="scheduleName, title, pingURL, createdAt, cronString, usesValidatingHttpCode, validatingHttpCode, usesValidatingRegexp, validatingRegexp, responseEncoding, reportEmail, receiveNotifications, receiveBackups, recentAvailabilityPercent, totalAvailabilityPercent, statusCounter, lastPingSummary, lastPingDetails"
                 exclude="jobResultsCount, lastBackupTimestamp, shortenURL, titleFriendly, id, lastPingResult, lastPingTimestamp"
                 add="totalAvailabilityPercent, recentAvailabilityPercent, statusCounter, lastPingSummary"
                 submitLabel="Apply Edit">
+                
+                <t:parameter name="scheduleName">
+                    <span>Schedule Name:</span>
+                    ${scheduleName}
+                </t:parameter>
                 
                 <t:parameter name="title">
                     <t:label for="title"/>
@@ -35,7 +40,9 @@
                     <t:label for="cronString"/>
                     <t:select t:id="cronString" model="cronStringModel" value="job.cronString"/>
                     &#8194;
-                    <a href="/feedback?subject=Request for new cron string">Need more? Send a request!</a>
+                    <a href="/feedback?subject=Request for new cron string">Need custom string? Send a request!</a>
+                    &#8194;
+                    <a href="/settings">See Quota Limits</a>
                 </t:parameter>
                 
                 <t:parameter name="validatingHttpCode">
@@ -86,7 +93,7 @@
                     &#8194;
                     <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html" target="_blank">Java Regexp Reference</a>
                     &#160;
-                    <a href="/feedback?subject=Need help on regexp">Need help? Ask an expert!</a>
+                    <a href="/feedback?subject=Need help on regexp">Need help? Ask an expert! (it's free!)</a>
                 </t:parameter>
                 
                 <t:parameter name="lastPingDetails">

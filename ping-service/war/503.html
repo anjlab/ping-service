@@ -1,18 +1,20 @@
 <html>
 <head>
     <title>Ping Service - Over Capacity</title>
+    <link href="/css/all.css" type="text/css" rel="stylesheet">
 </head>
 <body>
-    <h1>
+    <h2>
+        <a href="/"><img alt="Home" height="23" width="112" class="logo" src="/images/ping-service.png"></a>
         Over Capacity
-    </h1>
+    </h2>
     
     <p>
         We apologize for the inconvenience.
     </p>
     
     <p>
-        Service is temporary unavailable until <span id="deadline">8:00 am UTC time.</span>
+        Service is temporary unavailable until <span id="deadline">midnight Pacific time.</span>
         
         <script type="text/javascript">
            var element = document.getElementById("deadline");
@@ -23,10 +25,11 @@
            if (deadline <= now) {
                deadline.setDate(deadline.getDate() + 1);
            }
+           var hours = Math.round((deadline - now) / 60 / 60 / 1000);
+           var minutes = Math.round((deadline - now) / 60 / 1000);
            element.innerHTML = deadline.toLocaleTimeString().replace(/:00$/, "") 
-                             + " your time (" 
-                             + Math.round((deadline - now) / 60 / 60 / 1000) 
-                             + " hours left).";
+                             + " (~ " 
+                             + (hours < 1 ? minutes + " minutes " : hours + " hours ") + "left).";
         </script>
     </p>
 </body>

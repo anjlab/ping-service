@@ -10,25 +10,56 @@
         <h2><t:logo/> Settings</h2>
 
         <div align="center">
-	        <font color="${messageColor}">
-	            <p>${message}</p>
-	        </font>
-            <t:form>
-                <table>
-                    <tr>
-                        <td>Time Zone:</td>
-                        <td>
-                            <t:select t:id="timeZone" model="timeZoneModel"
-                                value="userAccount.timeZoneCity" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="right" colspan="2">
-                            <t:submit value="Save" />
-                        </td>
-                    </tr>
-                </table>
-            </t:form>
+             <font color="${messageColor}">
+                <p>${message}</p>
+            </font>
+            
+            <table>
+            <tr>
+            <th>
+            Quota Limits
+            </th>
+            <th></th>
+            </tr>
+            <tr>
+            <td>
+                <t:grid source="quotas" row="quota"
+                    exclude="empty"
+                    add="cronString, totalLimit, used">
+                    <t:parameter name="cronStringCell">
+                        ${quota}
+                    </t:parameter>
+                    <t:parameter name="totalLimitCell">
+                        ${totalQuota}
+                    </t:parameter>
+                    <t:parameter name="usedCell">
+                        ${usedQuota}
+                    </t:parameter>
+                </t:grid>
+                <p>
+                    <a href="/feedback?subject=Request for more quotas">Need more quotas? Send a request!</a>
+                </p>
+            </td>
+            <td valign="top">
+                <t:form>
+                    <table>
+                        <tr>
+                            <td>Time Zone:</td>
+                            <td>
+                                <t:select t:id="timeZone" model="timeZoneModel"
+                                    value="userAccount.timeZoneCity" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" colspan="2">
+                                <t:submit value="Save" />
+                            </td>
+                        </tr>
+                    </table>
+                </t:form>
+            </td>
+            </tr>
+            </table>
         </div>
 
         <t:footer />
