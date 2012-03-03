@@ -87,7 +87,7 @@ eclipse.classpath.file {
         }
         
         classpath.findAll { it.@kind == 'output' && it.@path == 'bin' }.each {
-            it.@path = '$webAppDirName/WEB-INF/classes'
+            it.@path = "$webAppDirName/WEB-INF/classes"
         }
         
         classpath.findAll { it.@kind == 'lib' && it.@path.endsWith('.jar') }.each {
