@@ -286,7 +286,7 @@ public class Analytics {
     public Location getPingServiceLocation() {
         if (pingServiceLocation == null) {
             pingServiceLocation = locationResolver.resolveLocation(
-                    ipResolver.resolveIp("http://ping-service.appspot.com"));
+                    ipResolver.resolveIp(Application.PING_SERVICE_PING_URL));
         }
         return pingServiceLocation;
     }
