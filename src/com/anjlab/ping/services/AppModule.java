@@ -77,6 +77,7 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.memcache.stdimpl.GCacheFactory;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
+import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.api.utils.SystemProperty.Environment;
 import com.google.apphosting.api.ApiProxy.OverQuotaException;
 import com.google.apphosting.api.DeadlineExceededException;
@@ -297,7 +298,7 @@ public class AppModule
         configuration.add(JpaSymbols.PROVIDE_ENTITY_VALUE_ENCODERS, "false");
         configuration.add(JpaSymbols.EARLY_START_UP, "false");
         
-        configuration.add(SymbolConstants.APPLICATION_VERSION, "stage-20120228");
+        configuration.add(SymbolConstants.APPLICATION_VERSION, SystemProperty.applicationVersion.get());
     }
 
     /**

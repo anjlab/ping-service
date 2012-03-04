@@ -10,7 +10,6 @@ import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -599,13 +598,18 @@ public class Application {
         
         List<Key> unmodifiableKeys = jobDAO.getJobsByCronString(cronString);
         
+        //  Tasks should be added outside of transaction scope
+        if (tx.isActive()) {
+            tx.rollback();
+        }
+        
         List<Key> jobKeys = new ArrayList<Key>(unmodifiableKeys.size());
         for (Key key : unmodifiableKeys) {
             jobKeys.add(key);
         }
         
         //  XXX Not required after removing the Schedule class
-        Collections.shuffle(jobKeys);
+//        Collections.shuffle(jobKeys);
         
         logger.debug("Found {} job(s) to enqueue", jobKeys.size());
 
@@ -621,24 +625,21 @@ public class Application {
             
             //  API restriction: No more than 100 tasks can be added in a single add call
             if (tasks.size() == 100) {
-                enqueueJobTasks(queue, tasks, tx);
+                enqueueJobTasks(queue, tasks);
             }
         }
         
         if (tasks.size() > 0) {
-            enqueueJobTasks(queue, tasks, tx);
+            enqueueJobTasks(queue, tasks);
         }
 
         logger.debug("Finished enqueueing jobs");
     }
 
-    private void enqueueJobTasks(Queue queue, List<TaskOptions> tasks, EntityTransaction tx) {
+    private void enqueueJobTasks(Queue queue, List<TaskOptions> tasks) {
         addTaskNonTransactional(queue, tasks);
         logger.debug("{} jobs enqueued", tasks.size());
         tasks.clear();
-        
-        tx.commit();
-        tx.begin();
     }
 
     public String getPath(Class<?> pageClass, Object... context) throws URISyntaxException {
@@ -688,8 +689,7 @@ public class Application {
     }
 
     public Map<String, String> getUsedQuotas() {
-        //  XXX Implement find by owner (this will work until schedule name equals owner name)
-        List<Job> jobs = jobDAO.findByScheduleName(getUserAccount().getEmail());
+        List<Job> jobs = findByOwner(getUserAccount().getEmail());
         
         Map<String, String> usedQuotas = new HashMap<String, String>();
         for (Job userJob : jobs) {
@@ -705,8 +705,7 @@ public class Application {
     }
     
     public boolean isQuotaLimitsForCreateOrUpdateExceeded(Job job) {
-        //  XXX Implement find by owner (this will work until schedule name equals owner name)
-        List<Job> jobs = jobDAO.findByScheduleName(job.getScheduleName());
+        List<Job> jobs = findByOwner(job.getScheduledBy());
         
         String oldCronString = null;
         
@@ -739,6 +738,11 @@ public class Application {
             count = 0;
         }
         return (count + 1) > limit;
+    }
+
+    private List<Job> findByOwner(String ownerEmail) {
+        //  XXX Implement find by owner (this will work until schedule name equals owner name)
+        return jobDAO.findByScheduleName(ownerEmail);
     }
 
 }

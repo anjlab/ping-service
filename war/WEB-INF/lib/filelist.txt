@@ -1,8 +1,8 @@
 antlr-2.7.7.jar
 antlr-runtime-3.3.jar
-appengine-api-1.0-sdk-1.6.2.1.jar
-appengine-api-labs-1.6.2.1.jar
-appengine-jsr107cache-1.6.2.1.jar
+appengine-api-1.0-sdk-1.6.3.jar
+appengine-api-labs-1.6.3.jar
+appengine-jsr107cache-1.6.3.jar
 commons-codec-1.5.jar
 cubics-core-1.1.0.jar
 cubics-renders-1.1.0.jar
@@ -13,7 +13,6 @@ datanucleus-jpa-1.1.5.jar
 geronimo-jpa_2.0_spec-1.1.jar
 geronimo-jpa_3.0_spec-1.1.1.jar
 geronimo-jta_1.1_spec-1.1.1.jar
-google_sql.jar
 hamcrest-core-1.1.jar
 javassist-3.12.1.GA.jar
 javax.inject-1.jar
