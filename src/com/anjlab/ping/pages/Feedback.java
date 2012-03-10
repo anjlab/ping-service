@@ -49,7 +49,9 @@ public class Feedback {
                 this.note = "Please, " + replyToReminder;
             }
         } else {
-            this.note += ".";
+            if (this.note != null) {
+                this.note += ".";
+            }
         }
     }
     
