@@ -21,6 +21,7 @@ import org.apache.tapestry5.MarkupWriter;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.Translator;
 import org.apache.tapestry5.internal.jpa.EntityManagerSourceImpl;
+import org.apache.tapestry5.internal.services.ResourceStreamer;
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.MethodAdviceReceiver;
@@ -40,6 +41,7 @@ import org.apache.tapestry5.jpa.JpaSymbols;
 import org.apache.tapestry5.jpa.JpaTransactionAdvisor;
 import org.apache.tapestry5.jpa.PersistenceUnitConfigurer;
 import org.apache.tapestry5.services.ApplicationStateManager;
+import org.apache.tapestry5.services.AssetPathConverter;
 import org.apache.tapestry5.services.ComponentEventLinkEncoder;
 import org.apache.tapestry5.services.Dispatcher;
 import org.apache.tapestry5.services.MarkupRenderer;
@@ -53,6 +55,7 @@ import org.apache.tapestry5.services.RequestFilter;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.RequestHandler;
 import org.apache.tapestry5.services.Response;
+import org.apache.tapestry5.services.ResponseCompressionAnalyzer;
 import org.apache.tapestry5.services.linktransform.PageRenderLinkTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,12 +75,13 @@ import com.anjlab.ping.services.location.gae.GeonamesTimeZoneResolver;
 import com.anjlab.ping.services.location.gae.IPWhoisNetIPResolver;
 import com.anjlab.ping.services.location.gae.IPWhoisNetLocationResolver;
 import com.anjlab.ping.services.security.AccessController;
+import com.anjlab.tapestry5.StaticAssetResourceStreamer;
+import com.anjlab.tapestry5.StaticAssetPathConverter;
 import com.anjlab.tapestry5.TimeTranslator;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.memcache.stdimpl.GCacheFactory;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
-import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.api.utils.SystemProperty.Environment;
 import com.google.apphosting.api.ApiProxy.OverQuotaException;
 import com.google.apphosting.api.DeadlineExceededException;
@@ -98,7 +102,12 @@ public class AppModule
         binder.bind(JobDAO.class, JobDAOImplCache.class).preventReloading();
         binder.bind(RefDAO.class, RefDAOImplCache.class).preventReloading();
     }
-
+    
+    public static AssetPathConverter decorateAssetPathConverter(
+            final ResponseCompressionAnalyzer analyzer, final RequestGlobals requestGlobals) {
+        return new StaticAssetPathConverter(requestGlobals);
+    }
+    
     @Contribute(PageRenderLinkTransformer.class)
     @Primary
     public static void provideURLRewriting(
@@ -199,17 +208,11 @@ public class AppModule
     }
     
     public static Application buildApplication(AccountDAO accountDAO, 
-                                               JobDAO jobDAO, 
-                                               RefDAO refDAO, 
-                                               GAEHelper gaeHelper, 
-                                               JobExecutor jobExecutor, 
-                                               Mailer mailer,
-                                               ApplicationStateManager stateManager,
-                                               PageRenderLinkSource linkSource,
-                                               RequestGlobals globals,
-                                               MemcacheService memcache,
-                                               TimeZoneResolver timeZoneResolver,
-                                               LocationResolver locationResolver)
+            JobDAO jobDAO, RefDAO refDAO, GAEHelper gaeHelper, JobExecutor jobExecutor,
+            Mailer mailer, ApplicationStateManager stateManager, 
+            PageRenderLinkSource linkSource, RequestGlobals globals,
+            MemcacheService memcache, TimeZoneResolver timeZoneResolver,
+            LocationResolver locationResolver)
     {
         return new Application(accountDAO, jobDAO, 
                 refDAO, gaeHelper, jobExecutor, mailer, linkSource,
@@ -298,7 +301,10 @@ public class AppModule
         configuration.add(JpaSymbols.PROVIDE_ENTITY_VALUE_ENCODERS, "false");
         configuration.add(JpaSymbols.EARLY_START_UP, "false");
         
-        configuration.add(SymbolConstants.APPLICATION_VERSION, SystemProperty.applicationVersion.get());
+        //    Version should be changed when any resource (that is referenced from CSS) changes
+        String version = "stage-20120310";
+        
+        configuration.add(SymbolConstants.APPLICATION_VERSION, version);
     }
 
     /**
@@ -350,7 +356,7 @@ public class AppModule
                 {
                     long elapsed = System.currentTimeMillis() - startTime;
 
-                    log.info(String.format("Request time: %d ms", elapsed));
+                    log.info(String.format("Request time [%s]: %d ms", request.getPath(), elapsed));
                 }
             }
         };
@@ -359,11 +365,19 @@ public class AppModule
     public void contributeMasterDispatcher(OrderedConfiguration<Dispatcher> configuration,
             @InjectService("AccessController") Dispatcher accessController) {
         
-            //  TODO Investigate performance issue here
-        
-            configuration.add("AccessController", accessController, "before:PageRender");
+        //  TODO Investigate performance issue here
+    
+        configuration.add("AccessController", accessController, "before:PageRender");
     }
 
+    public static ResourceStreamer decorateResourceStreamer(final ResourceStreamer streamer,
+            final RequestGlobals requestGlobals, @Symbol(SymbolConstants.PRODUCTION_MODE) boolean productionMode)
+    {
+        return productionMode
+             ? streamer
+             : new StaticAssetResourceStreamer(requestGlobals, streamer);
+    }
+    
     /**
      * This is a contribution to the RequestHandler service configuration. This is how we extend
      * Tapestry using the timing filter. A common use for this kind of filter is transaction
@@ -382,7 +396,7 @@ public class AppModule
         configuration.add("Utf8Filter", utf8Filter); // handle UTF-8
         configuration.add("Timing", timingFilter);
     }
-
+    
     public static void contributeTranslatorSource(MappedConfiguration<Class<?>, Translator<Date>> configuration)
     {
         configuration.add(Date.class, new TimeTranslator());

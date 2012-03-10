@@ -57,6 +57,9 @@
         <servlet-name>appstats</servlet-name>
         <url-pattern>/appstats/*</url-pattern>
     </servlet-mapping>
+    <security-role>
+        <role-name>admin</role-name>
+    </security-role>
     <security-constraint>
         <web-resource-collection>
             <url-pattern>/appstats/*</url-pattern>

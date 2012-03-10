@@ -9,20 +9,29 @@ targetCompatibility = 1.6
 def gaeSdkHome = System.getenv()['APPENGINE_HOME']
 
 def gaeSdkProps = new Properties()
-file(gaeSdkHome + '/SdkBundleRegistrant.properties').withInputStream { 
-    stream -> gaeSdkProps.load(stream) 
+def gaeSdkPropsFile = file(gaeSdkHome + '/SdkBundleRegistrant.properties')
+if (gaeSdkPropsFile.exists()) {
+    gaeSdkPropsFile.withInputStream { 
+        stream -> gaeSdkProps.load(stream) 
+    }
 }
 
-gaeSdkBundlePath = gaeSdkProps.getProperty('sdkBundlePath')
+gaeSdkBundlePath = gaeSdkProps.getProperty('sdkBundlePath') ?: ""
 
-def gaeEnhancerJar = ""
-
-file("$gaeSdkHome/$gaeSdkBundlePath/lib/tools/orm/").eachFileRecurse (groovy.io.FileType.FILES) { 
-  file ->
-  if (file.name.contains('enhancer')) {
-    gaeEnhancerJar = file.path
-  }
+def getGaeSdkJarPath(dir, jarName) {
+    def result = ""
+    file(dir).eachFileRecurse (groovy.io.FileType.FILES) { 
+      file ->
+      if (file.name.contains(jarName)) {
+        result = file.path
+      }
+    }
+    result
 }
+
+def gaeEnhancerJar = getGaeSdkJarPath("$gaeSdkHome/$gaeSdkBundlePath/lib/tools/orm/", 'enhancer')
+def gaeApiStubsJar = "$gaeSdkHome/$gaeSdkBundlePath/lib/impl/appengine-api-stubs.jar"
+def gaeTestingJar = "$gaeSdkHome/$gaeSdkBundlePath/lib/testing/appengine-testing.jar"
 
 webAppDirName = 'war'
 webInfLib = file("$webAppDirName/WEB-INF/lib")
@@ -40,6 +49,7 @@ configurations {
 dependencies {
   compile 'org.apache.tapestry:tapestry-core:5.3.2'
   compile 'org.apache.tapestry:tapestry-jpa:5.3.2'
+  compile 'org.apache.tapestry:tapestry-test:5.3.2'
   compile 'com.anjlab.cubics:cubics-core:1.1.0'
   compile 'com.anjlab.cubics:cubics-renders:1.1.0'
   compile 'org.slf4j:slf4j-jdk14:1.6.1'
@@ -78,12 +88,12 @@ eclipse.classpath.file {
     withXml {
         def classpath = it.asNode()
         
-        if (!classpath.find { it.@path == 'com.google.appengine.eclipse.core.GAE_CONTAINER' }) {
-            classpath.appendNode('classpathentry', ['kind':'con', 'path':'com.google.appengine.eclipse.core.GAE_CONTAINER'])
+        if (!classpath.find { it.@path.endsWith(new java.io.File(gaeEnhancerJar).getName()) }) {
+            classpath.appendNode('classpathentry', ['kind':'lib', 'path':gaeEnhancerJar])
         }
         
-        if (!classpath.find { it.@path.endsWith(file(gaeEnhancerJar).name) }) {
-            classpath.appendNode('classpathentry', ['kind':'lib', 'path':gaeEnhancerJar])
+        if (!classpath.find { it.@path == 'com.google.appengine.eclipse.core.GAE_CONTAINER' }) {
+            classpath.appendNode('classpathentry', ['kind':'con', 'path':'com.google.appengine.eclipse.core.GAE_CONTAINER'])
         }
         
         classpath.findAll { it.@kind == 'output' && it.@path == 'bin' }.each {
@@ -98,6 +108,14 @@ eclipse.classpath.file {
             it.@path = "WORKSPACE_HOME/sources/${it.@path}"
             it.@sourcepath = it.@sourcepath.replaceAll(System.getProperty('user.home'), 'USER_HOME')
             it.@kind = 'var'
+        }
+        
+        def gaeTestJars = [gaeApiStubsJar, gaeTestingJar]
+        gaeTestJars.each { gaeJar ->
+            def filename = new java.io.File(gaeJar).getName()
+            if (!classpath.find { it.@path.endsWith(filename) }) {
+                classpath.appendNode('classpathentry', ['kind':'lib', 'path':gaeJar])
+            }
         }
         
         println "Don't forget to execute 'gradle :updateWebInfLib'"
