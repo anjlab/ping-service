@@ -50,6 +50,10 @@ dependencies {
   compile 'org.apache.tapestry:tapestry-core:5.3.2'
   compile 'org.apache.tapestry:tapestry-jpa:5.3.2'
   compile 'org.apache.tapestry:tapestry-test:5.3.2'
+  compile('org.apache.tapestry:tapestry-yuicompressor:5.3.2') {
+      exclude group: 'com.yahoo.platform.yui'
+  }
+  compile 'com.yahoo.platform.yui:yuicompressor:2.4.7'
   compile 'com.anjlab.cubics:cubics-core:1.1.0'
   compile 'com.anjlab.cubics:cubics-renders:1.1.0'
   compile 'org.slf4j:slf4j-jdk14:1.6.1'

@@ -22,9 +22,11 @@ import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.Translator;
 import org.apache.tapestry5.internal.jpa.EntityManagerSourceImpl;
 import org.apache.tapestry5.internal.services.ResourceStreamer;
+import org.apache.tapestry5.internal.services.assets.ResourceChangeTracker;
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.MethodAdviceReceiver;
+import org.apache.tapestry5.ioc.OperationTracker;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.Resource;
 import org.apache.tapestry5.ioc.ServiceBinder;
@@ -56,6 +58,7 @@ import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.RequestHandler;
 import org.apache.tapestry5.services.Response;
 import org.apache.tapestry5.services.ResponseCompressionAnalyzer;
+import org.apache.tapestry5.services.assets.StreamableResourceSource;
 import org.apache.tapestry5.services.linktransform.PageRenderLinkTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -302,9 +305,10 @@ public class AppModule
         configuration.add(JpaSymbols.EARLY_START_UP, "false");
         
         //    Version should be changed when any resource (that is referenced from CSS) changes
-        String version = "stage-20120310";
+        String version = "stage-20120311";
         
         configuration.add(SymbolConstants.APPLICATION_VERSION, version);
+        configuration.add(SymbolConstants.MINIFICATION_ENABLED, "true");
     }
 
     /**
@@ -370,12 +374,17 @@ public class AppModule
         configuration.add("AccessController", accessController, "before:PageRender");
     }
 
-    public static ResourceStreamer decorateResourceStreamer(final ResourceStreamer streamer,
-            final RequestGlobals requestGlobals, @Symbol(SymbolConstants.PRODUCTION_MODE) boolean productionMode)
+    public static ResourceStreamer decorateResourceStreamer(Request request, Response response,
+            StreamableResourceSource streamableResourceSource,
+            ResponseCompressionAnalyzer analyzer, OperationTracker tracker,
+            @Symbol(SymbolConstants.PRODUCTION_MODE) boolean productionMode,
+            ResourceChangeTracker resourceChangeTracker,
+            ResourceStreamer streamer)
     {
         return productionMode
              ? streamer
-             : new StaticAssetResourceStreamer(requestGlobals, streamer);
+             : new StaticAssetResourceStreamer(request, response, streamableResourceSource, analyzer, tracker,
+                     productionMode, resourceChangeTracker);
     }
     
     /**

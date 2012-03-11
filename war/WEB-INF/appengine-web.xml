@@ -15,6 +15,12 @@
     </admin-console>
     
     <static-files>
+        <include path="/favicon.png" expiration="365d" />
+        <include path="/*.html" expiration="365d" />
+        <include path="/css/**" expiration="365d" />
+        <include path="/js/**" expiration="365d" />
+        <include path="/images/**" expiration="365d" />
+        <include path="/assets/**" expiration="365d" />
         <exclude path="/*.tml" />
         <exclude path="/**/*.tml" />
     </static-files>

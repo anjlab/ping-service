@@ -12,42 +12,62 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.tapestry5.internal.services.ResourceStreamer;
+import org.apache.tapestry5.internal.services.ResourceStreamerImpl;
+import org.apache.tapestry5.internal.services.assets.ResourceChangeTracker;
+import org.apache.tapestry5.ioc.OperationTracker;
 import org.apache.tapestry5.ioc.Resource;
-import org.apache.tapestry5.services.RequestGlobals;
+import org.apache.tapestry5.services.Request;
+import org.apache.tapestry5.services.Response;
+import org.apache.tapestry5.services.ResponseCompressionAnalyzer;
+import org.apache.tapestry5.services.assets.CompressionStatus;
 import org.apache.tapestry5.services.assets.StreamableResource;
+import org.apache.tapestry5.services.assets.StreamableResourceSource;
 
-public class StaticAssetResourceStreamer implements ResourceStreamer {
+public class StaticAssetResourceStreamer extends ResourceStreamerImpl {
     
+    private final Request request;
+    
+    public StaticAssetResourceStreamer(Request request, Response response,
+            StreamableResourceSource streamableResourceSource,
+            ResponseCompressionAnalyzer analyzer, OperationTracker tracker,
+            boolean productionMode, ResourceChangeTracker resourceChangeTracker) {
+        super(request, response, streamableResourceSource, analyzer, tracker,
+                productionMode, resourceChangeTracker);
+        
+        this.request = request;
+    }
+
     public static final String ASSETS_STATIC_PROPERTIES = "assets/static.properties";
     
-    private final RequestGlobals requestGlobals;
-    private final ResourceStreamer streamer;
-
-    public StaticAssetResourceStreamer(RequestGlobals requestGlobals, ResourceStreamer streamer) {
-        this.requestGlobals = requestGlobals;
-        this.streamer = streamer;
-    }
-
     @Override
     public void streamResource(StreamableResource resource) throws IOException {
-        streamer.streamResource(resource);
-    }
-
-    @Override
-    public void streamResource(Resource resource) throws IOException {
-        String path = requestGlobals.getRequest().getPath();
+        String path = request.getPath();
         if (path.startsWith("/assets")) {
             try {
-                createStaticAsset(path, resource.openStream());
+                createStaticAsset(path, (resource.getCompression() == CompressionStatus.COMPRESSED)
+                        ? uncompress(resource.openStream()) : resource.openStream());
             } catch (Exception e) {
                 throw new RuntimeException("Try running application with system property -D--enable_all_permissions=true", e);
             }
         }
-        streamer.streamResource(resource);
+        super.streamResource(resource);
+    }
+
+    private InputStream uncompress(InputStream input) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        GZIPInputStream gzip = new GZIPInputStream(input);
+        IOUtils.copy(gzip, output);
+        gzip.close();
+        return new ByteArrayInputStream(output.toByteArray());
+    }
+
+    @Override
+    public void streamResource(Resource resource) throws IOException {
+        super.streamResource(resource);
     }
 
     private synchronized void createStaticAsset(String assetPathVersioned, InputStream input)
