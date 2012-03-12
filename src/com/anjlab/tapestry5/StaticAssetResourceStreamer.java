@@ -29,6 +29,8 @@ import org.apache.tapestry5.services.assets.StreamableResourceSource;
 
 public class StaticAssetResourceStreamer extends ResourceStreamerImpl {
     
+    public static final String STATIC_ASSET_RESOURCE_STREAMER = "StaticAssetResourceStreamer";
+    
     private final Request request;
     
     public StaticAssetResourceStreamer(Request request, Response response,

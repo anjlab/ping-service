@@ -309,6 +309,9 @@ public class AppModule
         
         configuration.add(SymbolConstants.APPLICATION_VERSION, version);
         configuration.add(SymbolConstants.MINIFICATION_ENABLED, "true");
+        
+        //  Set this to true before running creation of static assets
+        configuration.add(StaticAssetResourceStreamer.STATIC_ASSET_RESOURCE_STREAMER, "false");
     }
 
     /**
@@ -378,13 +381,14 @@ public class AppModule
             StreamableResourceSource streamableResourceSource,
             ResponseCompressionAnalyzer analyzer, OperationTracker tracker,
             @Symbol(SymbolConstants.PRODUCTION_MODE) boolean productionMode,
+            @Symbol(StaticAssetResourceStreamer.STATIC_ASSET_RESOURCE_STREAMER) boolean enableStaticStreamer,
             ResourceChangeTracker resourceChangeTracker,
             ResourceStreamer streamer)
     {
-        return productionMode
-             ? streamer
-             : new StaticAssetResourceStreamer(request, response, streamableResourceSource, analyzer, tracker,
-                     productionMode, resourceChangeTracker);
+        return !productionMode || enableStaticStreamer
+             ? new StaticAssetResourceStreamer(request, response, streamableResourceSource, analyzer, tracker,
+                        productionMode, resourceChangeTracker)
+             : streamer;
     }
     
     /**

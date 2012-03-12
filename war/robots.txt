@@ -1,0 +1,11 @@
+User-Agent: *
+Disallow: /job
+Disallow: /settings
+Disallow: /report
+Disallow: /task
+Disallow: /profiler
+Disallow: /traceroute
+Disallow: /assets
+Disallow: /images
+Disallow: /css
+Disallow: /js
