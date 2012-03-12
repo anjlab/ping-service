@@ -1,1 +1,0 @@
-var T5={_:_.noConflict()};T5.extend=function(a,c){var b=T5._;if(b.isFunction(c)){c=c()}return b.extend(a,c)};T5.define=function(a,c){var b={};T5[a]=b;return this.extend(b,c)};

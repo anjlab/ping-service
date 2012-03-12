@@ -1,1 +1,0 @@
-T5.define("spi",{observe:undefined,find:undefined,hide:undefined,show:undefined,appendMarkup:undefined,ajaxRequest:undefined});

@@ -101,7 +101,11 @@ function plotHistogramChart($this, chartId, chartTitle) {
     for (var idx = 0; idx < jsonData.keys.length; idx++) {
         d.push([idx, jsonData.values[idx]]);
         var key = jsonData.keys[idx];
-        ticks.push([idx + 1, key.substring(key.indexOf(";") + 1, key.lastIndexOf("."))]);
+        var tickLabel = parseInt(key.substring(key.indexOf(";") + 1, key.lastIndexOf(".")));
+        if (tickLabel >= 1000) {
+            tickLabel = Math.floor(tickLabel / 1000) + "k";
+        }
+        ticks.push([idx + 1, tickLabel]);
     }
     
     d.push([idx, jsonData.others]);

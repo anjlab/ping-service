@@ -16,7 +16,7 @@
 
     <p>In Ping Service you create jobs in order to do this.</p>
     
-    <p>You can create job on <t:pagelink page="index">jobs</t:pagelink> page by 
+    <p>You can create job on your <t:pagelink page="index">home page</t:pagelink> by 
         clicking <t:pagelink page="job/create">Create Job...</t:pagelink>.</p>
         
     <p><em>Create Job</em> page allows you to specify the details of your job, like what is your site's address and how to validate its healthy state.</p>
@@ -44,7 +44,7 @@
                 Ping URL is your site's URL, e.g.:
                 <a href="http://anjlab.com" target="_blank">http://anjlab.com</a>
                 
-                <p>Note that your site will have to respond in less than 10 seconds. 
+                <p>Note that your site will have to respond in less than 60 seconds. 
                 We can't wait longer, sorry.</p>
             </td>
         </tr>
@@ -53,11 +53,13 @@
             <td>every 1 hours</td>
             <td>
                 <p>Cron String allows you to specify how frequent Ping Service will
-                    check your URL. There are only three options available for now:</p>
+                    check your URL. There are several options available for now:</p>
                 <ul type="circle">
                     <li>every 1 hours</li>
                     <li>every 30 minutes</li>
                     <li>every 15 minutes</li>
+                    <li>every 5 minutes</li>
+                    <li>every day 00:00</li>
                 </ul>
                 <p>
                     In general, this could be any valid
@@ -65,6 +67,10 @@
                     If you need some custom option which isn't in this list,
                     feel free to contact us using
                     <a href="/feedback?subject=Request for custom Cron string">the Feedback form</a>.
+                </p>
+                <p>
+                There are quota limits for available Cron Strings in Ping Service.
+                Every user have some quotas for free. You can examine your quotas on <a href="/settings">settings page</a>.
                 </p>
             </td>
         </tr>

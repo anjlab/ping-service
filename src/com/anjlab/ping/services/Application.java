@@ -561,7 +561,7 @@ public class Application {
         body.append("\n\nDetailed report:\n\n");
         
         if (job.isGoogleIOException()) {
-            body.append("Your server didn't respond in 10 seconds." +
+            body.append("Your server didn't respond in 60 seconds." +
                        "\nWe can't wait longer: http://code.google.com/intl/en/appengine/docs/java/urlfetch/overview.html#Requests\n\n");
         }
         

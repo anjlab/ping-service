@@ -3,6 +3,8 @@ package com.anjlab.ping.pages.job;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -23,6 +25,7 @@ import com.anjlab.cubics.Cube;
 import com.anjlab.cubics.FactModel;
 import com.anjlab.cubics.aggregate.histogram.Histogram.HistogramMergeStrategy;
 import com.anjlab.cubics.aggregate.histogram.HistogramAggregateFactory;
+import com.anjlab.cubics.aggregate.histogram.Range;
 import com.anjlab.cubics.aggregate.pie.PieAggregateFactory;
 import com.anjlab.cubics.coerce.IntegerCoercer;
 import com.anjlab.cubics.renders.html.HtmlRender;
@@ -102,7 +105,7 @@ public class Analytics {
     
     public Index onActivate(Long jobId) {
         try {
-            int defaultEnd = 10000;
+            int defaultEnd = 20000;
             try {
                 this.end = request.getParameterNames().contains("end") 
                     ? Long.parseLong(request.getParameter("end")) 
@@ -169,8 +172,23 @@ public class Analytics {
         model.setDimensions(view.split(" > "));
         model.setMeasures("responseTime", "pingResult");
         model.declareCustomAggregate(new PieAggregateFactory<JobResult>(new IntegerCoercer()), "pingResult");
+        
+        Range[] ranges;
+        
+        if (end > 1000) {
+            List<Range> rangeList = new ArrayList<Range>();
+            ranges = Range.createRanges(0, 100, 1000);
+            ranges[ranges.length - 1].setRightInclusive(false);
+            rangeList.addAll(Arrays.asList(ranges));
+            ranges = Range.createRanges(1000, (end - 1000) / 10, end);
+            rangeList.addAll(Arrays.asList(ranges));
+            ranges = rangeList.toArray(ranges);
+        } else {
+            ranges = Range.createRanges(0, end / 10, end);
+        }
+        
         model.declareCustomAggregate(
-                new HistogramAggregateFactory<JobResult>(HistogramMergeStrategy.NumericRanges, 0, end / 10, end), 
+                new HistogramAggregateFactory<JobResult>(HistogramMergeStrategy.SameRanges, ranges), 
                 "responseTime");
         
         Cube<JobResult> cube = Cube.createCube(model, results);
@@ -207,7 +225,7 @@ public class Analytics {
     }
 
     private void initResults() {
-        results = job.getRecentJobResults(Application.DEFAULT_NUMBER_OF_JOB_RESULTS);
+        results = job.getRecentJobResults2(Application.DEFAULT_NUMBER_OF_JOB_RESULTS);
         
         if (results.size() > 0) {
             dateFrom = results.get(0).getTimestamp();
@@ -216,7 +234,7 @@ public class Analytics {
             dateTo = dateFrom = new Date();
         }
     }
-    
+
     private StreamResponse getExport(final String format) {
         return new StreamResponse() {
             @Override

@@ -8,6 +8,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -420,6 +422,32 @@ public class Job implements Serializable, SerializableEstimations {
               : getKey().equals(job.getKey());
      }
 
+     public List<JobResult> getRecentJobResults2(int numberOfResults) {
+         List<JobResult> results = getRecentJobResults(numberOfResults);
+         if (results.size() > 0) {
+             Date dateFrom = results.get(0).getTimestamp();
+             Date dateTo = results.get(results.size() - 1).getTimestamp();
+             //  Truncate results to one month back
+             Date monthBack = monthBack(dateTo);
+             if (dateTo.getTime() - dateFrom.getTime() > dateTo.getTime() - monthBack.getTime()) {
+                 JobResult jobResult = new JobResult();
+                 jobResult.setTimestamp(monthBack);
+                 int index = Collections.binarySearch(results, jobResult, new Comparator<JobResult>() {
+                     @Override
+                     public int compare(JobResult a, JobResult b) {
+                         int dateDiffMillis = (int) (a.getTimestamp().getTime() - b.getTimestamp().getTime());
+                         int oneDayMillis = 1000 * 60 * 60 * 24;
+                         return Math.abs(dateDiffMillis) < oneDayMillis ? 0 : dateDiffMillis;
+                     }
+                 });
+                 if (index > 0) {
+                     results = results.subList(index, results.size());
+                 }
+             }
+         }
+         return results;
+     }
+     
      /**
       * If client changes returned results he is responsible 
       * for those changes to be persisted back to {@value #packedJobResults}, 
@@ -430,18 +458,25 @@ public class Job implements Serializable, SerializableEstimations {
       * @since 13.05.2010
       */
     public List<JobResult> getRecentJobResults(int numberOfResults) {
-         readJobResults();
-         
-         return numberOfResults == 0
-              ? jobResults
-              : (jobResults.size() == 0 
-                      ? jobResults
-                      : jobResults.subList(
-                              jobResults.size() > numberOfResults 
-                                 ? jobResults.size() - numberOfResults 
-                                 : 0, 
-                             jobResults.size()));
-     }
+        readJobResults();
+        
+        return numberOfResults == 0
+             ? jobResults
+             : (jobResults.size() == 0 
+                     ? jobResults
+                     : jobResults.subList(
+                             jobResults.size() > numberOfResults 
+                                ? jobResults.size() - numberOfResults 
+                                : 0, 
+                            jobResults.size()));
+    }
+    
+    private Date monthBack(Date from) {
+        Calendar instance = Calendar.getInstance();
+        instance.setTime(from);
+        instance.add(Calendar.MONTH, -1);
+        return instance.getTime();
+    }
 
     public int getResultsCount() {
         readJobResults();
