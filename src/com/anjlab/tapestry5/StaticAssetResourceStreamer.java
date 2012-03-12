@@ -29,8 +29,6 @@ import org.apache.tapestry5.services.assets.StreamableResourceSource;
 
 public class StaticAssetResourceStreamer extends ResourceStreamerImpl {
     
-    public static final String STATIC_ASSET_RESOURCE_STREAMER = "StaticAssetResourceStreamer";
-    
     private final Request request;
     
     public StaticAssetResourceStreamer(Request request, Response response,
@@ -47,13 +45,17 @@ public class StaticAssetResourceStreamer extends ResourceStreamerImpl {
     
     @Override
     public void streamResource(StreamableResource resource) throws IOException {
-        String path = request.getPath();
-        if (path.startsWith("/assets")) {
-            try {
-                createStaticAsset(path, (resource.getCompression() == CompressionStatus.COMPRESSED)
-                        ? uncompress(resource.openStream()) : resource.openStream());
-            } catch (Exception e) {
-                throw new RuntimeException("Try running application with system property -D--enable_all_permissions=true", e);
+        String header = request.getHeader(StaticAssetPathConverter.ASSETS_PRECOMPILATION);
+        if (header != null) {
+            //  Only create static assets during precompilation
+            String path = request.getPath();
+            if (path.startsWith("/assets")) {
+                try {
+                    createStaticAsset(path, (resource.getCompression() == CompressionStatus.COMPRESSED)
+                            ? uncompress(resource.openStream()) : resource.openStream());
+                } catch (Exception e) {
+                    throw new RuntimeException("Try running application with system property -D--enable_all_permissions=true", e);
+                }
             }
         }
         super.streamResource(resource);

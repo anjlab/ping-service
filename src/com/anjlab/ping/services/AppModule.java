@@ -78,8 +78,8 @@ import com.anjlab.ping.services.location.gae.GeonamesTimeZoneResolver;
 import com.anjlab.ping.services.location.gae.IPWhoisNetIPResolver;
 import com.anjlab.ping.services.location.gae.IPWhoisNetLocationResolver;
 import com.anjlab.ping.services.security.AccessController;
-import com.anjlab.tapestry5.StaticAssetResourceStreamer;
 import com.anjlab.tapestry5.StaticAssetPathConverter;
+import com.anjlab.tapestry5.StaticAssetResourceStreamer;
 import com.anjlab.tapestry5.TimeTranslator;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
@@ -309,9 +309,6 @@ public class AppModule
         
         configuration.add(SymbolConstants.APPLICATION_VERSION, version);
         configuration.add(SymbolConstants.MINIFICATION_ENABLED, "true");
-        
-        //  Set this to true before running creation of static assets
-        configuration.add(StaticAssetResourceStreamer.STATIC_ASSET_RESOURCE_STREAMER, "false");
     }
 
     /**
@@ -381,14 +378,12 @@ public class AppModule
             StreamableResourceSource streamableResourceSource,
             ResponseCompressionAnalyzer analyzer, OperationTracker tracker,
             @Symbol(SymbolConstants.PRODUCTION_MODE) boolean productionMode,
-            @Symbol(StaticAssetResourceStreamer.STATIC_ASSET_RESOURCE_STREAMER) boolean enableStaticStreamer,
             ResourceChangeTracker resourceChangeTracker,
             ResourceStreamer streamer)
     {
-        return !productionMode || enableStaticStreamer
-             ? new StaticAssetResourceStreamer(request, response, streamableResourceSource, analyzer, tracker,
-                        productionMode, resourceChangeTracker)
-             : streamer;
+        return new StaticAssetResourceStreamer(
+                request, response, streamableResourceSource, analyzer, tracker,
+                productionMode, resourceChangeTracker);
     }
     
     /**
