@@ -1,5 +1,8 @@
 package com.anjlab.ping.pages.report;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +29,9 @@ import com.anjlab.tapestry5.AbstractReadonlyPropertyConduit;
 
 public class JobsReport {
 
+    @SuppressWarnings("unused")
+    @Property
+    private Map.Entry<?, ?> entry;
     @Property
     private Job job;
     @Inject
@@ -285,4 +291,22 @@ public class JobsReport {
         return countersByNumberOfJobs;
     }
 
+    private MessageDigest digest;
+    public MessageDigest getDigest() {
+        if (digest == null) {
+            try {
+                digest = MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return digest;
+    }
+    
+    public String md5(String s) {
+        MessageDigest digest = getDigest();
+        digest.reset();
+        digest.update((s.trim().toLowerCase()).getBytes());
+        return new BigInteger(1, digest.digest()).toString(16);
+    }
 }

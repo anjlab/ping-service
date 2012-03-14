@@ -1,4 +1,5 @@
-<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd"
+    xmlns:p="tapestry:parameter">
 <head>
     <title>Jobs Report - Ping Service</title>
     <link rel="icon" type="image/png" href="${context:/favicon.png}" /> 
@@ -9,15 +10,21 @@
     
     <h2><t:logo/> Jobs Report</h2>
     
-    <t:mapVisualizer map="countersByAccount" key="Account" value="Count" />
+    <t:mapVisualizer map="countersByAccount" key="Account" value="Number of Jobs" entry="entry">
+        <p:keyBlock>
+            <a href="http://gravatar.com/${md5(entry.key)}"><img src="http://gravatar.com/avatar/${md5(entry.key)}"
+                style="width: 1em; height: 1em;" onmouseover="javascript:this.style.width=this.style.height=''" /></a>
+            <t:pagelink page="index" parameters="{'impersonatedUser':entry.key}">${entry.key}</t:pagelink>
+        </p:keyBlock>
+    </t:mapVisualizer>
     
     <br />
     
-    <t:mapVisualizer map="countersByCronString" key="Cron String" value="Count" />
+    <t:mapVisualizer map="countersByCronString" key="Cron String" value="Number of Jobs" />
     
     <br />
     
-    <t:mapVisualizer map="countersByNumberOfJobs" key="Number Of Jobs" value="Count" />
+    <t:mapVisualizer map="countersByNumberOfJobs" key="Number of Jobs" value="Number of Users" />
     
     <br />
     

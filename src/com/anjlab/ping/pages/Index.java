@@ -119,11 +119,15 @@ public class Index {
             String impersonatedUser = request.getParameter("impersonatedUser");
             userAccount = impersonatedUser == null
                         ? application.getUserAccount()
-                        : application.getUserAccount(impersonatedUser);
+                        : application.getUserAccount(decodeTapestryUrl(impersonatedUser));
         }
         return userAccount;
     }
     
+    private String decodeTapestryUrl(String impersonatedUser) {
+        return impersonatedUser.replaceAll("\\$0040", "@");
+    }
+
     @Property
     private String grantedEmail;
     

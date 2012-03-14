@@ -1,5 +1,14 @@
-<div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd"
+    xmlns:p="tapestry:parameter">
+    <t:block id="defaultKeyBlock">${entry.key}</t:block>
+    <t:block id="defaultValueBlock">${entry.value}</t:block>
     <t:grid empty="No records" source="entries" row="entry"
             model="model" rowsperpage="100" t:id="grid">
+        <p:keyCell>
+            <t:delegate to="keyBlock"/>
+        </p:keyCell>
+        <p:valueCell>
+            <t:delegate to="valueBlock"/>
+        </p:valueCell>
     </t:grid>
 </div>
