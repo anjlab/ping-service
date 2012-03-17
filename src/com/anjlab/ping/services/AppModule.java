@@ -205,9 +205,9 @@ public class AppModule
     
     public static void contributeIgnoredPathsFilter(Configuration<String> configuration) {
         //  GAE filters, except warmup requests
-        configuration.add("/_ah/[^warmup].*");
+        configuration.add("^/_ah/((?!warmup).*)$");
         //  GAE Appstats
-        configuration.add("/appstats/.*");
+        configuration.add("^/appstats/.*$");
     }
     
     public static Application buildApplication(AccountDAO accountDAO, 

@@ -26,7 +26,12 @@ public class TestRoutines {
         
         String ah = items.get(0);
         
-        Assert.assertFalse(Pattern.matches(ah, "/_ah/warmup"));
-        Assert.assertTrue(Pattern.matches(ah, "/_ah/login?continue=%2F_ah%2Flogout"));
+        Assert.assertTrue(ah.startsWith("^/_ah/"));
+        
+        Pattern ahPattern = Pattern.compile(ah, Pattern.CASE_INSENSITIVE);
+        
+        Assert.assertTrue("login request", ahPattern.matcher("/_ah/login?continue=%2F_ah%2Flogout").matches());
+        Assert.assertTrue("admin console request", ahPattern.matcher("/_ah/admin").matches());
+        Assert.assertFalse("warmup request", ahPattern.matcher("/_ah/warmup").matches());
     }
 }
