@@ -2,9 +2,9 @@ annotations-api-6.0.30.jar
 antlr-2.7.7.jar
 antlr-runtime-3.3.jar
 aopalliance-1.0.jar
-appengine-api-1.0-sdk-1.6.3.1.jar
-appengine-api-labs-1.6.3.1.jar
-appengine-jsr107cache-1.6.3.1.jar
+appengine-api-1.0-sdk-1.6.4.1.jar
+appengine-api-labs-1.6.4.1.jar
+appengine-jsr107cache-1.6.4.1.jar
 bcprov-jdk15-135.jar
 bsh-2.0b4.jar
 catalina-6.0.30.jar

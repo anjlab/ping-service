@@ -50,7 +50,7 @@ public class JobExecutor {
             job.setLastPingTimestamp(new Date());
             
             HTTPRequest request = new HTTPRequest(new URL(url), HTTPMethod.GET);
-            request.getFetchOptions().setDeadline(60d);
+            request.getFetchOptions().setDeadline(25d);
             request.getFetchOptions().doNotFollowRedirects();
             request.getFetchOptions().allowTruncate();
 

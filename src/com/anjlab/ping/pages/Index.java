@@ -25,7 +25,7 @@ import com.anjlab.gae.QuotaDetails.Quota;
 import com.anjlab.ping.entities.Account;
 import com.anjlab.ping.entities.Job;
 import com.anjlab.ping.entities.Ref;
-import com.anjlab.ping.pages.task.UpdateQuotasTask;
+import com.anjlab.ping.pages.task.UpdateJobsTask;
 import com.anjlab.ping.services.Application;
 import com.anjlab.ping.services.GAEHelper;
 import com.anjlab.ping.services.Utils;
@@ -325,6 +325,6 @@ public class Index {
     
     public void onActionFromUdpateQuotas() throws URISyntaxException {
         GAEHelper.addTaskNonTransactional(QueueFactory.getQueue(Application.DEFAULT_QUEUE),
-                application.buildTaskUrl(UpdateQuotasTask.class));
+                application.buildTaskUrl(UpdateJobsTask.class));
     }
 }

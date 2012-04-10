@@ -3,7 +3,7 @@
         <param-name>tapestry.app-package</param-name>
         <param-value>com.anjlab.ping</param-value>
     </context-param>
-    <!-- filter>
+    <filter>
         <filter-name>appstats</filter-name>
         <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
         <init-param>
@@ -14,7 +14,15 @@
     <filter-mapping>
         <filter-name>appstats</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping -->
+    </filter-mapping>
+    <filter>
+        <filter-name>worker</filter-name>
+        <filter-class>com.anjlab.ping.filters.WorkerFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>worker</filter-name>
+        <url-pattern>/filters/worker/*</url-pattern>
+    </filter-mapping>
     <filter>
         <filter-name>runJob</filter-name>
         <filter-class>com.anjlab.ping.filters.RunJobFilter</filter-class>

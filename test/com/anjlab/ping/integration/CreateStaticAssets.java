@@ -1,5 +1,8 @@
 package com.anjlab.ping.integration;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -41,6 +44,7 @@ public class CreateStaticAssets {
     
     @Test
     public void precompileAssets() {
+        //  XXX set production = true in AppModule
         //  XXX Run application with system property
         //  -D--enable_all_permissions=true
         selenium.addCustomRequestHeader(StaticAssetPathConverter.ASSETS_PRECOMPILATION, "true");
@@ -77,5 +81,20 @@ public class CreateStaticAssets {
         
         selenium.open("/settings");
         Assert.assertEquals("Settings - Ping Service", selenium.getTitle());
+        
+        Pattern appVersionPattern = Pattern.compile(".*/assets/([^/]+)/", Pattern.DOTALL);
+        String htmlSource = selenium.getHtmlSource();
+        Matcher matcher = appVersionPattern.matcher(htmlSource);
+        Assert.assertTrue(matcher.find());
+        String appVersion = matcher.group(1);
+        
+        Assert.assertNotNull(appVersion);
+        
+        selenium.open("/assets/" + appVersion + "/ctx/images/exclamation.png");
+        selenium.open("/assets/" + appVersion + "/ctx/images/tick.png");
+        selenium.open("/assets/" + appVersion + "/ctx/images/bullet_error.png");
+        selenium.open("/assets/" + appVersion + "/ctx/images/external.png");
+        selenium.open("/assets/" + appVersion + "/ctx/images/ping-service.png");
+        selenium.open("/assets/" + appVersion + "/ctx/images/analytics-demo.png");
     }
 }

@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.datanucleus.jpa.annotations.Extension;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -59,6 +60,7 @@ public class Job implements Serializable, SerializableEstimations {
     private String pingURL;
     //     Validating regexp
     @Column(nullable=true)
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private String validatingRegexp;
     //     Cron string to select jobs against a cron action
     @Column(nullable=false)
@@ -66,25 +68,40 @@ public class Job implements Serializable, SerializableEstimations {
     private String cronString;
     //     Email to send reports to
     @Validate("email")
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private String reportEmail;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Date lastPingTimestamp;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private int lastPingResult;
     @Basic
     private Text lastPingDetails;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private boolean usesValidatingRegexp;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private boolean usesValidatingHttpCode;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Integer validatingHttpCode;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private String responseEncoding;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private String title;
     
     //     Number of times this job stays in failed or okay status
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Integer statusCounter;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Integer previousStatusCounter;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Integer totalStatusCounter;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Integer totalSuccessStatusCounter;
     
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Boolean receiveNotifications;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Boolean receiveBackups;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Date lastBackupTimestamp;
     
     // Since 13.05.2010
@@ -95,14 +112,20 @@ public class Job implements Serializable, SerializableEstimations {
     @Transient
     private boolean updatingJobResults;
 
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Date createdAt;
     
     // Since 14.02.2012
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private String suspendReason;
+    //  Intentionally left indexed
     private Date suspendedAt;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private String suspendedBy;
     
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Date modifiedAt;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private String modifiedBy;
 
     private String scheduleName;

@@ -114,9 +114,11 @@ public class Application {
         for (Ref ref : refs) {
             Account account = accountDAO.find(ref.getAccountKey().getId());
             
-            account.setRef(ref);
-            
-            result.add(account);
+            if (account != null) {
+                account.setRef(ref);
+                
+                result.add(account);
+            }
         }
         
         return result;

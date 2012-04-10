@@ -1,0 +1,1 @@
+T5.extend(T5,function(){return{initializers:{},extendInitializers:function(a){T5.extend(T5.initializers,a)}}});

@@ -2,6 +2,7 @@ package com.anjlab.ping.entities;
 
 import java.io.Serializable;
 
+import org.datanucleus.jpa.annotations.Extension;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -28,6 +29,7 @@ public class Ref implements Serializable {
     
     private String scheduleName;
     
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private int accessType;
     
     public static final int ACCESS_TYPE_READONLY = 0;

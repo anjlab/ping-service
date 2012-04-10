@@ -44,7 +44,7 @@
                 Ping URL is your site's URL, e.g.:
                 <a href="http://anjlab.com" target="_blank">http://anjlab.com</a>
                 
-                <p>Note that your site will have to respond in less than 60 seconds. 
+                <p>Note that your site will have to respond in less than 25 seconds. 
                 We can't wait longer, sorry.</p>
             </td>
         </tr>
@@ -70,7 +70,7 @@
                 </p>
                 <p>
                 There are quota limits for available Cron Strings in Ping Service.
-                Every user have some quotas for free. You can examine your quotas on <a href="/settings">settings page</a>.
+                Every user have some quotas for free. You can check available quotas on <a href="/settings">settings page</a>.
                 </p>
             </td>
         </tr>

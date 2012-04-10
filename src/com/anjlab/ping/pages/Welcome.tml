@@ -25,7 +25,7 @@
             <p>You also may find helpful our <t:pagelink page="help">Quick Start Guide</t:pagelink>.</p>
 
             <t:pagelink page="job/analytics" context="pingServiceJobContext">
-                <img src="images/analytics-demo.png" width="500" height="252" alt="Analytics Workspace Demo"
+                <img src="${context:images/analytics-demo.png}" width="500" height="252" alt="Analytics Workspace Demo"
                     style="border: 5px lightblue solid; padding: 5px;" />
             </t:pagelink>
         </div>

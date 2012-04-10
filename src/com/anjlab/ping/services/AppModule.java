@@ -296,6 +296,9 @@ public class AppModule
         // on the command line as -Dtapestry.production-mode=false
         boolean production = Environment.environment.value() == Environment.Value.Production;
 
+        //  Overriding for CreateStaticAssets
+//        production = true;
+        
         configuration.add(SymbolConstants.PRODUCTION_MODE, Boolean.toString(production));
         configuration.add(SymbolConstants.COMPRESS_WHITESPACE, Boolean.toString(production));
 
@@ -343,7 +346,9 @@ public class AppModule
                     if (!request.getPath().startsWith("/assets/") 
                             && !request.getPath().startsWith("/favicon.ico")) {
                         try {
-                            application.trackUserActivity();
+                            if (!quotaDetails.isQuotaLimited()) {
+                                application.trackUserActivity();
+                            }
                         } catch (Exception e) {
                             log.error("Error tracking user activity", e);
                             quotaDetails.checkOverQuotaException(e);

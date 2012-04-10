@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.datanucleus.jpa.annotations.Extension;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,13 +31,17 @@ public class Account implements Serializable {
     
     @Column(nullable=false)
     private String email;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private String timeZoneCity;
     
     // Since 13.05.2010
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Date lastVisitDate;
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private Date creationDate;
 
     //  Since 26.02.2012
+    @Extension(vendorName="datanucleus", key="gae.unindexed", value="true")
     private String quotaLimits;
     
     public Account() {

@@ -96,6 +96,6 @@
 	<classpathentry sourcepath="USER_HOME/.gradle/caches/artifacts-8/filestore/com.beust/jcommander/1.12/source/b48b3ece6fb6272e00bd76c377fedb1bfa83fe59/jcommander-1.12-sources.jar" kind="var" path="WORKSPACE_HOME/sources/war/WEB-INF/lib/jcommander-1.12.jar" exported="true"/>
 	<classpathentry sourcepath="USER_HOME/.gradle/caches/artifacts-8/filestore/org.testng/testng/5.14.9/source/1597da2faa023410a51968dc86ee3fcfb719e4a7/testng-5.14.9-sources.jar" kind="var" path="WORKSPACE_HOME/sources/war/WEB-INF/lib/testng-5.14.9.jar" exported="true"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/datanucleus-enhancer-1.1.4.jar"/>
-	<classpathentry kind="lib" path="/Applications/eclipse-reporting/plugins/com.google.appengine.eclipse.sdkbundle_1.6.3.v201202290255r37//appengine-java-sdk-1.6.3/lib/impl/appengine-api-stubs.jar"/>
-	<classpathentry kind="lib" path="/Applications/eclipse-reporting/plugins/com.google.appengine.eclipse.sdkbundle_1.6.3.v201202290255r37//appengine-java-sdk-1.6.3/lib/testing/appengine-testing.jar"/>
+	<classpathentry kind="lib" path="/Users/dmitrygusev/dev/workspaces/appengine-java-sdk-1.6.4.1//lib/impl/appengine-api-stubs.jar"/>
+	<classpathentry kind="lib" path="/Users/dmitrygusev/dev/workspaces/appengine-java-sdk-1.6.4.1//lib/testing/appengine-testing.jar"/>
 </classpath>
