@@ -14,8 +14,6 @@ import org.datanucleus.util.SoftValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.appengine.api.memcache.MemcacheServiceException;
-
 public class LocalMemorySoftCache implements Cache {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalMemorySoftCache.class);
@@ -141,7 +139,7 @@ public class LocalMemorySoftCache implements Cache {
             } else {
                 return cache.put(key, value);
             }
-        } catch (MemcacheServiceException e) {
+        } catch (Exception e) {
             logger.warn("Error putting value into cache", e);
             
             //  A value may be already in cache. We should remove it to avoid

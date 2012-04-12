@@ -30,7 +30,7 @@ public class TestUtils {
 
     @Test
     public void testFormatTime2() {
-        assertEquals("Less than a day", Utils.formatMillisecondsToWordsUpToDays(0));
+        assertEquals("A moment", Utils.formatMillisecondsToWordsUpToDays(0));
         assertEquals("Less than a day", Utils.formatMillisecondsToWordsUpToDays(1 * 1000));
         assertEquals("Less than a day", Utils.formatMillisecondsToWordsUpToDays(10 * 1000));
         assertEquals("Less than a day", Utils.formatMillisecondsToWordsUpToDays(61 * 1000));

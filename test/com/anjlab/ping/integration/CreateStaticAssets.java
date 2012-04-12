@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.server.RemoteControlConfiguration;
 import org.openqa.selenium.server.SeleniumServer;
@@ -42,6 +43,7 @@ public class CreateStaticAssets {
         seleniumServer.stop();
     }
     
+    @Ignore
     @Test
     public void precompileAssets() {
         //  XXX set production = true in AppModule

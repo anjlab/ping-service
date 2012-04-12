@@ -1,5 +1,6 @@
 package com.anjlab.ping.pages.job;
 
+import java.text.MessageFormat;
 import java.util.Date;
 
 import org.apache.tapestry5.annotations.AfterRender;
@@ -9,6 +10,7 @@ import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.corelib.components.Form;
 import org.apache.tapestry5.corelib.components.Select;
+import org.apache.tapestry5.corelib.components.TextField;
 import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.slf4j.Logger;
@@ -136,9 +138,16 @@ public class EditJob {
     @Component(id="cronString")
     private Select cronStringField;
     
+    @Component(id="validatingRegexp")
+    private TextField validatingRegexpField;
+    
     public void onValidateFromJobForm() {
         if (application.isQuotaLimitsForCreateOrUpdateExceeded(job)) {
             jobForm.recordError(cronStringField, messages.get("account-cron-string-quota-limit"));
+        }
+        if (job.isUsesValidatingRegexp() && Utils.isNullOrEmpty(job.getValidatingRegexp())) {
+            jobForm.recordError(validatingRegexpField, 
+                    String.format(messages.get("required"), validatingRegexpField.getLabel()));
         }
     }
 

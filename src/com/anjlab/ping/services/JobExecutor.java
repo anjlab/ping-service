@@ -187,14 +187,20 @@ public class JobExecutor {
         
         sb.append("Regexp validation ");
 
-        Matcher m = Pattern.compile(job.getValidatingRegexp()).matcher(content);
+        String regexp = job.getValidatingRegexp();
         
-        if (m.find()) {
-            sb.append("succeeded");
-        } else {
-            job.setLastPingResult(job.getLastPingResult() | Job.PING_RESULT_REGEXP_VALIDATION_FAILED);
+        if (!Utils.isNullOrEmpty(regexp)) {
+            Matcher m = Pattern.compile(regexp).matcher(content);
+            
+            if (m.find()) {
+                sb.append("succeeded");
+            } else {
+                job.setLastPingResult(job.getLastPingResult() | Job.PING_RESULT_REGEXP_VALIDATION_FAILED);
 
-            sb.append("failed");
+                sb.append("failed");
+            }
+        } else {
+            sb.append("unknown (regexp was not specified)");
         }
         
         sb.append("\n\nResponse content is:\n\n");

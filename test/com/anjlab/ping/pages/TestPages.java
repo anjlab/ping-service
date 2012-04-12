@@ -2,8 +2,10 @@ package com.anjlab.ping.pages;
 
 import java.security.Principal;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.tapestry5.dom.Document;
 import org.apache.tapestry5.services.RequestGlobals;
@@ -47,6 +49,14 @@ public class TestPages {
                 return "test@example.org";
             }
         }).anyTimes();
+        
+        HttpSession httpSession = EasyMock.createMock(HttpSession.class);
+        EasyMock.expect(servletRequest.getSession()).andReturn(httpSession);
+        
+        ServletContext servletContext = EasyMock.createMock(ServletContext.class);
+        EasyMock.expect(httpSession.getServletContext()).andReturn(servletContext);
+        EasyMock.expect(servletContext.getRealPath("")).andReturn(null);
+        
         EasyMock.replay(servletRequest);
         
         HttpServletResponse servletResponse = EasyMock.createMock(HttpServletResponse.class);

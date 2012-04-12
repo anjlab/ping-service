@@ -108,7 +108,9 @@ public class Job implements Serializable, SerializableEstimations {
     @Basic
     private Blob packedJobResults;
     @Transient
-    private List<JobResult> jobResults;
+    //  Add transient keyword to not serialize this field
+    //  (cache throws "Policy prevented put operation" exception for big objects)
+    private transient List<JobResult> jobResults;
     @Transient
     private boolean updatingJobResults;
 
@@ -773,5 +775,22 @@ public class Job implements Serializable, SerializableEstimations {
         return packedJobResults == null 
              ? minimumSerializedSize
              : minimumSerializedSize + packedJobResults.getBytes().length;
+    }
+
+    public JobResult getFirstResult() {
+        readJobResults();
+        
+        return jobResults.size() > 0
+             ? jobResults.get(0)
+             : null;
+    }
+
+
+    public JobResult getLastResult() {
+        readJobResults();
+        
+        return jobResults.size() > 0
+             ? jobResults.get(jobResults.size() - 1) 
+             : null;
     }
 }

@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -11,11 +13,10 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.anjlab.ping.entities.Job;
-import com.anjlab.ping.entities.JobResult;
 import com.anjlab.ping.services.Application;
 import com.anjlab.ping.services.JobResultCSVImporter;
 import com.anjlab.ping.services.JobResultsAnalyzer;
+import com.anjlab.ping.services.Utils;
 
 
 public class TestJob {
@@ -67,6 +68,28 @@ public class TestJob {
         }
     }
 
+    @Test
+    public void testReadRecentJobResults() {
+        Job job = new Job();
+        job.beginUpdateJobResults();
+        Calendar cal = Calendar.getInstance();
+        List<JobResult> results = new ArrayList<JobResult>();
+        for (int i = 0; i < 5000; i++) {
+            JobResult result = new JobResult();
+            result.setTimestamp(cal.getTime());
+            cal.add(Calendar.MINUTE, -15);
+            results.add(result);
+        }
+        for (int i = results.size() - 1; i >= 0; i--) {
+            job.addJobResult(results.get(i));
+        }
+        job.endUpdateJobResults();
+        JobResult firstResult = job.getFirstResult();
+        JobResult lastResult = job.getLastResult();
+        long timeframe = lastResult.getTimestamp().getTime() - firstResult.getTimestamp().getTime();
+        System.out.println(Utils.formatMillisecondsToWordsUpToMinutes(timeframe));
+    }
+    
     @Test
     public void testReadJobResults() throws IOException {
         Job job = new Job();

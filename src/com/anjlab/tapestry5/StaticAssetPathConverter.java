@@ -23,11 +23,14 @@ public class StaticAssetPathConverter implements AssetPathConverter {
         this.requestGlobals = requestGlobals;
         this.staticProperties = new Properties();
         
-        String staticPropertiesPath = getRealPath(StaticAssetResourceStreamer.ASSETS_STATIC_PROPERTIES);
+        String staticPropertiesPath = StaticAssetResourceStreamer.ASSETS_STATIC_PROPERTIES;
         try {
+            staticPropertiesPath = getRealPath(staticPropertiesPath);
             staticProperties.load(new FileInputStream(staticPropertiesPath));
         } catch (IOException e) {
             logger.error("Failed to load properties from {}: {}", staticPropertiesPath, e);
+        } catch (Exception e) {
+            logger.error("Error initializing " + StaticAssetResourceStreamer.class.getName(), e);
         }
     }
 
@@ -48,7 +51,7 @@ public class StaticAssetPathConverter implements AssetPathConverter {
         return assetHash == null ? assetPath : assetPath + "?" + assetHash;
     }
 
-    public String getRealPath(String path) {
+    private String getRealPath(String path) {
         String realPath = requestGlobals.getHTTPServletRequest()
                 .getSession().getServletContext().getRealPath(path);
         return realPath;
